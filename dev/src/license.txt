@@ -1,0 +1,6 @@
+/*!!
+ * Crossroads - JavaScript Routes
+ * Released under the MIT license <http://www.opensource.org/licenses/mit-license.php>
+ * @author Miller Medeiros
+ * @version ::VERSION_NUMBER:: ::BUILD_NUMBER:: ::BUILD_DATE::
+ */
