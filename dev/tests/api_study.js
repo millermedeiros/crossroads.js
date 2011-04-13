@@ -43,13 +43,13 @@ crossroads.add('lipsum', 'lorem_{ipsum}', function(ipsum){
 );
 
 
-//03 - simplified params + public properties *** FAVORITE ***
+//03 - simplified params + public properties
 var foo = crossroads.add('/{foo}/{bar}', myAwesomeCallback);
 foo.id = 'foobar';
 
 
 //04 - signals + public properties *** FAVORITE ***
-var bar = crossroads.add('/{foo}');
+var bar = crossroads.addRoute('/{foo}');
 bar.separator = '-'; //will match: [/lorem/, /lorem/ipsum/dolor, /lorem_ipsum_dolor], won't match: [/lorem-, /lorem-ipsum/dolor]
 bar.matched.add(myAwesomeListener);
 
@@ -75,14 +75,14 @@ crossroads.route('/foo/5/102'); //will trigger any route that matches this patte
 
 //02 - id + segments *** FAVORITE ***
 //params => routeId:string, [segments]:Object
-crossroads.trigger('foobar', {
+crossroads.route('foobar', {
 	bar : 5,
 	ipsum : 102
 });
 
 //02_2 - route + segments *** FAVORITE ***
 //params => routeId:string, [segments]:Object
-crossroads.trigger(myRoute, {
+crossroads.route(myRoute, {
 	bar : 5,
 	ipsum : 102
 });
@@ -101,7 +101,7 @@ crossroads.trigger({
 //====== Get Route ======//
 
 //01 - *** FAVORITE ***
-var myRoute = crossroads.getById('foobar');
+var myRoute = crossroads.getRouteById('foobar');
 myRoute.matched.add(myOtherCallback);
 
 
@@ -109,10 +109,25 @@ myRoute.matched.add(myOtherCallback);
 //====== Remove/Destroy Route ======//
 
 //01 - by id
-crossroads.remove('foobar');
+crossroads.removeRoute('foobar');
 
 //02 - by route
-crossroads.remove(myRoute);
+crossroads.removeRoute(myRoute);
 
 //03 - dispose *** FAVORITE ***
 myRoute.dispose();
+
+
+
+//====== Not-found / default route ======//
+
+
+
+crossroads.notMatched.add(listener);
+crossroads.notFound.add(listener);
+crossroads.notRouted.add(listener);
+crossroads.routed.add(listener);
+crossroads.failed.add(listener);
+crossroads.bypassed.add(listener); // *** FAVORITE ***
+
+crossroads.setDefault(listener);
