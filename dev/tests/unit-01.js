@@ -1,12 +1,12 @@
 YUI().use('node', 'console', 'test', function (Y){
 	
 	//==============================================================================
-	// BASIC TEST ------------------------------------------------------------------
+	// Pattern Lexer ---------------------------------------------------------------
 	
-	var basic = new Y.Test.Case({
+	var lexerTestCase = new Y.Test.Case({
 	
 		//name of the test case - if not provided, one is auto-generated
-		name : "Basic Test",
+		name : "Lexer",
 		
 		//---------------------------------------------------------------------
 		// Special instructions
@@ -32,38 +32,107 @@ YUI().use('node', 'console', 'test', function (Y){
 		 * Cleans up everything that was created by setUp().
 		 */
 		tearDown : function(){
-			//crossroads.removeAllRoutes();
+			
 		},
 		
 		//---------------------------------------------------------------------
 		// Test methods - names must begin with "test"
 		//---------------------------------------------------------------------
 		
+		testLexerIds : function(){
+			var ids = crossroads.patternLexer.getParamIds('/lorem/{ipsum}/{dolor}');
+			Y.Assert.areSame('ipsum', ids[0]);
+			Y.Assert.areSame('dolor', ids[1]);
+		},
+		
+		testLexerCompilePattern : function(){
+			var pattern = '/lorem/{ipsum}/{dolor}',
+				regex = crossroads.patternLexer.compilePattern(pattern);
+			Y.Assert.areEqual(/\/lorem\/([^\/]+)\/([^\/]+)/.source, regex.source);
+			Y.Assert.isTrue(regex.test(pattern));
+		},
+		
+		testLexerCompilePatternWithSpecialChars : function(){
+			var pattern = '/lo[rem](ipsum)/{ipsum}/{dolor}',
+				regex = crossroads.patternLexer.compilePattern(pattern);
+			Y.Assert.areEqual(/\/lo\[rem\]\(ipsum\)\/([^\/]+)\/([^\/]+)/.source, regex.source);
+			Y.Assert.isTrue(regex.test(pattern));
+		},
+		
+		testLexerGetParamValues : function(){
+			var pattern = '/lorem/{ipsum}/{dolor}',
+				regex = crossroads.patternLexer.compilePattern(pattern),
+				params = crossroads.patternLexer.getParamValues('/lorem/foo/bar', regex);
+			Y.Assert.isArray(params);
+			Y.Assert.areSame('foo', params[0]);
+			Y.Assert.areSame('bar', params[1]);
+		}
+	
+	});
+	
+	//==============================================================================
+	// Router ------------------------------------------------------------------
+	
+	var routerTestCase = new Y.Test.Case({
+	
+		//name of the test case - if not provided, one is auto-generated
+		name : "Router",
+		
+		//---------------------------------------------------------------------
+		// Special instructions
+		//---------------------------------------------------------------------
+		
+		_should: {
+			ignore: {},
+			error : {}
+		},
+		
+		//---------------------------------------------------------------------
+		// setUp and tearDown
+		//---------------------------------------------------------------------
+		
+		/*
+		 * Sets up data that is needed by each test.
+		 */
+		setUp : function(){
+			
+		},
+		
+		/*
+		 * Cleans up everything that was created by setUp().
+		 */
+		tearDown : function(){
+			crossroads.removeAllRoutes();
+		},
+		
+		//---------------------------------------------------------------------
+		// Test methods - names must begin with "test"
+		//---------------------------------------------------------------------
+		
+		
 		//-------------------------- Add -------------------------------------//
 		
-		testAdd : function(){			
+		testAdd : function(){
 			var s = crossroads.addRoute('/{foo}');
 			
 			Y.Assert.isObject(s);
-			Y.Assert.areSame(s.separator, '/');
-			Y.Assert.isNull(s.rules);
-			Y.Assert.isNull(s.id);
-			Y.Assert.isInstanceOf(s.matched, signals.Signal);
-			Y.Assert.areSame(s.pattern, '/{foo}');
+			Y.Assert.isUndefined(s.rules);
+			Y.Assert.isUndefined(s.id);
+			Y.Assert.isInstanceOf(signals.Signal, s.matched); //maybe remove signals...
+			Y.Assert.areSame(1, crossroads._routes.length);
 		},
 		
-		testAdd2 : function(){			
+		testAdd2 : function(){
 			var s = crossroads.addRoute('/{foo}', function(foo){
 				Y.Assert.fail('not a trigger test');
 			});
 			
 			Y.Assert.isObject(s);
-			Y.Assert.areSame(s.separator, '/');
-			Y.Assert.isNull(s.rules);
-			Y.Assert.isNull(s.id);
-			Y.Assert.isInstanceOf(s.matched, signals.Signal);
-			Y.Assert.areSame(s.matched.getNumListeners(), 1);
-			Y.Assert.areSame(s.pattern, '/{foo}');
+			Y.Assert.isUndefined(s.rules);
+			Y.Assert.isUndefined(s.id);
+			Y.Assert.isInstanceOf(signals.Signal, s.matched);
+			Y.Assert.areSame(1, s.matched.getNumListeners());
+			Y.Assert.areSame(1, crossroads._routes.length);
 		},
 		
 		//-------------------------- Route ---------------------------------------//
@@ -75,9 +144,9 @@ YUI().use('node', 'console', 'test', function (Y){
 			crossroads.addRoute('/{foo}', function(foo){
 				t1 = foo;
 			});
-			crossroads.route('/lorem_ipsum');
+			crossroads.parse('/lorem_ipsum');
 			
-			Y.Assert.areSame(t1, 'lorem_ipsum');
+			Y.Assert.areSame('lorem_ipsum', t1);
 		},
 		
 		testRouteSimple2 : function(){
@@ -87,23 +156,29 @@ YUI().use('node', 'console', 'test', function (Y){
 				t1 = foo;
 				t2 = bar;
 			});
-			crossroads.route('/lorem_ipsum/dolor');
+			crossroads.parse('/lorem_ipsum/dolor');
 			
-			Y.Assert.areSame(t1, 'lorem_ipsum');
-			Y.Assert.areSame(t2, 'dolor');
+			Y.Assert.areSame('lorem_ipsum', t1);
+			Y.Assert.areSame('dolor', t2);
 		},
 		
 		testRouteSimple3 : function(){
-			var t1, t2;
+			var t1, t2, t3, t4;
 			
 			crossroads.addRoute('/{foo}/{bar}', function(foo, bar){
 				t1 = foo;
 				t2 = bar;
 			});
-			crossroads.route('/lorem_ipsum/dolor/'); //shouldn't match because of trailing slash
+			crossroads.addRoute('/{foo}/{bar}/', function(foo, bar){
+				t3 = foo;
+				t4 = bar;
+			});
+			crossroads.parse('/lorem_ipsum/dolor/');
 			
 			Y.Assert.isUndefined(t1);
 			Y.Assert.isUndefined(t2);
+			Y.Assert.areSame('lorem_ipsum', t3);
+			Y.Assert.areSame('dolor', t4);
 		},
 		
 		testRouteSimple4 : function(){
@@ -116,12 +191,12 @@ YUI().use('node', 'console', 'test', function (Y){
 				t2 = foo;
 				t3 = bar;
 			});
-			crossroads.route('/lorem_ipsum');
-			crossroads.route('/maecennas/ullamcor');
+			crossroads.parse('/lorem_ipsum');
+			crossroads.parse('/maecennas/ullamcor');
 			
-			Y.Assert.areSame(t1, 'lorem_ipsum');
-			Y.Assert.areSame(t2, 'maecennas');
-			Y.Assert.areSame(t3, 'ullamcor');
+			Y.Assert.areSame('lorem_ipsum', t1);
+			Y.Assert.areSame('maecennas', t2);
+			Y.Assert.areSame('ullamcor', t3);
 		},
 		
 		testRouteSimple5 : function(){
@@ -138,12 +213,12 @@ YUI().use('node', 'console', 'test', function (Y){
 				t3 = bar;
 			});
 			
-			crossroads.route('/lorem_ipsum');
-			crossroads.route('/maecennas/ullamcor');
+			crossroads.parse('/lorem_ipsum');
+			crossroads.parse('/maecennas/ullamcor');
 			
-			Y.Assert.areSame(t1, 'lorem_ipsum');
-			Y.Assert.areSame(t2, 'maecennas');
-			Y.Assert.areSame(t3, 'ullamcor');
+			Y.Assert.areSame('lorem_ipsum', t1);
+			Y.Assert.areSame('maecennas', t2);
+			Y.Assert.areSame('ullamcor', t3);
 		},
 		
 		testRouteWithTrailingChar : function(){
@@ -160,12 +235,12 @@ YUI().use('node', 'console', 'test', function (Y){
 				t3 = bar;
 			});
 			
-			crossroads.route('/lorem_ipsum/');
-			crossroads.route('/maecennas/ullamcor/');
+			crossroads.parse('/lorem_ipsum/');
+			crossroads.parse('/maecennas/ullamcor/');
 			
-			Y.Assert.areSame(t1, 'lorem_ipsum');
-			Y.Assert.areSame(t2, 'maecennas');
-			Y.Assert.areSame(t3, 'ullamcor');
+			Y.Assert.areSame('lorem_ipsum', t1);
+			Y.Assert.areSame('maecennas', t2);
+			Y.Assert.areSame('ullamcor', t3);
 		},
 		
 		testRouteWithTrailingChar2 : function(){
@@ -182,12 +257,12 @@ YUI().use('node', 'console', 'test', function (Y){
 				t3 = bar;
 			});
 			
-			crossroads.route('/lorem_ipsum');
-			crossroads.route('/maecennas/ullamcor/');
+			crossroads.parse('/lorem_ipsum');
+			crossroads.parse('/maecennas/ullamcor/');
 			
 			Y.Assert.isUndefined(t1);
-			Y.Assert.areSame(t2, 'maecennas');
-			Y.Assert.areSame(t3, 'ullamcor');
+			Y.Assert.areSame('maecennas', t2);
+			Y.Assert.areSame('ullamcor', t3);
 		},
 		
 		testRouteWithTrailingChar3 : function(){
@@ -204,12 +279,12 @@ YUI().use('node', 'console', 'test', function (Y){
 				t3 = bar;
 			});
 			
-			crossroads.route('qwelorem_ipsumasd');
-			crossroads.route('qwemaecennas/ullamcorasd');
+			crossroads.parse('qwelorem_ipsumasd');
+			crossroads.parse('qwemaecennas/ullamcorasd');
 			
-			Y.Assert.areSame(t1, 'lorem_ipsum');
-			Y.Assert.areSame(t2, 'maecennas');
-			Y.Assert.areSame(t3, 'ullamcor');
+			Y.Assert.areSame('lorem_ipsum', t1);
+			Y.Assert.areSame('maecennas', t2);
+			Y.Assert.areSame('ullamcor', t3);
 		},
 		
 		testRouteWithWordSeparator : function(){
@@ -227,39 +302,13 @@ YUI().use('node', 'console', 'test', function (Y){
 				t4 = bar;
 			});
 			
-			crossroads.route('/lorem_ipsum');
-			crossroads.route('/maecennas-ullamcor');
+			crossroads.parse('/lorem_ipsum');
+			crossroads.parse('/maecennas-ullamcor');
 			
-			Y.Assert.areSame(t1, 'lorem');
-			Y.Assert.areSame(t2, 'ipsum');
-			Y.Assert.areSame(t3, 'maecennas');
-			Y.Assert.areSame(t4, 'ullamcor');
-		},
-		
-		testRouteWithCustomSeparator : function(){
-			var t1, t2, t3, t4;
-			
-			var a = crossroads.addRoute('/{foo}{bar}');
-			a.matched.add(function(foo, bar){
-				t1 = foo;
-				t2 = bar;
-			});
-			a.separator = '_';
-			
-			var b = crossroads.addRoute('/{foo}{bar}');
-			b.matched.add(function(foo, bar){
-				t3 = foo;
-				t4 = bar;
-			});
-			b.separator = '-';
-			
-			crossroads.route('/lorem_ipsum');
-			crossroads.route('/maecennas-ullamcor');
-			
-			Y.Assert.areSame(t1, 'lorem');
-			Y.Assert.areSame(t2, 'ipsum');
-			Y.Assert.areSame(t3, 'maecennas');
-			Y.Assert.areSame(t4, 'ullamcor');
+			Y.Assert.areSame('lorem', t1);
+			Y.Assert.areSame('ipsum', t2);
+			Y.Assert.areSame('maecennas', t3);
+			Y.Assert.areSame('ullamcor', t4);
 		}
 		
 		//-------------------------- Remove ---------------------------------------//
@@ -278,7 +327,8 @@ YUI().use('node', 'console', 'test', function (Y){
 	 
 	if(document.getElementById('testLogger')) r.render('#testLogger');
 	 
-	Y.Test.Runner.add(basic);
+	Y.Test.Runner.add(lexerTestCase);
+	Y.Test.Runner.add(routerTestCase);
 	
 	//run the tests
 	Y.Test.Runner.run();

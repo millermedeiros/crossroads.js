@@ -25,7 +25,7 @@ crossroads.add({
 		},
 		ipsum : ['qwerty', 'dvorak'] //allowed values
 	},
-	separator : '/', //default string used to separate segments
+	separator : '/', //default string used to separate segments -- forget about separator, not really required and bad idea
 	callback : function(bar, ipsum){
 		//do anything with values
 	}
@@ -44,7 +44,7 @@ crossroads.add('lipsum', 'lorem_{ipsum}', function(ipsum){
 
 
 //03 - simplified params + public properties - probably most popular usage *** FAVORITE ***
-var foo = crossroads.add('/{foo}/{bar}', myAwesomeCallback);
+var foo = crossroads.addRoute('/{foo}/{bar}', myAwesomeCallback);
 foo.id = 'foobar';
 
 
@@ -71,6 +71,8 @@ crossroads.addRoute(a);
 
 //01 - plain string *** FAVORITE ***
 crossroads.route('/foo/5/102'); //will trigger any route that matches this pattern 
+crossroads.parse('/foo/5/102');  // *** FAVORITE ***
+crossroads.process('/foo/5/102'); 
 
 
 //02 - id + segments => easy to pass parameters in case you forget order, not a huge fan of strings for ids tho.. *** FAVORITE ***
@@ -141,5 +143,7 @@ crossroads.closeTag = '}';
 
 crossroads.paramRegexp = /{[^}]+}/; //no need to create new regexp object every time, harder to customize but not that much.. *** FAVORITE ***
 
-crossroads.separator = '/'; //used to divide route segments *** FAVORITE ***
+crossroads.separator = '/'; //used to divide route segments
+
+crossroads.segmentRegexp = /[^\/]+/; //used to divide route segments *** FAVORITE ***
 
