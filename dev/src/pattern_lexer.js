@@ -21,7 +21,7 @@
 		function compilePattern(pattern){
 			pattern = pattern? saveParams(pattern) : '';
 			pattern = escapePattern(pattern); //make sure chars that need to be escaped are properly converted
-			pattern = restoreParams(pattern);
+			pattern = convertSavedParams(pattern);
 			return new RegExp('^'+ pattern + '$');
 		}
 		
@@ -29,7 +29,7 @@
 			return pattern.replace(PARAMS_REGEXP, SAVE_PARAMS);
 		}
 		
-		function restoreParams(pattern){
+		function convertSavedParams(pattern){
 			return pattern.replace(SAVED_PARAM_REGEXP, SEGMENT_REGEXP.source);
 		}
 		
@@ -46,8 +46,8 @@
 		//API
 		return {
 			getParamIds : getParamIds,
-			compilePattern : compilePattern,
-			getParamValues : getParamValues
+			getParamValues : getParamValues,
+			compilePattern : compilePattern
 		};
 	
 	}());

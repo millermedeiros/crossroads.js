@@ -1,4 +1,3 @@
-/*jslint onevar:true, undef:true, newcap:true, regexp:true, bitwise:true, maxerr:50, indent:4, white:false, nomen:false, plusplus:false */
 	
 	var crossroads = (function(){
 		
@@ -30,7 +29,10 @@
 		}
 		
 		function removeAllRoutes(){
-			//TODO: dispose routes
+			var n = getNumRoutes();
+			while(--n){
+				_routes[n]._destroy();
+			}
 			_routes.length = 0;
 		}
 		
