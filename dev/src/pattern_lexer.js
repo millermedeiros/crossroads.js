@@ -22,7 +22,7 @@
 			pattern = pattern? saveParams(pattern) : '';
 			pattern = escapePattern(pattern); //make sure chars that need to be escaped are properly converted
 			pattern = restoreParams(pattern);
-			return new RegExp(pattern);
+			return new RegExp('^'+ pattern + '$');
 		}
 		
 		function saveParams(pattern){
@@ -38,7 +38,9 @@
 		}
 		
 		function getParamValues(request, regexp){
-			
+			var vals = regexp.exec(request);
+			if(vals) vals.shift();
+			return vals;
 		}
 		
 		//API

@@ -38,7 +38,7 @@
 			var route = getMatchedRoute(request),
 				params = route? getParamValues(request, route) : null;
 			if(route){ 
-				params? route.matched.dispatch.apply(null, params) : route.matched.dispatch();
+				params? route.matched.dispatch.apply(route.matched, params) : route.matched.dispatch();
 			}
 		}
 		

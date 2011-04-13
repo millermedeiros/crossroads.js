@@ -48,14 +48,14 @@ YUI().use('node', 'console', 'test', function (Y){
 		testLexerCompilePattern : function(){
 			var pattern = '/lorem/{ipsum}/{dolor}',
 				regex = crossroads.patternLexer.compilePattern(pattern);
-			Y.Assert.areEqual(/\/lorem\/([^\/]+)\/([^\/]+)/.source, regex.source);
+			Y.Assert.areEqual(/^\/lorem\/([^\/]+)\/([^\/]+)$/.source, regex.source);
 			Y.Assert.isTrue(regex.test(pattern));
 		},
 		
 		testLexerCompilePatternWithSpecialChars : function(){
 			var pattern = '/lo[rem](ipsum)/{ipsum}/{dolor}',
 				regex = crossroads.patternLexer.compilePattern(pattern);
-			Y.Assert.areEqual(/\/lo\[rem\]\(ipsum\)\/([^\/]+)\/([^\/]+)/.source, regex.source);
+			Y.Assert.areEqual(/^\/lo\[rem\]\(ipsum\)\/([^\/]+)\/([^\/]+)$/.source, regex.source);
 			Y.Assert.isTrue(regex.test(pattern));
 		},
 		
