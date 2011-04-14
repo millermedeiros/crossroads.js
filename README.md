@@ -6,18 +6,14 @@
 
 ## Introduction ##
 
-The main of idea behind Crossroads is that it should be a routing system that isn't strictly related with the 
-URL, location.hash and/or server requests. The idea is to process any kind of string input and execute functions
-that matches the desired patterns.
+Crossroads.js is a routing system that isn't strictly related with the URL, location.hash and/or server requests.  
+The idea is to process any kind of string input and dispatch events if it matches any of the desired patterns.
 
 Crossroads shouldn't depend on any existing library or framework besides [JS-Signals](http://millermedeiros.github.com/js-signals/) 
-(used for event dispatching), it should be a pluggable piece that can be used on many different kinds of projects, 
+(used for event dispatching), it should be a pluggable piece of code that can be used on many different kinds of projects, 
 be it for a server-side or client-side application.
 
-The syntax of the pattern matching will probably follow Rails and Pyramid style since those standards are being 
-used broadly and are already familiar to a lot of people but it won't follow Rails/Pyramid mapping to *views* 
-and *actions*, it will just dispatch an event triggering any listener for that specific *route*. It should be 
-as flexible as possible while still being simple to use.
+It should be *robust* and as flexible as possible while still being simple to use.
 
 
 ## Dependencies ##
@@ -26,11 +22,11 @@ as flexible as possible while still being simple to use.
 
 
 
-## Draft API ##
+## API ##
 
 The `crossroads` object contain these public methods/properties:  
 
-    crossroads.addRoute(pattern:String, callback:(Function|null));
+    crossroads.addRoute(pattern:String, callback:(Function|null), priority:(Number|null));
     crossroads.removeRoute(myRoute:Route); //detroy route
     crossroads.removeAllRoutes();
     crossroads.parse(request:String); //parse string trying to find a route that matches it
@@ -50,7 +46,7 @@ The `crossroads` object contain these public methods/properties:
     crossroads.addRoute('/news/{id}', function(id){
       alert(id);
     });
-    crossroads.parse('/news/123'); //will match news/{id} route passing 123 as param
+    crossroads.parse('/news/123'); //will match '/news/{id}' route passing 123 as param
 
 
 ### storing route reference and attaching mutiple listeners ####
@@ -75,7 +71,7 @@ The `crossroads` object contain these public methods/properties:
       id : /[0-9]+/ //match only numeric ids
     };
     crossroads.parse('/news/asd'); //won't match since ID isn't numeric
-    crossroads.parse('/news/5'); //will match
+    crossroads.parse('/news/5'); //will match `specialNews` and pass 5 as param to all listeners
 
 
 ### using functions to validate params ###
@@ -116,9 +112,10 @@ The `crossroads` object contain these public methods/properties:
 ### disposing route ###
 
     var myRoute = crossroads.addRoute('/foo/{id}');
-    myRoute.dispose(); //remove route from crossroads and also remove all listeners
+    myRoute.dispose(); //remove route from crossroads and also remove all listeners from route.matched
 
 
 ## License ##
 
 [MIT License](http://www.opensource.org/licenses/mit-license.php)
+

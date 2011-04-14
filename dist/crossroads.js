@@ -2,8 +2,8 @@
  * Crossroads - JavaScript Routes
  * Released under the MIT license <http://www.opensource.org/licenses/mit-license.php>
  * @author Miller Medeiros
- * @version 0.2a
- * @build 13 (04/14/2011 03:44 AM)
+ * @version 0.2
+ * @build 15 (04/14/2011 04:10 AM)
  */
 (function(global){
 		
@@ -84,9 +84,7 @@
 		function getMatchedRoute(request){
 			var i = getNumRoutes(), route;
 			while(route = _routes[--i]){ //should be decrement loop since higher priorities are added at the end of array  
-				if(route.match(request)){
-					return route;
-				}
+				if(route.match(request)) return route;
 			}
 			return null;
 		}

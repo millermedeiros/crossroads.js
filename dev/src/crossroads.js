@@ -56,9 +56,7 @@
 		function getMatchedRoute(request){
 			var i = getNumRoutes(), route;
 			while(route = _routes[--i]){ //should be decrement loop since higher priorities are added at the end of array  
-				if(route.match(request)){
-					return route;
-				}
+				if(route.match(request)) return route;
 			}
 			return null;
 		}
