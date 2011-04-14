@@ -2,8 +2,8 @@
  * Crossroads - JavaScript Routes
  * Released under the MIT license <http://www.opensource.org/licenses/mit-license.php>
  * @author Miller Medeiros
- * @version 0.1.1
- * @build 11 (04/14/2011 02:58 AM)
+ * @version 0.2a
+ * @build 13 (04/14/2011 03:44 AM)
  */
 define(function(){
 		
@@ -35,10 +35,21 @@ define(function(){
 		var _routes = [],
 			_bypassed = new signals.Signal();
 		
-		function addRoute(pattern, callback){
-			var route = new Route(pattern, callback);
-			_routes.push(route);
+		function addRoute(pattern, callback, priority){
+			var route = new Route(pattern, callback, priority);
+			sortedInsert(route);
 			return route;
+		}
+		
+		function sortedInsert(route){
+			//simplified insertion sort
+			var n = getNumRoutes();
+			do { --n; } while (_routes[n] && route._priority <= _routes[n]._priority);
+			_routes.splice(n+1, 0, route);
+		}
+		
+		function getNumRoutes(){
+			return _routes.length;
 		}
 		
 		function removeRoute(route){
@@ -59,10 +70,6 @@ define(function(){
 			_routes.length = 0;
 		}
 		
-		function getNumRoutes(){
-			return _routes.length;
-		}
-		
 		function parse(request){
 			request = request || '';
 			var route = getMatchedRoute(request),
@@ -75,8 +82,8 @@ define(function(){
 		}
 		
 		function getMatchedRoute(request){
-			var i = 0, route;
-			while(route = _routes[i++]){ //should be increment loop to match routes attached before first
+			var i = getNumRoutes(), route;
+			while(route = _routes[--i]){ //should be decrement loop since higher priorities are added at the end of array  
 				if(route.match(request)){
 					return route;
 				}
@@ -108,12 +115,13 @@ define(function(){
 	// Route --------------
 	//=====================
 	
-	function Route(pattern, callback){
+	function Route(pattern, callback, priority){
 		this._pattern = pattern; //maybe delete, used only for debug
 		this._paramsId = patternLexer.getParamIds(pattern);
 		this._matchRegexp = patternLexer.compilePattern(pattern);
 		this.matched = new signals.Signal();
 		if(callback) this.matched.add(callback);
+		this._priority = priority || 0;
 	}
 	
 	Route.prototype = {

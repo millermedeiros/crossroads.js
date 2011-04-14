@@ -2,12 +2,13 @@
 	// Route --------------
 	//=====================
 	
-	function Route(pattern, callback){
+	function Route(pattern, callback, priority){
 		this._pattern = pattern; //maybe delete, used only for debug
 		this._paramsId = patternLexer.getParamIds(pattern);
 		this._matchRegexp = patternLexer.compilePattern(pattern);
 		this.matched = new signals.Signal();
 		if(callback) this.matched.add(callback);
+		this._priority = priority || 0;
 	}
 	
 	Route.prototype = {

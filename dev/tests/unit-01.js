@@ -362,6 +362,49 @@ YUI().use('node', 'console', 'test', function (Y){
 			Y.Assert.areSame('ipsum', t2);
 		},
 		
+		//------------------------------ Priority --------------------------------------------//
+		
+		testRouteWithPriority : function(){
+			var t1, t2, t3, t4;
+			
+			var a = crossroads.addRoute('/{foo}/{bar}');
+			a.matched.add(function(foo, bar){
+				Y.Assert.fail('shouldn\'t match');
+			});
+			
+			var b = crossroads.addRoute('/{foo}/{bar}', null, 1);
+			b.matched.add(function(foo, bar){
+				t3 = 'foo';
+				t4 = 'bar';
+			});
+			
+			crossroads.parse('/123/456');
+			crossroads.parse('/maecennas/ullamcor');
+			
+			Y.Assert.areSame('foo', t3);
+			Y.Assert.areSame('bar', t4);
+		},
+		
+		testRouteWithPriority2 : function(){
+			var t1, t2, t3, t4;
+			
+			var a = crossroads.addRoute('/{foo}/{bar}', function(foo, bar){
+					Y.Assert.fail('shouldn\'t match');
+				}, 4);
+			
+			var b = crossroads.addRoute('/{foo}/{bar}', function(foo, bar){
+					t3 = 'foo';
+					t4 = 'bar';
+				}, 5);
+			
+			crossroads.parse('/123/456');
+			crossroads.parse('/maecennas/ullamcor');
+			
+			Y.Assert.areSame('foo', t3);
+			Y.Assert.areSame('bar', t4);
+		},
+		
+		
 		//-------------------------- Param Validation ---------------------------------------//
 		
 		testRouteWithRegexRules : function(){

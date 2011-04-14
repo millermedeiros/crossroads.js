@@ -7,10 +7,21 @@
 		var _routes = [],
 			_bypassed = new signals.Signal();
 		
-		function addRoute(pattern, callback){
-			var route = new Route(pattern, callback);
-			_routes.push(route);
+		function addRoute(pattern, callback, priority){
+			var route = new Route(pattern, callback, priority);
+			sortedInsert(route);
 			return route;
+		}
+		
+		function sortedInsert(route){
+			//simplified insertion sort
+			var n = getNumRoutes();
+			do { --n; } while (_routes[n] && route._priority <= _routes[n]._priority);
+			_routes.splice(n+1, 0, route);
+		}
+		
+		function getNumRoutes(){
+			return _routes.length;
 		}
 		
 		function removeRoute(route){
@@ -31,10 +42,6 @@
 			_routes.length = 0;
 		}
 		
-		function getNumRoutes(){
-			return _routes.length;
-		}
-		
 		function parse(request){
 			request = request || '';
 			var route = getMatchedRoute(request),
@@ -47,8 +54,8 @@
 		}
 		
 		function getMatchedRoute(request){
-			var i = 0, route;
-			while(route = _routes[i++]){ //should be increment loop to match routes attached before first
+			var i = getNumRoutes(), route;
+			while(route = _routes[--i]){ //should be decrement loop since higher priorities are added at the end of array  
 				if(route.match(request)){
 					return route;
 				}
