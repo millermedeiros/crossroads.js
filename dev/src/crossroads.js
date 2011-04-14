@@ -1,35 +1,14 @@
-	
-	// Helpers -----------
-	//====================
-	
-	function arrayIndexOf(arr, val){
-		var n = arr.length;
-		//Array.indexOf doesn't work on IE 6-7
-		while(n--){
-			if(arr[n] === val) return n;
-		}
-		return -1;
-	}
-	
-	
+		
 	// Crossroads --------
 	//====================
 	
-	var crossroads = (function(){
+	crossroads = (function(){
 		
 		var _routes = [],
 			_bypassed = new signals.Signal();
-				
-		function getNumRoutes(){
-			return _routes.length;
-		}
 		
-		function getRouteIndex(route){
-			return arrayIndexOf(_routes, route);
-		}
-		
-		function addRoute(pattern, callback, rules){
-			var route = new Route(pattern, callback, rules);
+		function addRoute(pattern, callback){
+			var route = new Route(pattern, callback);
 			_routes.push(route);
 			return route;
 		}
@@ -40,12 +19,20 @@
 			route._destroy();
 		}
 		
+		function getRouteIndex(route){
+			return arrayIndexOf(_routes, route);
+		}
+		
 		function removeAllRoutes(){
 			var n = getNumRoutes();
 			while(n--){
 				_routes[n]._destroy();
 			}
 			_routes.length = 0;
+		}
+		
+		function getNumRoutes(){
+			return _routes.length;
 		}
 		
 		function parse(request){
@@ -60,7 +47,7 @@
 		
 		function getMatchedRoute(request){
 			var i = 0, route;
-			while(route = _routes[i++]){
+			while(route = _routes[i++]){ //should be increment loop to match routes attached before first
 				if(route.match(request)){
 					return route;
 				}
@@ -80,7 +67,10 @@
 			removeAllRoutes : removeAllRoutes,
 			parse : parse,
 			bypassed : _bypassed,
-			getNumRoutes : getNumRoutes
+			getNumRoutes : getNumRoutes,
+			toString : function(){
+				return '[crossroads numRoutes:'+ getNumRoutes() +']';
+			}
 		};
 		
 	}());

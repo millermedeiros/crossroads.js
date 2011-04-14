@@ -27,7 +27,10 @@
 		</tstamp>
 		
 		<loadfile property="license.txt" srcFile="${src.dir}/license.txt"/>
+		<loadfile property="intro.js" srcFile="${src.dir}/intro.js"/>
 		<loadfile property="crossroads.js" srcFile="${src.dir}/crossroads.js"/>
+		<loadfile property="route.js" srcFile="${src.dir}/route.js"/>
+		<loadfile property="lexer.js" srcFile="${src.dir}/pattern_lexer.js"/>
 		
 		<copy file="${src.dir}/wrapper_closure.js" tofile="${dist.dir}/${dist.name}" />	
 		<copy file="${src.dir}/wrapper_amd.js" tofile="${dist.dir}/${dist.amd.name}" />
@@ -35,7 +38,10 @@
 		<replace>
 			<fileset dir="${dist.dir}" includes="${dist.name} ${dist.amd.name}" />
 			<replacefilter token="//::LICENSE:://" value="${license.txt}" />
+			<replacefilter token="//::INTRO_JS:://" value="${intro.js}" />
 			<replacefilter token="//::CROSSROADS_JS:://" value="${crossroads.js}" />
+			<replacefilter token="//::ROUTE_JS:://" value="${route.js}" />
+			<replacefilter token="//::LEXER_JS:://" value="${lexer.js}" />
 			<!-- version number, build number/date should come after other replaces -->
 			<replacefilter token="::VERSION_NUMBER::" value="${version.number}" />
 			<replacefilter token="::BUILD_NUMBER::" value="${build.number}" />
@@ -44,20 +50,6 @@
 		
 		<echo message="${dist.name} built." />
 	</target> 
-	
-	<target name="lint">
-		<echo message="JSLinting ${dist.name}..."/>
-		
-		<apply executable="java">
-			<filelist dir="${dist.dir}">
-				<file name="${dist.name}"/>
-			</filelist>
-			<arg line="-jar"/>  
-			<arg path="${jslint.jar}"/>
-		</apply>
-		
-		<echo message="JSLinted ${dist.name}."/>
-	</target>
 	
 	<target name="minify">
 		<echo message="Building ${dist.min.name}..." />
@@ -79,7 +71,7 @@
 		<echo message="${dist.min.name} built." />
 	</target>
 	
-	<target name="compile" depends="build, lint, minify">
+	<target name="compile" depends="build, minify">
 		<echo message="Build Complete." />
 	</target>
 	

@@ -2,11 +2,11 @@
 	// Pattern Lexer ------
 	//=====================
 	
-	var patternLexer = crossroads.patternLexer = (function(){
+	patternLexer = crossroads.patternLexer = (function(){
 
 		var ESCAPE_CHARS_REGEXP = /[\\\.\+\*\?\^\$\[\]\(\)\{\}\/\'\#]/g,
 			SEGMENT_REGEXP = /([^\/]+)/,
-			PARAMS_REGEXP = /{([^}]+)}/g,
+			PARAMS_REGEXP = /\{([^\}]+)\}/g,
 			SAVE_PARAMS = '___CR_PARAM___',
 			SAVED_PARAM_REGEXP = new RegExp(SAVE_PARAMS, 'g');
 		

@@ -1,7 +1,7 @@
 
 # Crossroads - JavaScript Routes #
 
-**this project didn't even reached alpha yet, API isn't totally defined yet..**
+**IMPORTANT: API isn't totally defined yet, some features may be added/removed and methods/properties renamed.**
 
 
 ## Introduction ##
@@ -30,19 +30,19 @@ as flexible as possible while still being simple to use.
 
 The `crossroads` object contain these public methods/properties:  
 
-    crossroads.addRoute(pattern:String, callback:(Function|null), validationRules:(Object|null));
-    crossroads.removeRoute(myRoute:Route);
+    crossroads.addRoute(pattern:String, callback:(Function|null));
+    crossroads.removeRoute(myRoute:Route); //detroy route
     crossroads.removeAllRoutes();
     crossroads.parse(request:String); //parse string trying to find a route that matches it
     crossroads.getNumRoutes();
-    crossroads.bypassed; //Signal, dispatched when can't find a route that match request
+    crossroads.bypassed; //{Signal} : dispatched when can't find a route that match request
 
 `crossrodas.addRoute()` returns a `Route` object which contains these public methods/properties:
 
-    myRoute.match(request); //Return boolean
-    myRoute.dispose();
-    myRoute.matched; //Signal, dispatched when request match route
-    myRoute.rules; //Object, validation rules for route params
+    myRoute.match(request); //return boolean
+    myRoute.dispose(); //remove route from `crossroads` and destroy it
+    myRoute.matched; //{Signal} : dispatched when request match route
+    myRoute.rules; //{Object|undefined} : validation rules for route params
     
 
 ### simple usage ###

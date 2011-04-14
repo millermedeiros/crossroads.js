@@ -2,18 +2,17 @@
 	// Route --------------
 	//=====================
 	
-	var _toString = Object.prototype.toString;
-	
-	function Route(pattern, callback, rules){
+	function Route(pattern, callback){
 		this._pattern = pattern; //maybe delete, used only for debug
 		this._paramsId = patternLexer.getParamIds(pattern);
 		this._matchRegexp = patternLexer.compilePattern(pattern);
 		this.matched = new signals.Signal();
-		this.rules = rules;
 		if(callback) this.matched.add(callback);
 	}
 	
 	Route.prototype = {
+		
+		rules : void(0),
 		
 		match : function(request){
 			return this._matchRegexp.test(request) && validateParams(this, request);
@@ -26,6 +25,10 @@
 		_destroy : function(){
 			this.matched.dispose();
 			this.matched = this._pattern = this._paramsId = this._matchRegexp = null;
+		},
+		
+		toString : function(){
+			return '[Route pattern:"'+ this._pattern +'", numListeners:'+ this.matched.getNumListeners() +']';
 		}
 		
 	};
@@ -43,18 +46,15 @@
 	}
 	
 	function validateRule(rule, val, values, request){
-		switch(_toString.call(rule)){
+		switch(toString(rule)){
 			case '[object RegExp]':
 				return rule.test(val);
-				break;
 			case '[object Array]':
 				return arrayIndexOf(rule, val) !== -1;
-				break;
 			case '[object Function]':
 				return rule(val, request, values);
-				break;
 			default:
-				return true; //not sure if it should throw an error or just fail silently...
+				return false; //not sure if it should throw an error or just fail silently...
 		}
 	}
 	

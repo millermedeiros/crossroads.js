@@ -464,37 +464,40 @@ YUI().use('node', 'console', 'test', function (Y){
 			
 		},
 		
-		testRouteWithRulesAsParam : function(){
+		testRouteWithInvalidRules : function(){
 			var t1, t2, t3, t4;
 			
 			var pattern = '{foo}-{bar}';
 			
-			var callback = function(foo, bar){
+			var a = crossroads.addRoute(pattern);
+			a.matched.add(function(foo, bar){
 				t1 = foo;
 				t2 = bar;
+			});
+			a.rules = {
+				foo : 'lorem',
+				bar : 123
 			};
 			
-			var rules = {
-				foo : /\w+/,
-				bar : function(value, request, matches){
-					return request === 'lorem-123';
-				}
+			var b = crossroads.addRoute(pattern);
+			b.matched.add(function(foo, bar){
+				t3 = foo;
+				t4 = bar;
+			});
+			b.rules = {
+				foo : false,
+				bar : void(0)
 			};
-			
-			var a = crossroads.addRoute(pattern, callback, rules);
 			
 			crossroads.parse('45-ullamcor');
-			crossroads.parse('123-ullamcor');
 			crossroads.parse('lorem-123');
-			crossroads.parse('lorem-555');
 			
-			Y.Assert.areSame('lorem', t1);
-			Y.Assert.areSame(123, t2);
+			Y.Assert.isUndefined(t1);
+			Y.Assert.isUndefined(t2);
 			Y.Assert.isUndefined(t3);
 			Y.Assert.isUndefined(t4);
 			
 		},
-		
 		
 		//-------------------------- Bypassed ---------------------------------------//
 		
@@ -520,6 +523,20 @@ YUI().use('node', 'console', 'test', function (Y){
 			Y.Assert.areSame(2, count);
 		},
 		
+		
+		//-------------------------- toString ---------------------------------------//
+		
+		testBypassed : function(){
+			var count = 0, requests = [];
+			
+			var a = crossroads.addRoute('/{foo}_{bar}');
+			a.matched.add(function(foo, bar){
+				Y.Assert.fail('not a trigger test');
+			});
+			
+			Y.Assert.areSame('[crossroads numRoutes:1]', crossroads.toString());
+			Y.Assert.areSame('[Route pattern:"/{foo}_{bar}", numListeners:1]', a.toString());
+		},
 		
 		//-------------------------- Remove ---------------------------------------//
 		
