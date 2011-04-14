@@ -2,6 +2,8 @@
 	// Route --------------
 	//=====================
 	
+	var _toString = Object.prototype.toString;
+	
 	function Route(pattern, callback){
 		this._pattern = pattern; //maybe delete, used only for debug
 		this._paramsId = patternLexer.getParamIds(pattern);
@@ -30,28 +32,29 @@
 	function validateParams(route, request){
 		var rules = route.rules,
 			values = rules? getValuesObject(route, request) : null,
-			rule, 
-			val,
 			prop;
 		for(prop in rules){
 			if(rules.hasOwnProperty(prop)){ //filter prototype
-				rule = rules[prop];
-				val = values[prop];
-				switch(Object.prototype.toString.call(rule)){
-					case '[object RegExp]':
-						if(! rule.test(val) ) return false;
-						break;
-					case '[object Array]':
-						if(arrayIndexOf(rule, val) === -1) return false;
-						break;
-					case '[object Function]':
-						if(! rule(val, request, values)) return false;
-						break;
-				} 
-				
+				if(! validateRule(rules[prop], values[prop], values, request) ) return false;
 			}
 		}
 		return true;
+	}
+	
+	function validateRule(rule, val, values, request){
+		switch(_toString.call(rule)){
+			case '[object RegExp]':
+				return rule.test(val);
+				break;
+			case '[object Array]':
+				return arrayIndexOf(rule, val) !== -1;
+				break;
+			case '[object Function]':
+				return rule(val, request, values);
+				break;
+			default:
+				return true; //not sure if it should throw an error or just fail silently...
+		}
 	}
 	
 	function getValuesObject(route, request){
