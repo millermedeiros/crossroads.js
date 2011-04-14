@@ -30,10 +30,22 @@
 	function validateParams(route, request){
 		var rules = route.rules,
 			values = rules? getValuesObject(route, request) : null,
-			rule;
-		for(rule in rules){
-			if(rules.hasOwnProperty(rule)){ //filter prototype
-				if(! rules[rule].test(values[rule])) return false;
+			rule, 
+			val,
+			prop;
+		for(prop in rules){
+			if(rules.hasOwnProperty(prop)){ //filter prototype
+				rule = rules[prop];
+				val = values[prop];
+				switch(Object.prototype.toString.call(rule)){
+					case '[object RegExp]':
+						if(! rule.test(val) ) return false;
+						break;
+					case '[object Array]':
+						if(arrayIndexOf(rule, val) === -1) return false;
+						break;
+				} 
+				
 			}
 		}
 		return true;
