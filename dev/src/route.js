@@ -4,11 +4,12 @@
 	
 	var _toString = Object.prototype.toString;
 	
-	function Route(pattern, callback){
+	function Route(pattern, callback, rules){
 		this._pattern = pattern; //maybe delete, used only for debug
 		this._paramsId = patternLexer.getParamIds(pattern);
 		this._matchRegexp = patternLexer.compilePattern(pattern);
 		this.matched = new signals.Signal();
+		this.rules = rules;
 		if(callback) this.matched.add(callback);
 	}
 	

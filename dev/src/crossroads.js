@@ -28,8 +28,8 @@
 			return arrayIndexOf(_routes, route);
 		}
 		
-		function addRoute(pattern, callback){
-			var route = new Route(pattern, callback);
+		function addRoute(pattern, callback, rules){
+			var route = new Route(pattern, callback, rules);
 			_routes.push(route);
 			return route;
 		}

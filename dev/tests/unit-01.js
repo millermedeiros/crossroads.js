@@ -464,6 +464,37 @@ YUI().use('node', 'console', 'test', function (Y){
 			
 		},
 		
+		testRouteWithRulesAsParam : function(){
+			var t1, t2, t3, t4;
+			
+			var pattern = '{foo}-{bar}';
+			
+			var callback = function(foo, bar){
+				t1 = foo;
+				t2 = bar;
+			};
+			
+			var rules = {
+				foo : /\w+/,
+				bar : function(value, request, matches){
+					return request === 'lorem-123';
+				}
+			};
+			
+			var a = crossroads.addRoute(pattern, callback, rules);
+			
+			crossroads.parse('45-ullamcor');
+			crossroads.parse('123-ullamcor');
+			crossroads.parse('lorem-123');
+			crossroads.parse('lorem-555');
+			
+			Y.Assert.areSame('lorem', t1);
+			Y.Assert.areSame(123, t2);
+			Y.Assert.isUndefined(t3);
+			Y.Assert.isUndefined(t4);
+			
+		},
+		
 		
 		//-------------------------- Bypassed ---------------------------------------//
 		
