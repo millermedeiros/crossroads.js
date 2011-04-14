@@ -44,6 +44,9 @@
 					case '[object Array]':
 						if(arrayIndexOf(rule, val) === -1) return false;
 						break;
+					case '[object Function]':
+						if(! rule(val, request, values)) return false;
+						break;
 				} 
 				
 			}
