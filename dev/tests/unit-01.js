@@ -465,6 +465,31 @@ YUI().use('node', 'console', 'test', function (Y){
 		},
 		
 		
+		//-------------------------- Bypassed ---------------------------------------//
+		
+		
+		testBypassed : function(){
+			var count = 0, requests = [];
+			
+			var a = crossroads.addRoute('/{foo}_{bar}');
+			a.matched.add(function(foo, bar){
+				Y.Assert.fail('shouldn\'t match');
+			});
+			
+			crossroads.bypassed.add(function(request){
+				requests.push(request);
+				count++;
+			});
+			
+			crossroads.parse('/lorem/ipsum');
+			crossroads.parse('/foo/bar');
+			
+			Y.Assert.areSame('/lorem/ipsum', requests[0]);
+			Y.Assert.areSame('/foo/bar', requests[1]);
+			Y.Assert.areSame(2, count);
+		},
+		
+		
 		//-------------------------- Remove ---------------------------------------//
 		
 		testRemove : function(){
@@ -482,6 +507,34 @@ YUI().use('node', 'console', 'test', function (Y){
 			
 			Y.Assert.areSame('lorem', t1);
 			Y.Assert.areSame('ipsum', t2);
+		},
+		
+		testRemoveAll : function(){
+			var t1, t2, t3, t4;
+			
+			var a = crossroads.addRoute('/{foo}/{bar}');
+			a.matched.add(function(foo, bar){
+				t1 = foo;
+				t2 = bar;
+			});
+			
+			var b = crossroads.addRoute('/{foo}_{bar}');
+			b.matched.add(function(foo, bar){
+				t1 = foo;
+				t2 = bar;
+			});
+			
+			Y.Assert.areSame(2, crossroads.getNumRoutes());
+			crossroads.removeAllRoutes();
+			Y.Assert.areSame(0, crossroads.getNumRoutes());
+			
+			crossroads.parse('/lorem/ipsum');
+			crossroads.parse('/foo_bar');
+			
+			Y.Assert.isUndefined(t1);
+			Y.Assert.isUndefined(t2);
+			Y.Assert.isUndefined(t3);
+			Y.Assert.isUndefined(t4);
 		},
 		
 		testDisposeRoute : function(){

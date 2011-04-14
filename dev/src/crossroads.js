@@ -17,7 +17,8 @@
 	
 	var crossroads = (function(){
 		
-		var _routes = [];
+		var _routes = [],
+			_bypassed = new signals.Signal();
 				
 		function getNumRoutes(){
 			return _routes.length;
@@ -52,6 +53,8 @@
 				params = route? getParamValues(request, route) : null;
 			if(route){ 
 				params? route.matched.dispatch.apply(route.matched, params) : route.matched.dispatch();
+			}else{
+				_bypassed.dispatch(request);
 			}
 		}
 		
@@ -75,7 +78,9 @@
 			addRoute : addRoute,
 			removeRoute : removeRoute,
 			removeAllRoutes : removeAllRoutes,
-			parse : parse
+			parse : parse,
+			bypassed : _bypassed,
+			getNumRoutes : getNumRoutes
 		};
 		
 	}());

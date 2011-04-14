@@ -39,8 +39,10 @@
 		
 		function getParamValues(request, regexp){
 			var vals = regexp.exec(request);
-			if(vals) vals.shift();
-			vals = typecastValues(vals);
+			if(vals){
+				vals.shift();
+				vals = typecastValues(vals);
+			}
 			return vals;
 		}
 		
