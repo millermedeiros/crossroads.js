@@ -1,5 +1,5 @@
 
-	// PatternLexer -------
+	// Pattern Lexer ------
 	//=====================
 	
 	var patternLexer = crossroads.patternLexer = (function(){

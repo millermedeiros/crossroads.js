@@ -1,4 +1,7 @@
 	
+	// Crossroads --------
+	//====================
+	
 	var crossroads = (function(){
 		
 		var _routes = [];
@@ -10,7 +13,7 @@
 		function getRouteIndex(route){
 			var n = getNumRoutes();
 			//Array.indexOf doesn't work on IE 6-7
-			while(--n){
+			while(n--){
 				if(_routes[n] === route) return n;
 			}
 			return -1;
@@ -30,7 +33,7 @@
 		
 		function removeAllRoutes(){
 			var n = getNumRoutes();
-			while(--n){
+			while(n--){
 				_routes[n]._destroy();
 			}
 			_routes.length = 0;
@@ -66,33 +69,4 @@
 		};
 		
 	}());
-	
-		
-	// Route --------------
-	//=====================
-	
-	function Route(pattern, callback){
-		this._pattern = pattern; //maybe delete, used only for debug
-		this._paramsId = patternLexer.getParamIds(pattern);
-		this._matchRegexp = patternLexer.compilePattern(pattern);
-		this.matched = new signals.Signal();
-		if(callback) this.matched.add(callback);
-	}
-	
-	Route.prototype = {
-		
-		match : function(request){
-			return this._matchRegexp.test(request);
-		},
-		
-		dispose : function(){
-			crossroads.removeRoute(this);
-		},
-		
-		_destroy : function(){
-			this.matched.dispose();
-			this.matched = null;
-		}
-		
-	};
 	

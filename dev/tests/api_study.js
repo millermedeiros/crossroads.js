@@ -1,10 +1,18 @@
 
  
-//-------------------
-//
-//  This file is used only to study different kinds of APIs, CODE DESCRIBED HERE MAY **NEVER** BE IMPLEMENTED.
-//
-//------------------
+/************************************************************************************************************
+ *
+ * IMPORTANT
+ * ---------
+ * 
+ * 
+ * This file is used only to study different kinds of APIs, CODE DESCRIBED HERE MAY **NEVER** BE IMPLEMENTED
+ * or be implemented with different names...
+ * 
+ * This fil will be deleted as soon as I define the API.
+ * 
+ * 
+ ************************************************************************************************************/
 
 
 
@@ -15,7 +23,7 @@
 
 //params => {pattern:String, callback:Function, [id]:String, [rules]:Object, [separator]:String}
 crossroads.add({
-	id : 'foobar', //unique ID, not required. used as convenience to trigger/get routes later. 
+	id : 'foobar', //unique ID, not required. used as convenience to trigger/get routes later. -- probably forget about ID
 	pattern : '/{foo}/{bar}/{ipsum}',
 	rules : {
 		foo : /\d{1,3}/, //custom regexp to validate segment
@@ -75,20 +83,19 @@ crossroads.parse('/foo/5/102');  // *** FAVORITE ***
 crossroads.process('/foo/5/102'); 
 
 
-//02 - id + segments => easy to pass parameters in case you forget order, not a huge fan of strings for ids tho.. *** FAVORITE ***
+//02 - id + segments => easy to pass parameters in case you forget order, not a huge fan of strings for ids tho..
 //params => routeId:string, [segments]:Object
 crossroads.route('foobar', {
 	bar : 5,
 	ipsum : 102
 });
 
-//02_2 - route + segments => if method accepts a string it should also accept a reference to the route..  *** FAVORITE ***
+//02_2 - route + segments => if method accepts a string it should also accept a reference to the route..
 //params => routeId:string, [segments]:Object
 crossroads.route(myRoute, {
 	bar : 5,
 	ipsum : 102
 });
-
 
 //03 - config object => unnecessary
 crossroads.trigger({
@@ -99,10 +106,17 @@ crossroads.trigger({
 	}
 });
 
+//04 - execute route directly *** FAVORITE ***
+myRoute.execute({
+	bar : 5,
+	ipsum : 102
+});
+
+
 
 //====== Get Route ======//
 
-//01 - I can't see myself using the ID but it may be useful for someone... *** FAVORITE ***
+//01 - I can't see myself using the ID but it may be useful for someone...
 var myRoute = crossroads.getRouteById('foobar');
 myRoute.matched.add(myOtherCallback);
 
@@ -118,6 +132,9 @@ crossroads.removeRoute(myRoute);
 
 //03 - dispose *** FAVORITE ***
 myRoute.dispose();
+
+//05 - remove all
+crossroads.removeAllRoutes();å
 
 
 

@@ -1,6 +1,8 @@
 
 # Crossroads - JavaScript Routes #
 
+** this project didn't even reached alpha yet, API isn't totally defined and some stuff are not even working.. **
+
 
 ## Introduction ##
 

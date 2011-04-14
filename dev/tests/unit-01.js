@@ -309,9 +309,43 @@ YUI().use('node', 'console', 'test', function (Y){
 			Y.Assert.areSame('ipsum', t2);
 			Y.Assert.areSame('maecennas', t3);
 			Y.Assert.areSame('ullamcor', t4);
-		}
+		},
 		
 		//-------------------------- Remove ---------------------------------------//
+		
+		testRemove : function(){
+			var t1, t2, t3, t4;
+			
+			var a = crossroads.addRoute('/{foo}_{bar}');
+			a.matched.add(function(foo, bar){
+				t1 = foo;
+				t2 = bar;
+			});
+			
+			crossroads.parse('/lorem_ipsum');			
+			crossroads.removeRoute(a);
+			crossroads.parse('/foo_bar');
+			
+			Y.Assert.areSame('lorem', t1);
+			Y.Assert.areSame('ipsum', t2);
+		},
+		
+		testDisposeRoute : function(){
+			var t1, t2, t3, t4;
+			
+			var a = crossroads.addRoute('/{foo}_{bar}');
+			a.matched.add(function(foo, bar){
+				t1 = foo;
+				t2 = bar;
+			});
+			
+			crossroads.parse('/lorem_ipsum');			
+			a.dispose();
+			crossroads.parse('/foo_bar');
+			
+			Y.Assert.areSame('lorem', t1);
+			Y.Assert.areSame('ipsum', t2);
+		}
 		
 		
 	});
