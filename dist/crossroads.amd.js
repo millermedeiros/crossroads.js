@@ -2,8 +2,8 @@
  * Crossroads - JavaScript Routes
  * Released under the MIT license <http://www.opensource.org/licenses/mit-license.php>
  * @author Miller Medeiros
- * @version 0.1
- * @build 9 (04/14/2011 02:27 AM)
+ * @version 0.1.1
+ * @build 11 (04/14/2011 02:58 AM)
  */
 define(function(){
 		
@@ -64,6 +64,7 @@ define(function(){
 		}
 		
 		function parse(request){
+			request = request || '';
 			var route = getMatchedRoute(request),
 				params = route? getParamValues(request, route) : null;
 			if(route){ 

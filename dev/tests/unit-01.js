@@ -311,6 +311,57 @@ YUI().use('node', 'console', 'test', function (Y){
 			Y.Assert.areSame('ullamcor', t4);
 		},
 		
+		testRouteWithEmptyPattern : function(){
+			var t1, t2, t3, t4;
+			
+			var a = crossroads.addRoute();
+			a.matched.add(function(foo, bar){
+				t1 = 'lorem';
+				t2 = 'ipsum';
+			});
+			
+			crossroads.parse('/123/456');
+			crossroads.parse('/maecennas/ullamcor');
+			crossroads.parse('');
+			
+			Y.Assert.areSame('lorem', t1);
+			Y.Assert.areSame('ipsum', t2);
+		},
+		
+		testRouteWithEmptyStringPattern : function(){
+			var t1, t2, t3, t4;
+			
+			var a = crossroads.addRoute('');
+			a.matched.add(function(foo, bar){
+				t1 = 'lorem';
+				t2 = 'ipsum';
+			});
+			
+			crossroads.parse('/123/456');
+			crossroads.parse('/maecennas/ullamcor');
+			crossroads.parse('');
+			
+			Y.Assert.areSame('lorem', t1);
+			Y.Assert.areSame('ipsum', t2);
+		},
+		
+		testRouteWithEmptyParse : function(){
+			var t1, t2, t3, t4;
+			
+			var a = crossroads.addRoute('');
+			a.matched.add(function(foo, bar){
+				t1 = 'lorem';
+				t2 = 'ipsum';
+			});
+			
+			crossroads.parse('/123/456');
+			crossroads.parse('/maecennas/ullamcor');
+			crossroads.parse();
+			
+			Y.Assert.areSame('lorem', t1);
+			Y.Assert.areSame('ipsum', t2);
+		},
+		
 		//-------------------------- Param Validation ---------------------------------------//
 		
 		testRouteWithRegexRules : function(){

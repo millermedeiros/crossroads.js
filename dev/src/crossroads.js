@@ -36,6 +36,7 @@
 		}
 		
 		function parse(request){
+			request = request || '';
 			var route = getMatchedRoute(request),
 				params = route? getParamValues(request, route) : null;
 			if(route){ 
