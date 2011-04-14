@@ -311,6 +311,43 @@ YUI().use('node', 'console', 'test', function (Y){
 			Y.Assert.areSame('ullamcor', t4);
 		},
 		
+		//-------------------------- Param Validation ---------------------------------------//
+		
+		testRouteWithRegexRules : function(){
+			var t1, t2, t3, t4;
+			
+			var pattern = '{foo}-{bar}';
+			
+			var a = crossroads.addRoute(pattern);
+			a.matched.add(function(foo, bar){
+				t1 = foo;
+				t2 = bar;
+			});
+			a.rules = {
+				foo : /\w+/,
+				bar : /\d+/
+			};
+			
+			var b = crossroads.addRoute(pattern);
+			b.matched.add(function(foo, bar){
+				t3 = foo;
+				t4 = bar;
+			});
+			b.rules = {
+				foo : /\d+/
+			};
+			
+			crossroads.parse('45-ullamcor'); //first so we make sure it bypassed route `a`
+			crossroads.parse('lorem-123');
+			
+			Y.Assert.areSame('lorem', t1);
+			Y.Assert.areSame(123, t2);
+			Y.Assert.areSame(45, t3);
+			Y.Assert.areSame('ullamcor', t4);
+			
+		},
+		
+		
 		//-------------------------- Remove ---------------------------------------//
 		
 		testRemove : function(){

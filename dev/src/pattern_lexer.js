@@ -40,7 +40,18 @@
 		function getParamValues(request, regexp){
 			var vals = regexp.exec(request);
 			if(vals) vals.shift();
+			vals = typecastValues(vals);
 			return vals;
+		}
+		
+		function typecastValues(values){
+			var n = values.length, 
+				result = [],
+				val;
+			while(val = values[--n]){
+				result[n] = (val === null || val === '' || isNaN(val))? val : parseFloat(val); //parseFloat(null || '') returns NaN
+			}
+			return result;
 		}
 		
 		//API

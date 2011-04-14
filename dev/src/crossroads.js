@@ -50,7 +50,9 @@
 		function getMatchedRoute(request){
 			var i = 0, route;
 			while(route = _routes[i++]){
-				if(route.match(request)) return route;
+				if(route.match(request)){
+					return route;
+				}
 			}
 			return null;
 		}

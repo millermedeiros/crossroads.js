@@ -13,7 +13,7 @@
 	Route.prototype = {
 		
 		match : function(request){
-			return this._matchRegexp.test(request);
+			return this._matchRegexp.test(request) && validateParams(this, request);
 		},
 		
 		dispose : function(){
@@ -26,4 +26,27 @@
 		}
 		
 	};
+	
+	function validateParams(route, request){
+		var rules = route.rules,
+			values = rules? getValuesObject(route, request) : null,
+			rule;
+		for(rule in rules){
+			if(rules.hasOwnProperty(rule)){ //filter prototype
+				if(! rules[rule].test(values[rule])) return false;
+			}
+		}
+		return true;
+	}
+	
+	function getValuesObject(route, request){
+		var ids = route._paramsId,
+			values = patternLexer.getParamValues(request, route._matchRegexp),
+			o = {}, 
+			n = ids.length;
+		while(n--){
+			o[ids[n]] = values[n];
+		}
+		return o;
+	}
 	
