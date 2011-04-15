@@ -1,0 +1,9 @@
+.tmp*
+.project
+.settings/
+design/
+
+.DS_Store?
+ehthumbs.db
+Icon?
+Thumbs.db
