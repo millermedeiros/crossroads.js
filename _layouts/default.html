@@ -20,8 +20,11 @@
 					</p>
 				</div>
 			</div>
-			<section class="content">
-				{{ content }}
+			<section id="introduction">
+				{% include introduction.markdown %}
+			</section>
+			<section id="documentation">
+				{% include documentation.markdown %}
 			</section>
 			<nav id="main-nav">
 				<ul>

@@ -28,18 +28,17 @@ strong, b{font-weight:bold}
 
 /* ========================= GENERAL TAGS ======================== */
 
-html{font-family:Arial, Helvetica, sans-serif; overflow-y:scroll; min-width:1000px}
-body{background-color:#fff; color:#444; font-size:11px}
+html{font-family:'Helvetica Neue', Helvetica, Arial, sans-serif; overflow-y:scroll; min-width:780px}
+body{background-color:#e7fdf8; color:#333; font-size:12px; line-height:18px}
 
-h1, h2, h3, h4, h5, h6{margin:.8em 0; font-weight:bold}
-h1, .h1{font-size:2em}
-h2, .h2{font-size:1.6em}
-h3, .h3{font-size:1.4em}
-h4, .h4{font-size:1.2em}
-h5, .h5{font-size:1.1em}
-h6, .h6{font-size:1em}
+h2, h3, h4, h5, h6{font-weight:normal}
+h2{font-size:30px; margin:1em 0 24px}
+h3{font-size:24px; margin:1em 0 18px}
+h4{font-size:18px; margin:1em 0 12px} 
+h5{font-size:18px; margin:1em 0 12px}
+h6{font-size:12px; margin:1em 0 6px}
 
-p{margin:1em 0}
+p{margin:12px 0}
 small{font-size:.833em}
 
 a{text-decoration:underline}
