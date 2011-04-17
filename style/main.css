@@ -60,14 +60,14 @@ blockquote{padding:0.2em 1em 0.2em 2em; border-left:3px solid #eee}
 
 /* clearfix hack [http://j.mp/bestclearfix] */
 .clear{clear:both}
-br.clear, .clearfix:before, .clearfix:after, .colholder:before, .colholder:after, .colholder .lastCol:after, .ffluid:after{display:block; height:0 !important; line-height:0; overflow:hidden; visibility:hidden}
+br.clear, .clearfix:before, .clearfix:after, .colholder:before, .colholder:after, .colholder .lastcol:after, .ffluid:after{display:block; height:0 !important; line-height:0; overflow:hidden; visibility:hidden}
 .clearfix:before, .clearfix:after, .colholder:before, .colholder:after{content:"."}
 .clearfix:after, .colholder:after{clear:both}
 .clearfix, .colholder, .ffluid{*zoom:1}
 
 /* Nicole Sullivan zoom-fix hack [http://bit.ly/gpXFlK] */
-.colholder-2:after, .colholder-2 .lastCol:after, .ffluid:after{font-size:xx-large; content:" x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x "}
-.colholder-2 .lastCol{display:table-cell; float:none; width:auto !important; *display:block; *zoom:1; _position:relative; _left:-3px; _margin-right:-3px}
+.colholder-2:after, .colholder-2 .lastcol:after, .ffluid:after{font-size:xx-large; content:" x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x "}
+.colholder-2 .lastcol{display:table-cell; float:none; width:auto !important; *display:block; *zoom:1; _position:relative; _left:-3px; _margin-right:-3px}
 
 /* columns */
 .col{float:left}

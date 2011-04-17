@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<link rel="stylesheet" href="style/main.css">
+		<title>Crossroads.js: JavaScript Routes System</title>
+	</head>
+	<body>
+		<div id="wrapper">
+			<h1 class="ir">Crossroads.js: JavaScript Routes System</h1>
+			<div class="ribbon big">
+				<div class="inner-wrapper">
+					<p>
+						<strong>Crossroads.js</strong> is a routing library inspired by URL Route/Dispatch utilities present on 
+						frameworks like Rails, Pyramid, Django, CodeIgniter, etc... It parses a string input and  decides which 
+						action should be executed by matching the string against multiple patterns.
+					</p>
+					<p>
+						If used properly it can reduce code complexity a lot by avoiding tightly coupling objects and also by abstracting navigation paths.
+					</p>
+				</div>
+			</div>
+			<section id="introduction">
+				<div class="inner-wrapper">
+					<h2 class="h2-1">Why?</h2>
+	
+					<p>JavaScript applications are becoming bigger and more complex each day and it is hard to keep control 
+					of what should be loaded/executed at each section.</p>
+					
+					<p>Most of the back-end frameworks already provide some sort of routes or url dispatch system but it usually requires 
+					a strict structure that limits the flexibility of the code, specially since it is directly related with the server request 
+					and calling actions on specific kinds of classes/objects.</p>
+					
+					<p>Crossroads.js was built with flexibility in mind and with the goal to be used as a standalone utility which can be plugged 
+					into any application and/or other libraries and frameworks to allow easy and robust url dispatch.</p>
+					
+					<p>One of the main differences of Crossroads.js is that it uses plain strings for the routing system which means it can be 
+					used to route URLs, server requests or simply as a messaging system across your application. It also means that 
+					Crossroads.js dont do things that it isn't supposed to do like updating the window.location, loading data or changing 
+					the application state unless you want to.</p>
+					
+					<p><strong>A routes system shouldn't do anythings else besides routing.</strong></p>
+					
+					<hr />
+					
+					<h2 class="h2-1">Dependencies</h2>
+					
+					<p>The only dependency is <a href="http://millermedeiros.github.com/js-signals/">JS-Signals</a> which is used for the event 
+					system to allow greater flexibility and also to provide advanced features that wouldn't be available with simple callbacks. 
+					It can be used together with any existing JavaScript library/framework.</p>
+					
+					<hr />
+					
+					<h2 class="h2-1">Should I use it for every kind of project?</h2>
+					
+					<p>Certainly not. If your project have just a few static pages a simple switch statement may be enough to solve your 
+					problems, but as applications start to grow and you have a slightly more complicated flow, having a system that supports 
+					dynamic variable parsing and a flexible validation schema may help you to reduce the overhead of doing those things manually. </p>
+					
+					<p>I consider the main target to be single page applications with complex navigation paths and also large websites that shares 
+					the same JS files across multiple pages or would benefit of this kind of approach.</p>
+					
+					<hr />
+					
+					<h2 class="h2-1">Why isn't it a plugin for one of the famous JS Libraries/Frameworks?</h2>
+					
+					<p>Extending a library to do things it isn't supposed to do and that are not directly related with its core goal defeats 
+					the Single Responsibility Principle and is considered a bad practice besides its broad use.</p>
+					
+					<p>DOM manipulation libraries should be used only for manipulating the DOM. Routing libraries shouldnt do anything 
+					besides routing... - A duck can walk, fly and swim, but he doesn't know how to do any of those things properly...</p>
+					
+					<p>Another reason for not extending an existing library/framework is that the amount of code reused would be so minimal 
+					that it doesn't pay-off the flexibility loss.</p>
+				</div>
+			</section>
+			<section id="documentation">
+				<div class="ribbon">
+					<h1 class="inner-wrapper">Documentation</h1>
+				</div>
+				<div class="inner-wrapper">
+					<p>
+						Crossroads.js comes in two different flavors, a regular JS file that creates a variable called crossroads on the global 
+						scope or an AMD module, which doesn’t generate any global variables. Both versions shares exactly the same code base the 
+						only thing that differs from both is the way that the code is wrapped for deployment.
+					</p>
+					<hr />
+					<h2 class="h2-1">API</h2>
+					<nav class="colholder">
+						<ul class="col col-1_2 code">
+							<li><a href="#crossroads-add_route">crossroads.addRoute()</a></li>
+							<li><a href="#crossroads-remove_route">crossroads.removeRoute()</a></li>
+							<li><a href="#crossroads-remove_all_routes">crossroads.removeAllRoutes()</a></li>
+							<li><a href="#crossroads-parse">crossroads.parse()</a></li>
+							<li><a href="#crossroads-get_num_routes">crossroads.getNumRoutes()</a></li>
+							<li><a href="#crossroads-bypassed">crossroads.bypassed</a></li>
+						</ul>
+						<ul class="col col-1_2 lastcol code">
+							<li><a href="#route-matched">Route.matched</a></li>
+							<li><a href="#route-rules">Route.rules</a></li>
+							<li><a href="#route-dispose">Route.dispose()</a></li>
+							<li><a href="#route-match">Route.match()</a></li>
+						</ul>
+					</nav>
+					<hr />
+					<h3 class="h3-2 code">crossroads.addRoute(<em>pattern, handler, priority</em>)</h3>
+					<p>Creates a new route pattern listener and add it to crossroads routes collection.</p>
+					<h4 class="h4-1">Parameters</h4>
+					<dl>
+						<dt>pattern<em>:String</em></dt>
+							<dd>String pattern that should be used to match against requests. 
+								Pattern can contain named variables surrounded by `{}` that will be evaluated 
+								and passed to handlers as parameters.
+							</dd>
+						<dt>handler<em>:Function (optional)<em></dt>
+							<dd>Function that should be executed when a request matches the Route pattern.</dd>
+						<dt>priority<em>:Nuber (optional)</em></dt>
+							<dd>Route execution priority. Routes with higher priority will be tested before. 
+								It is important to note that crossroads will stop pattern match test as soon as 
+								it finds a Route that matches the request. Setting the priority is a way to invert 
+								“natural” test order. Routes are tested by order of creeation if priority is omitted.
+							</dd>
+					</dl>
+				</div>
+			</section>
+			<nav id="main-nav">
+				<ul>
+					<li><a href="#introduction">Introduction</a></li>
+					<li><a href="#documentation">Documentation</a></li>
+				</ul>
+			</nav>
+			<footer>
+				&copy; 2011, <a href="http://blog.millermedeiros.com/">Miller Medeiros</a>.
+			</footer>
+		</div>
+	</body>
+</html>
