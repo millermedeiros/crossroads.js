@@ -46,7 +46,7 @@
 			request = request || '';
 			var route = getMatchedRoute(request),
 				params = route? getParamValues(request, route) : null;
-			if(route){ 
+			if(route){
 				params? route.matched.dispatch.apply(route.matched, params) : route.matched.dispatch();
 			}else{
 				_bypassed.dispatch(request);

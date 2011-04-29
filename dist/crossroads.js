@@ -3,12 +3,13 @@
  * Released under the MIT license <http://www.opensource.org/licenses/mit-license.php>
  * @author Miller Medeiros
  * @version 0.2
- * @build 15 (04/14/2011 04:10 AM)
+ * @build 16 (04/29/2011 03:05 AM)
  */
 (function(global){
 		
-	var crossroads, 
-		patternLexer, 
+	var crossroads,
+		Route,
+		patternLexer,
 		_toString = Object.prototype.toString;
 	
 	// Helpers -----------
@@ -23,8 +24,20 @@
 		return -1;
 	}
 	
-	function toString(obj){
-		return _toString.call(obj);
+	function isType(type, val){
+		return '[object '+ type +']' === _toString.call(val);
+	}
+	
+	function isRegExp(val){
+		return isType('RegExp', val);
+	}
+	
+	function isArray(val){
+		return isType('Array', val);
+	}
+	
+	function isFunction(val){
+		return isType('Function', val);
 	}
 			
 	// Crossroads --------
@@ -74,7 +87,7 @@
 			request = request || '';
 			var route = getMatchedRoute(request),
 				params = route? getParamValues(request, route) : null;
-			if(route){ 
+			if(route){
 				params? route.matched.dispatch.apply(route.matched, params) : route.matched.dispatch();
 			}else{
 				_bypassed.dispatch(request);
@@ -113,21 +126,46 @@
 	// Route --------------
 	//=====================
 	
-	function Route(pattern, callback, priority){
-		this._pattern = pattern; //maybe delete, used only for debug
-		this._paramsId = patternLexer.getParamIds(pattern);
-		this._matchRegexp = patternLexer.compilePattern(pattern);
+	//expose Route even not being very useful outside crossroads chain to enable better unit tests 
+	Route = crossroads.Route = function (pattern, callback, priority){
+		var isRegExpPattern = isRegExp(pattern);
+		this._pattern = pattern;
+		this._paramsId = isRegExpPattern? [] : patternLexer.getParamIds(pattern);
+		this._matchRegexp = isRegExpPattern? pattern : patternLexer.compilePattern(pattern);
 		this.matched = new signals.Signal();
 		if(callback) this.matched.add(callback);
 		this._priority = priority || 0;
-	}
+	};
 	
 	Route.prototype = {
 		
 		rules : void(0),
 		
 		match : function(request){
-			return this._matchRegexp.test(request) && validateParams(this, request);
+			return this._matchRegexp.test(request) && (isRegExp(this._pattern) || this.validateParams(request)); //if regexp no need to validate params
+		},
+		
+		validateParams : function(request){
+			var rules = this.rules,
+				values = rules? this._getValuesObject(request) : null,
+				prop;
+			for(prop in rules){
+				if(rules.hasOwnProperty(prop)){ //filter prototype
+					if(! isValidRule(rules[prop], values[prop], values, request) ) return false;
+				}
+			}
+			return true;
+		},
+		
+		_getValuesObject : function(request){ //TODO: refactor, ugly code and shouldn't be here.
+			var ids = this._paramsId,
+				values = patternLexer.getParamValues(request, this._matchRegexp),
+				o = {}, 
+				n = ids.length;
+			while(n--){
+				o[ids[n]] = values[n];
+			}
+			return o;
 		},
 		
 		dispose : function(){
@@ -145,42 +183,17 @@
 		
 	};
 	
-	function validateParams(route, request){
-		var rules = route.rules,
-			values = rules? getValuesObject(route, request) : null,
-			prop;
-		for(prop in rules){
-			if(rules.hasOwnProperty(prop)){ //filter prototype
-				if(! validateRule(rules[prop], values[prop], values, request) ) return false;
-			}
-		}
-		return true;
-	}
-	
-	function validateRule(rule, val, values, request){
-		switch(toString(rule)){
-			case '[object RegExp]':
-				return rule.test(val);
-			case '[object Array]':
-				return arrayIndexOf(rule, val) !== -1;
-			case '[object Function]':
-				return rule(val, request, values);
-			default:
-				return false; //not sure if it should throw an error or just fail silently...
+	function isValidRule(rule, val, values, request){
+		if (isRegExp(rule)) {
+			return rule.test(val);
+		} else if (isArray(rule)) {
+			return arrayIndexOf(rule, val) !== -1;
+		} else if (isFunction(rule)) {
+			return rule(val, request, values);
+		} else {
+			return false; //XXX: not sure if it should throw an error or just fail silently...
 		}
 	}
-	
-	function getValuesObject(route, request){
-		var ids = route._paramsId,
-			values = patternLexer.getParamValues(request, route._matchRegexp),
-			o = {}, 
-			n = ids.length;
-		while(n--){
-			o[ids[n]] = values[n];
-		}
-		return o;
-	}
-	
 	
 	// Pattern Lexer ------
 	//=====================
