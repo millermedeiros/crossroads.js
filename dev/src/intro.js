@@ -1,7 +1,7 @@
 	
 	var crossroads, 
-		patternLexer, 
-		_toString = Object.prototype.toString;
+		patternLexer,
+		Route;
 	
 	// Helpers -----------
 	//====================
@@ -13,8 +13,4 @@
 			if(arr[n] === val) return n;
 		}
 		return -1;
-	}
-	
-	function toString(obj){
-		return _toString.call(obj);
 	}
