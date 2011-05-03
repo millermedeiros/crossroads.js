@@ -1,13 +1,10 @@
 		
 	// Route --------------
 	//=====================
-	
-	//expose Route even not being very useful outside crossroads chain to enable better unit tests 
-	Route = crossroads.Route = function (pattern, callback, priority){
-		var isRegExpPattern = isRegExp(pattern);
+	 
+	Route = function (pattern, callback, priority){
 		this._pattern = pattern;
-		this._paramsId = isRegExpPattern? [] : patternLexer.getParamIds(pattern);
-		this._matchRegexp = isRegExpPattern? pattern : patternLexer.compilePattern(pattern);
+		this._matchRegexp = isRegExp(pattern)? pattern : patternLexer.compilePattern(pattern);
 		this.matched = new signals.Signal();
 		if(callback) this.matched.add(callback);
 		this._priority = priority || 0;
@@ -18,23 +15,39 @@
 		rules : void(0),
 		
 		match : function(request){
-			return this._matchRegexp.test(request) && (isRegExp(this._pattern) || this.validateParams(request)); //if regexp no need to validate params
+			return this._matchRegexp.test(request) && (isRegExp(this._pattern) || this._validateParams(request)); //if regexp no need to validate params
 		},
 		
-		validateParams : function(request){
-			var rules = this.rules,
-				values = rules? this._getValuesObject(request) : null,
+		_validateParams : function(request){
+			var rules = this.rules, 
 				prop;
 			for(prop in rules){
 				if(rules.hasOwnProperty(prop)){ //filter prototype
-					if(! isValidRule(rules[prop], values[prop], values, request) ) return false;
+					if(! this._isValidParam(request, prop) ) return false;
 				}
 			}
 			return true;
 		},
 		
-		_getValuesObject : function(request){ //TODO: refactor, ugly code and shouldn't be here.
-			var ids = this._paramsId,
+		_isValidParam : function(request, prop){
+			var validationRule = this.rules[prop],
+				values = this._getParamValuesObject(request),
+				val = values[prop],
+				isValid;
+			
+			if(isRegExp(validationRule)){
+				isValid = validationRule.test(val);
+			}else if(isArray(validationRule)){
+				isValid = arrayIndexOf(validationRule, val) !== -1;
+			}else if(isFunction(validationRule)){
+				isValid = validationRule(val, request, values);
+			}
+			
+			return isValid || false; //fail silently if validationRule is from an unsupported type
+		},
+		
+		_getParamValuesObject : function(request){
+			var ids = patternLexer.getParamIds(this._pattern),
 				values = patternLexer.getParamValues(request, this._matchRegexp),
 				o = {}, 
 				n = ids.length;
@@ -50,7 +63,7 @@
 		
 		_destroy : function(){
 			this.matched.dispose();
-			this.matched = this._pattern = this._paramsId = this._matchRegexp = null;
+			this.matched = this._pattern = this._matchRegexp = null;
 		},
 		
 		toString : function(){
@@ -59,14 +72,3 @@
 		
 	};
 	
-	function isValidRule(rule, val, values, request){
-		if (isRegExp(rule)) {
-			return rule.test(val);
-		} else if (isArray(rule)) {
-			return arrayIndexOf(rule, val) !== -1;
-		} else if (isFunction(rule)) {
-			return rule(val, request, values);
-		} else {
-			return false; //XXX: not sure if it should throw an error or just fail silently...
-		}
-	}

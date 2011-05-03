@@ -103,6 +103,8 @@ YUI().use('node', 'console', 'test', function (Y){
 		 */
 		tearDown : function(){
 			crossroads.removeAllRoutes();
+			crossroads.bypassed.removeAll();
+			crossroads.routed.removeAll();
 		},
 		
 		//---------------------------------------------------------------------
@@ -149,7 +151,6 @@ YUI().use('node', 'console', 'test', function (Y){
 		},
 		
 		//-------------------------- Route ---------------------------------------//
-		
 		
 		testRouteSimple1 : function(){
 			var t1;
@@ -405,6 +406,7 @@ YUI().use('node', 'console', 'test', function (Y){
 			
 			Y.Assert.areSame('maecennas', t1);
 			Y.Assert.areSame('ullamcor', t2);
+			
 		},
 		
 		//------------------------------ Priority --------------------------------------------//
@@ -638,7 +640,7 @@ YUI().use('node', 'console', 'test', function (Y){
 			
 		},
 		
-		//-------------------------- Bypassed ---------------------------------------//
+		//-------------------------- Signals ---------------------------------------//
 		
 		
 		testBypassed : function(){
@@ -660,6 +662,43 @@ YUI().use('node', 'console', 'test', function (Y){
 			Y.Assert.areSame('/lorem/ipsum', requests[0]);
 			Y.Assert.areSame('/foo/bar', requests[1]);
 			Y.Assert.areSame(2, count);
+		},
+		
+		testRoutedSignal : function(){
+			var count = 0, 
+				requests = [], 
+				count2 = 0,
+				routed;
+			
+			var a = crossroads.addRoute('/{foo}_{bar}');
+			a.matched.add(function(foo, bar){
+				count2++;
+			});
+			
+			crossroads.bypassed.add(function(request){
+				requests.push(request);
+				count++;
+			});
+			
+			crossroads.routed.add(function(request, route, params){
+				requests.push(request);
+				count++;
+				
+				Y.Assert.areSame('/foo_bar', request);
+				Y.Assert.areSame(a, route);
+				Y.Assert.areEqual('foo', params[0]);
+				Y.Assert.areEqual('bar', params[1]);
+				routed = true;
+			});
+			
+			crossroads.parse('/lorem/ipsum');
+			crossroads.parse('/foo_bar');
+			
+			Y.Assert.areSame('/lorem/ipsum', requests[0]);
+			Y.Assert.areSame('/foo_bar', requests[1]);
+			Y.Assert.areSame(2, count);
+			Y.Assert.areSame(1, count2);
+			Y.Assert.areEqual(true, routed);
 		},
 		
 		

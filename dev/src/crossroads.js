@@ -5,7 +5,8 @@
 	crossroads = (function(){
 		
 		var _routes = [],
-			_bypassed = new signals.Signal();
+			_bypassed = new signals.Signal(),
+			_routed = new signals.Signal();
 		
 		function addRoute(pattern, callback, priority){
 			var route = new Route(pattern, callback, priority);
@@ -48,6 +49,7 @@
 				params = route? getParamValues(request, route) : null;
 			if(route){
 				params? route.matched.dispatch.apply(route.matched, params) : route.matched.dispatch();
+				_routed.dispatch(request, route, params);
 			}else{
 				_bypassed.dispatch(request);
 			}
@@ -73,6 +75,7 @@
 			removeAllRoutes : removeAllRoutes,
 			parse : parse,
 			bypassed : _bypassed,
+			routed : _routed,
 			getNumRoutes : getNumRoutes,
 			toString : function(){
 				return '[crossroads numRoutes:'+ getNumRoutes() +']';
