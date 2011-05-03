@@ -1,10 +1,12 @@
 # Crossroads.js Changelog #
 
-## ?? ##
+## v0.3 (2011/05/03) ##
 
 ### API Changes ###
 
  - added support for RegExp route pattern. (#8)
+ - added signal `routed` to crossroads. (#9)
+ - added commonjs module wrapper.
 
 
 
