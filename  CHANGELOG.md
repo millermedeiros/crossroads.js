@@ -1,15 +1,25 @@
 # Crossroads.js Changelog #
 
+## v0.3 (2011/05/03) ##
+
+### API Changes ###
+
+ - added support for RegExp route pattern. (#8)
+ - added signal `routed` to crossroads. (#9)
+ - added commonjs module wrapper.
+
+
 
 ## v0.2 (2011/04/14) ##
 
 ### API Changes ###
  
- - added priority param to `addRoute`. 
+ - added priority param to `addRoute`. (#2) 
 
 ### Other ###
 
  - added "js-signals" as module dependency on AMD version.
+
 
 
 ## v0.1.1 (2011/04/14) ##
@@ -17,6 +27,7 @@
 ### Fixes ###
 
  - safe guarded from empty `parse` calls.
+
 
 
 ## v0.1 (2011/04/14) ##

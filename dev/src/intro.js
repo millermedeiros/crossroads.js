@@ -1,6 +1,7 @@
 	
-	var crossroads, 
-		patternLexer, 
+	var crossroads,
+		Route,
+		patternLexer,
 		_toString = Object.prototype.toString;
 	
 	// Helpers -----------
@@ -15,6 +16,18 @@
 		return -1;
 	}
 	
-	function toString(obj){
-		return _toString.call(obj);
+	function isType(type, val){
+		return '[object '+ type +']' === _toString.call(val);
+	}
+	
+	function isRegExp(val){
+		return isType('RegExp', val);
+	}
+	
+	function isArray(val){
+		return isType('Array', val);
+	}
+	
+	function isFunction(val){
+		return isType('Function', val);
 	}

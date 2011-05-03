@@ -3,9 +3,9 @@
  * Released under the MIT license <http://www.opensource.org/licenses/mit-license.php>
  * @author Miller Medeiros
  * @version 0.3
- * @build 18 (05/03/2011 04:01 AM)
+ * @build 17 (05/03/2011 03:59 AM)
  */
-(function(global){
+	var signals = require('signals');
 		
 	var crossroads,
 		Route,
@@ -266,6 +266,4 @@
 	
 	}());
 	
-	global.crossroads = crossroads;
-	
-}(window || this));
+	exports = crossroads;

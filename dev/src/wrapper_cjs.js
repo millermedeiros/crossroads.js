@@ -1,9 +1,7 @@
 //::LICENSE:://
-define(['signals'], function(signals){
+	var signals = require('signals');
 	//::INTRO_JS:://
 	//::CROSSROADS_JS:://
 	//::ROUTE_JS:://
 	//::LEXER_JS:://
-	return crossroads;
-	
-});
+	exports = crossroads;
