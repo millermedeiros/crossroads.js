@@ -2,6 +2,7 @@
 <html>
 	<head>
 		<meta charset="utf-8">
+		<link rel="shortcut icon" href="./favicon.ico" type="image/x-icon" />
 		<!--[if lt IE 9]>
 		<script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
 		<![endif]-->
@@ -15,11 +16,15 @@
 				<div class="innerwrapper">
 					<p>
 						<strong>Crossroads.js</strong> is a routing library inspired by URL Route/Dispatch utilities present on 
-						frameworks like Rails, Pyramid, Django, CodeIgniter, etc... It parses a string input and  decides which 
+						frameworks like <a href="http://guides.rubyonrails.org/routing.html">Rails</a>, 
+						<a href="http://docs.pylonsproject.org/projects/pyramid/dev/narr/urldispatch.html">Pyramid</a>, 
+						<a href="http://docs.djangoproject.com/en/dev/topics/http/urls/">Django</a>, 
+						<a href="http://book.cakephp.org/view/945/Routes-Configuration">CakePHP</a>, 
+						<a href="http://codeigniter.com/user_guide/general/routing.html">CodeIgniter</a>, etc... It parses a string input and  decides which 
 						action should be executed by matching the string against multiple patterns.
 					</p>
 					<p>
-						If used properly it can reduce code complexity by avoiding tightly coupling objects and also by abstracting navigation paths.
+						If used properly it can reduce code complexity by decoupling objects and also by abstracting navigation paths.
 					</p>
 				</div>
 			</div>
@@ -33,58 +38,84 @@
 					<p>
 						Most of the back-end frameworks already provide some sort of routes or URL dispatch system but it usually requires 
 						a strict structure that limits the flexibility of the code, specially since it is directly related with the server request 
-						and calling actions on specific kinds of classes/objects.
+						and calling actions on specific kinds of classes/objects <small>(like views or controllers)</small>.
 					</p>
 					<p>
-						Crossroads.js was built with flexibility in mind and with the goal to be used as a standalone utility which can be plugged 
-						into any application and/or other libraries and frameworks to allow easy and robust URL dispatch.
+						<strong>Crossroads.js</strong> was built with flexibility in mind and with the goal to be used as a standalone utility which can be plugged 
+						into any application and other libraries or frameworks to allow easy and robust URL dispatch.
 					</p>
 					<p>
-						One of the main differences of Crossroads.js is that it uses plain strings for the routing system which means it can be 
+						One of the main differences of <strong>Crossroads.js</strong> is that it uses plain strings for the routing system which means it can be 
 						used to route URLs, server requests or simply as a messaging system across your application. It also means that 
-						Crossroads.js don't do things that it isn't supposed to do like updating the window.location, loading data or changing 
-						the application state unless you want to.
+						<strong>Crossroads.js</strong> doesn't do things that it isn't supposed to do like updating the window.location, loading data or changing 
+						the application state unless you want to. &mdash; <strong>A routes system shouldn't do anything else besides routing.</strong>
 					</p>
 					<p>
-						<strong>A routes system shouldn't do anythings else besides routing.</strong>
+						It also has many advanced features to enable easy mapping of strings to actions that aren't present 
+						on most JavaScript solutions.
 					</p>
 					<hr />
 					
 					<h2 class="h2-1">Why isn't it a plugin for one of the famous JS Libraries/Frameworks?</h2>
 					<p>
 						Extending a library to do things it isn't supposed to do and that are not directly related with its core goal defeats 
-						the Single Responsibility Principle and is considered a bad practice besides its broad use.
+						the <a href="http://en.wikipedia.org/wiki/Single_responsibility_principle">Single Responsibility Principle</a> and is considered a bad practice besides its broad use.
 					</p>
 					<p>
 						DOM manipulation libraries should be used only for manipulating the DOM. Routing libraries shouldn't do anything 
-						besides routing... <em>- A duck can walk, fly and swim, but he doesn't do any of those things properly...</em>
+						besides routing...
 					</p>
+					<blockquote class="cite">
+						<em>A duck can walk, fly and swim, but he doesn't do any of those things well...</em>
+					</blockquote>
 					<p>
 						Another reason for not extending an existing library/framework is that the amount of code reused would be so minimal 
-						that it doesn't pay-off the flexibility loss. <strong>It means that you can use Crossroads.js with "any" other library/framework.</strong>
+						that it doesn't pay-off the flexibility loss. <strong>It means that you can use <strong>Crossroads.js</strong> with "any" other library/framework.</strong>
 					</p>
 					<hr />
 					
 					<h2 class="h2-1">Dependencies</h2>
 					<p>
 						The only dependency is <a href="http://millermedeiros.github.com/js-signals/">JS-Signals</a> which is used for the event 
-						system to allow greater flexibility and also to provide advanced features that wouldn't be available with simple callbacks. 
-						It can be used together with any existing JavaScript library/framework.
+						system to allow greater flexibility and also to provide advanced features that wouldn't be available with simple callbacks.
 					</p>
 					<hr />
 					
 					<h2 class="h2-1">Should I use it for every kind of project?</h2>
 					<p>
 						Certainly not. If your project have just a few static pages a simple switch statement may be enough to solve your 
-						problems, but as applications start to grow and you have a slightly more complicated flow, having a system that supports 
+						problems, but as applications start to grow and you have a slightly more complex flow, having a system that supports 
 						dynamic variable parsing and a flexible validation schema may help you to reduce the overhead of doing those things manually.
 					</p>
 					<p>
 						I consider the main target to be single page applications with complex navigation paths and also large websites that shares 
 						the same JS files across multiple pages or would benefit from this kind of approach.
 					</p>
+					<hr />
 					
+					<h2 class="h2-1">Reliable and Easy to Maintain</h2>
+					<p>
+						<strong>Crossroads.js</strong> follows many <em>best-practices</em>, its source code is <a href="https://github.com/millermedeiros/crossroads.js/blob/master/dist/crossroads.js">well structured and clean</a>, meaning that it is easy to maintain. 
+						It is also fully unit-tested to ensure that code works as expected on different scenarios and that future updates won't break existing features by accident.
+					</p>
+					<hr />
 					
+					<h2 class="h2-1">License</h2>
+					<p>
+						This project is released under the <a href="http://www.opensource.org/licenses/mit-license.php">MIT License</a>.
+					</p>
+					<hr />
+					
+					<h2 class="h2-1">Bugs / Feature Requests</h2>
+					<p>
+						Use github <a href="https://github.com/millermedeiros/crossroads.js/issues">issue tracker</a> to submit bugs and feature requests.
+					</p>
+					<hr />
+					
+					<h2 class="h2-1">Author</h2>
+					<p>
+						<a href="http://blog.millermedeiros.com/">Miller Medeiros</a>
+					</p>
 				</div>
 			</section>
 			<section id="documentation">
@@ -93,13 +124,13 @@
 				</div>
 				<div class="innerwrapper">
 					<p>
-						Crossroads.js comes in two different flavors, a regular JS file that creates a variable called crossroads on the global 
-						scope or an AMD module, which doesn’t generate any global variables. Both versions shares exactly the same code base the 
-						only thing that differs from both is the way that the code is wrapped for deployment.
+						<strong>Crossroads.js</strong> comes in three different flavors, a regular JS file that creates a variable called <code>crossroads</code> on the global 
+						scope, an AMD module which doesn’t generate any global variables and also as a CommonJS module. All versions shares exactly the same code base the 
+						only thing that differs is the way that the code is wrapped for deployment.
 					</p>
 					<hr />
-					<h2 class="h2-1">API</h2>
-					<nav class="colholder">
+					<h2 class="h2-1" id="api">API</h2>
+					<nav class="clearfix">
 						<ul class="col col-1_2 code">
 							<li><a href="#crossroads-add_route">crossroads.addRoute()</a></li>
 							<li><a href="#crossroads-remove_route">crossroads.removeRoute()</a></li>
@@ -107,8 +138,9 @@
 							<li><a href="#crossroads-parse">crossroads.parse()</a></li>
 							<li><a href="#crossroads-get_num_routes">crossroads.getNumRoutes()</a></li>
 							<li><a href="#crossroads-bypassed">crossroads.bypassed</a></li>
+							<li><a href="#crossroads-routed">crossroads.routed</a></li>
 						</ul>
-						<ul class="col col-1_2 lastcol code">
+						<ul class="col col-1_2 code">
 							<li><a href="#route-matched">Route.matched</a></li>
 							<li><a href="#route-rules">Route.rules</a></li>
 							<li><a href="#route-dispose">Route.dispose()</a></li>
@@ -116,17 +148,21 @@
 						</ul>
 					</nav>
 					<hr />
-					<h3 class="h3-1 code" id="crossroads-add_route">crossroads.addRoute(<em>pattern, handler, priority</em>)</h3>
+					<h3 class="h3-1 code" id="crossroads-add_route">crossroads.addRoute(<em>pattern, handler, priority</em>)<em>:Route</em></h3>
 					<p>Creates a new route pattern listener and add it to crossroads routes collection.</p>
 					<h4 class="h4-1">Parameters</h4>
-					<dl class="doc">
-						<dt>pattern<em>:String</em></dt>
-							<dd>String pattern that should be used to match against requests. 
-								Pattern can contain named variables surrounded by `{}` that will be evaluated 
-								and passed to handlers as parameters.
+					<dl class="simpleList doc">
+						<dt>pattern<em>:String|RegExp</em></dt>
+							<dd>String pattern or Regular Expression that should be used to match against requests. 
+								If pattern is a String it can contain named variables surrounded by `{}` that will be evaluated 
+								and passed to handlers as parameters. If pattern is a RegExp, capturing groups will be passed as 
+								parameters to handlers as well.
 							</dd>
 						<dt>handler<em>:Function (optional)</em></dt>
-							<dd>Function that should be executed when a request matches the Route pattern.</dd>
+							<dd>
+								Function that should be executed when a request matches the Route pattern. 
+								<small>(This is just a helper to attach a handler to the <a href="#route-matched">Route.matched</a> Signal.)</small>
+							</dd>
 						<dt>priority<em>:Number (optional)</em></dt>
 							<dd>Route execution priority. Routes with higher priority will be tested before. 
 								It is important to note that crossroads will stop pattern match test as soon as 
@@ -140,10 +176,211 @@
 					</p>
 					<h4 class="h4-1">Example</h4>
 <pre class="brush: js; gutter:false; toolbar:false">
-//match '/news/123' passing 123 as param to handler
-var myRoute = crossroads.addRoute('/news/{id}', function(id){
-  alert(id);
+//String rule: match '/news/123' passing 123 as param to handler
+var route1 = crossroads.addRoute('/news/{id}', function(id){
+  console.log(id);
 });
+
+//RegExp rule: match '/lorem/ipsum' passing "ipsum" as param to handler
+//note the capturing group around segment
+var route2 = crossroads.addRoute(/^\/lorem\/([a-z]+)$/, function(id){
+  console.log(id);
+});
+</pre>
+					<hr />
+					<h3 class="h3-1 code" id="crossroads-remove_route">crossroads.removeRoute(<em>route</em>)</h3>
+					<p>Remove a single route from crossroads collection.</p>
+					<h4 class="h4-1">Parameters</h4>
+					<dl class="simpleList doc">
+						<dt>route<em>:Route</em></dt>
+							<dd>
+								Reference to the <code>Route</code> object returned by <a href="#crossroads-add_route">crossroads.addRoute()</a>.
+							</dd>
+					</dl>
+					<p class="small em">
+						PS: It is important to note that Route object will be destroyed during removal so trying to call any method or accessing any
+						property on the Route object will throw errors.
+					</p>
+					<hr />
+					<h3 class="h3-1 code" id="crossroads-remove_all_routes">crossroads.removeAllRoutes()</h3>
+					<p>Remove all routes from crossroads collection.</p>
+					<hr />
+					<h3 class="h3-1 code" id="crossroads-parse">crossroads.parse(<em>request</em>)</h3>
+					<p>Parse a string input and dispatch <a href="#route-matched">matched</a> Signal of the first Route that matches the request pattern.</p>
+					<h4 class="h4-1">Parameters</h4>
+					<dl class="simpleList doc">
+						<dt>request<em>:String</em></dt>
+							<dd>
+								String that should be evaluated and matched against Routes to define which Route handlers should be executed and 
+								which parameters should be passed to the handlers.
+							</dd>
+					</dl>
+					<h4 class="h4-1">Example</h4>
+<pre class="brush: js; gutter:false; toolbar:false">
+var route1 = crossroads.addRoute('/news/{id}');
+route1.matched.add(function(id){
+  console.log(id);
+});
+crossroads.parse('/news/123'); //will match `route1` and call handlers
+</pre>
+					<hr />
+					<h3 class="h3-1 code" id="crossroads-get_num_routes">crossroads.getNumRoutes()<em>:Number</em></h3>
+					<p>Get number of Routes contained on the crossroads collection.</p>
+					<hr />
+					<h3 class="h3-1 code" id="crossroads-bypassed">crossroads.bypassed<em>:Signal</em></h3>
+					<p>
+						Signal dispatched every time that <a href="#crossroads-parse">crossroads.parse</a> can't find a Route that matches the request. 
+						Useful for debuging and error handling.
+					</p>
+					<h4 class="h4-1">Signal Handler Parameters</h4>
+					<dl class="simpleList doc">
+						<dt>request<em>:String</em></dt>
+							<dd>
+								String passed to the crossroads.parse method.
+							</dd>
+					</dl>
+<h4 class="h4-1">Example</h4>
+<pre class="brush: js; gutter:false; toolbar:false">
+var route1 = crossroads.addRoute('/news/{id}');
+crossroads.bypassed.add(function(request){
+	console.log(request);
+});
+crossroads.parse('/foo'); //won't match any route, triggering `bypassed` Signal
+</pre>
+					<hr />
+					<h3 class="h3-1 code" id="crossroads-routed">crossroads.routed<em>:Signal</em></h3>
+					<p>
+						Signal dispatched every time that <a href="#crossroads-parse">crossroads.parse</a> find a Route that matches the request. 
+						Useful for debuging.
+					</p>
+					<h4 class="h4-1">Signal Handler Parameters</h4>
+					<dl class="simpleList doc">
+						<dt>request<em>:String</em></dt>
+							<dd>
+								String passed to the crossroads.parse method.
+							</dd>
+						<dt>route<em>:Route</em></dt>
+							<dd>
+								Route object that matches the string request.
+							</dd>
+						<dt>params<em>:Array</em></dt>
+							<dd>
+								Array containing all the parameters captured by Route pattern.
+							</dd>
+					</dl>
+<h4 class="h4-1">Example</h4>
+<pre class="brush: js; gutter:false; toolbar:false">
+var route1 = crossroads.addRoute('/news/{id}');
+crossroads.routed.add(function(request, route, params){
+	console.log(request +' - '+ route +' - '+ params);
+});
+crossroads.parse('/news/123'); //match `route1`, triggering `routed` Signal
+</pre>
+					<hr />
+					<h3 class="h3-1 code" id="route-matched">Route.matched<em>:Signal</em></h3>
+					<p>Signal dispatched every time a request matches the route pattern.</p>
+					<p>
+						Signal handlers will receive all parameters captured by the Route pattern, it is important to note that values will be "typecasted",
+						so if the request was <code>"/foo/123"</code> and pattern <code>"{section}/{sub}"</code>, <code>"foo"</code> (String) will be the first parameter and <code>123</code> (Number) 
+						will be the second parameter of the handler.
+					</p>
+					<h4 class="h4-1">Example</h4>
+<pre class="brush: js; gutter:false; toolbar:false">
+var route1 = crossroads.addRoute('/news/{id}');
+route1.matched.add(function(id){
+  console.log('handler 1: '+ id);
+});
+route1.matched.add(function(id){
+  console.log('handler 2: '+ id);
+});
+crossroads.parse('/news/123'); //you trigger both handlers of `route1`
+</pre>
+					<hr />
+					<h3 class="h3-1 code" id="route-rules">Route.rules<em>:Object</em></h3>
+					<p>
+						Object used to configure parameters/segments validation rules. <strong>This Object is only used if Route pattern is a String.</strong>
+					</p>
+					<p>
+						Validation rules can be an Array, a RegExp or a Function:
+					</p>
+					<ul class="simpleList">
+						<li>If rule is an Array, crossroads will try to match a request segment against items of the Array, if item is found parameter is valid.</li>
+						<li>If rule is a RegExp, crossroads will try to match a request segment against it.</li>
+						<li>If rule is a Function, crossroads will base validation on value returned by Function (should return a Boolean).</li>
+					</ul>
+					<p>
+						Rules <em>keys</em> should match route pattern segment names.
+					</p>
+					<h4 class="h4-1">Example</h4>
+<pre class="brush: js; gutter:false; toolbar:false">
+var route1 = crossroads.addRoute('/{section}/{date}/{id}');
+
+//note that `rules` keys should be the same as route pattern segments names 
+route1.rules = {
+	
+	section : ['blog', 'news'], //match only values inside array
+	
+	date : /^[0-9]{4}-[0-9]{2}-[0-9]{2}$/,  //validate dates on the format "yyyy-mm-dd"
+	
+	/*
+	 * @param {String|Number} value  Request segment value.
+	 * @param {String} request  String passed to the crossroads.parse method.
+	 * @param {Object} valuesObj  Object containing values of all pattern segments.
+	 */
+	id : function(value, request, valuesObj){
+		if(isNaN(value)){
+			return false;			
+		}else{
+			if(value < 100 &amp;&amp; valuesObj.section == 'blog'){
+				return true;
+			}else if(valuesObj.section == 'news'){
+				return true;
+			}else{
+				return false;
+			}
+		}
+	}
+	
+};
+
+crossroads.route("/foo/2011-05-04/2"); //won't match. {section} doesn't have a valid value
+crossroads.route("/blog/20110504/2"); //won't match. {date} is on the wrong format
+crossroads.route("/blog/2011-05-04/999"); //won't match. {id} is too high
+crossroads.route("/blog/2011-05-04/2"); //matches `route1` since all segments validate
+</pre>
+					<hr />
+					<h3 class="h3-1 code" id="route-dispose">Route.dispose</h3>
+					<p>
+						Remove route from crossroads and destroy it, releasing memory.
+					</p>
+					<hr />
+					<h3 class="h3-1 code" id="route-match">Route.match(<em>request</em>):<em>Boolean</em></h3>
+					<p>
+						Test if Route matches against request. Return <code>true</code> if request validate against route rules and pattern.
+					</p>
+					<h4 class="h4-1">Example</h4>
+<pre class="brush: js; gutter:false; toolbar:false">
+var route1 = crossroads.addRoute('/news/{id}');
+route1.match('/foo/bar'); //false
+route1.match('/news/123'); //true
+</pre>
+					<hr />
+					<h2 class="h2-1">Examples</h2>
+					<p>
+						If you want to see more usage examples check <a href="https://github.com/millermedeiros/crossroads.js/blob/master/dev/tests/unit-01.js">unit tests</a>.
+					</p>
+				</div>
+			</section>
+			<section id="download">
+				<div class="ribbon">
+					<h1 class="innerwrapper h1-2">Download</h1>
+				</div>
+				<div class="innerwrapper">
+					<p>
+						You can download this project in either <a href="https://github.com/millermedeiros/crossroads.js/zipball/master">zip</a> or <a href="https://github.com/millermedeiros/crossroads.js/tarball/master">tar</a> formats. You can also clone the project with <a href="http://git-scm.com/">Git</a> by running: 
+					</p>
+<pre class="syntaxhighlighter">
+$ git clone git://github.com/millermedeiros/crossroads.js.git
 </pre>
 				</div>
 			</section>
@@ -152,6 +389,9 @@ var myRoute = crossroads.addRoute('/news/{id}', function(id){
 					&copy; Copyright 2011, <a href="http://blog.millermedeiros.com/">Miller Medeiros</a>.
 				</div>
 			</footer>
+			<a href="http://github.com/millermedeiros/crossroads.js">
+				<img alt="Fork me on GitHub" src="http://s3.amazonaws.com/github/ribbons/forkme_right_darkblue_121621.png" style="position: absolute; top: 0pt; right: 0pt; border: 0pt none;">
+			</a>
 		</div>
 		<script src="scripts/main.js"></script>
 	</body>

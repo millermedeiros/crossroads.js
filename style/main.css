@@ -1,30 +1,49 @@
 /**
-* Awesome website
-* @author YOUR_NAME_HERE
-* @version 0.1
+* Crossroads.js
+* @author Miller Medeiros
 */
+
+/* ============================ FONTS ============================ */
+
+@font-face {
+    font-family: 'LaneNarrowRegular';
+    src: url('../fonts/LANENAR_-webfont.eot');
+    src: url('../fonts/LANENAR_-webfont.eot?#iefix') format('eot'),
+         url('../fonts/LANENAR_-webfont.woff') format('woff'),
+         url('../fonts/LANENAR_-webfont.ttf') format('truetype'),
+         url('../fonts/LANENAR_-webfont.svg#webfontMAZXZguX') format('svg');
+    font-weight: normal;
+    font-style: normal;
+}
+
 
 /* ============================ RESET ============================ */
 
-html, body, a, address, blockquote, button, dl, dd, dt, form, fieldset, h1, h2, h3, h4, h5, h6, hr, img, input, label, li, p, pre, object, ol, span, select, textarea, ul{margin:0; padding:0}
-html{width:100%; height:100%; font:100.01%/120% sans-serif}
-body{height:100%}
-form label{cursor:pointer}
-img, fieldset{border:none}
-table{border-collapse:collapse; border-spacing:0}
+/* ===== Eric Meyer Reset ===== */
+
+/* http://meyerweb.com/eric/tools/css/reset/
+   v2.0 | 20110126
+   License: none (public domain)
+*/
+
+html,body,div,span,applet,object,iframe,h1,h2,h3,h4,h5,h6,p,blockquote,pre,a,abbr,acronym,address,big,cite,code,del,dfn,em,img,ins,kbd,q,s,samp,small,strike,strong,sub,sup,tt,var,b,u,i,center,dl,dt,dd,ol,ul,li,fieldset,form,label,legend,table,caption,tbody,tfoot,thead,tr,th,td,article,aside,canvas,details,embed,figure,figcaption,footer,header,hgroup,menu,nav,output,ruby,section,summary,time,mark,audio,video{margin:0;padding:0;border:0;font-size:100%;font:inherit;vertical-align:baseline}
+article,aside,details,figcaption,figure,footer,header,hgroup,menu,nav,section{display:block}
+body{line-height:1}ol,ul{list-style:none}
+blockquote,q{quotes:none}
+blockquote:before,blockquote:after,q:before,q:after{content:'';content:none}
+table{border-collapse:collapse;border-spacing:0}
+
+/* ===== CUSTOM RESET ===== */
+
 object{outline:none; display:block; overflow:hidden} /* force redraw on IE8, fix outline/scroll bug on Firefox 3.6, remove unnecessary margin (copied from swffit)  */
-input, select, textarea{font-family:inherit; font-size:inherit}
 textarea{overflow:auto} /* fix IE */
-iframe{border:none}
+iframe{border:0}
 
 /* fix line-height [https://gist.github.com/413930] */
 sup, sub{line-height:0; font-size:.75em; position:relative; vertical-align:baseline}
 sup{top:-0.5em}
 sub{bottom:-0.25em}
 
-/* for cufón */
-em, i{font-style:italic}
-strong, b{font-weight:bold}
 
 /* ========================= GENERAL TAGS ======================== */
 
@@ -32,50 +51,46 @@ html{font-family:'Helvetica Neue', Helvetica, Arial, sans-serif; overflow-y:scro
 body{background-color:#e7fdf8; color:#333; font-size:12px; line-height:18px}
 
 h1, h2, h3, h4, h5, h6{font-weight:normal; line-height:1em}
-h1{font-size:48px; margin:1em 0 36px}
-h2{font-size:30px; margin:1em 0 24px}
-h3{font-size:24px; margin:1em 0 18px}
-h4{font-size:18px; margin:1em 0 12px} 
-h5{font-size:18px; margin:1em 0 12px}
-h6{font-size:12px; margin:1em 0 6px}
+h1, .h1{font-size:48px; margin:1em 0 36px}
+h2, .h2{font-size:30px; margin:1em 0 24px}
+h3, .h3{font-size:24px; margin:1em 0 18px}
+h4, .h4{font-size:18px; margin:1em 0 12px} 
+h5, .h5{font-size:18px; margin:1em 0 12px}
+h6, .h6{font-size:12px; margin:1em 0 6px}
 
 p{margin:12px 0}
 small{font-size:.833em}
+em{font-style:italic}
+strong, b{font-weight:bold}
+code, pre{font-family:monospace}
 
-a{text-decoration:underline}
-a:hover, a:focus{text-decoration:none}
+a{color:#555; text-decoration:underline}
+a:hover, a:focus{color:#c01458; text-decoration:underline}
 a:hover, a:active{outline:none}
-
-ul, ol, dl, dd{padding-left:2em; margin:1em 0}
-li{margin:.5em 0}
-li ul{margin:0 0 1em}
-dt{margin:1em 0 .5em}
-dd{margin:.5em 0}
 
 hr{background-color:#e7fdf8; border:1px solid #e7fdf8; border-top:1px solid #cfe3df; clear:both; margin:5em 0}
 blockquote{padding:0.2em 1em 0.2em 2em; border-left:3px solid #eee}
 
-a{color:#555; text-decoration:underline}
-a:hover{color:#c01458; text-decoration:underline}
 
 /* ======================= GENERIC CLASSES ======================= */
 
-/* ----- FRAMEWORK ----- */
+/* ===== FRAMEWORK ===== */
 
 /* clearfix hack [http://j.mp/bestclearfix] */
-.clear{clear:both}
-br.clear, .clearfix:before, .clearfix:after, .colholder:before, .colholder:after, .colholder .lastcol:after, .ffluid:after{display:block; height:0 !important; line-height:0; overflow:hidden; visibility:hidden}
-.clearfix:before, .clearfix:after, .colholder:before, .colholder:after{content:"."}
-.clearfix:after, .colholder:after{clear:both}
-.clearfix, .colholder, .ffluid{*zoom:1}
+.clearfix:before, .clearfix:after, .clearfix > .lastcol:after, .ffluid:after, br.cb{display:block; height:0 !important; line-height:0; overflow:hidden; visibility:hidden}
+.clearfix:before, .clearfix:after{content:"."}
+.clearfix:after{clear:both}
+.clearfix, .ffluid{*zoom:1}
 
 /* Nicole Sullivan zoom-fix hack [http://bit.ly/gpXFlK] */
-.colholder-2:after, .colholder-2 .lastcol:after, .ffluid:after{font-size:xx-large; content:" x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x "}
-.colholder-2 .lastcol{display:table-cell; float:none; width:auto !important; *display:block; *zoom:1; _position:relative; _left:-3px; _margin-right:-3px}
+.fcolholder:after, .fcolholder .lastcol:after, .ffluid:after{font-size:xx-large; content:" x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x "}
+.fcolholder .lastcol{display:table-cell; float:none; width:auto !important; *display:block; *zoom:1; _position:relative; _left:-3px; _margin-right:-3px}
 
-/* columns */
+
+/* -- columns -- */
+
 .col{float:left}
-.col-1_1{float:none}
+.col-1_1{float:none; width:100%}
 .col-1_2, .col-2_4, .col-3_6{width:50%}
 .col-1_3, .col-2_6{width:33.33333%}
 .col-2_3, .col-4_6{width:66.66666%}
@@ -87,56 +102,80 @@ br.clear, .clearfix:before, .clearfix:after, .colholder:before, .colholder:after
 .col-4_5{width:80%}
 .col-1_6{width:16.66667%}
 .col-5_6{width:83.33333%}
-/* */
+
+
+/* -- image -- */
 
 /* image replacement (borrowed from HTML5 boilerplate) */
 .ir{text-indent:-999em; display:block; overflow:hidden; text-align:left; direction:ltr}
 
+/* -- floats -- */
+
 .fl{float:left; _margin-right:-3px}
 .fr{float:right; _margin-left:-3px}
+.ffluid{display:table-cell; *display:block; width:auto}
 .cr{clear:right}
 .cl{clear:left}
-.ffluid{display:table-cell; *display:block; width:auto}
+.cb{clear:both}
+
+
+/* -- display -- */
 
 .hidden{display:none !important}
 .hidden, .invisible{visibility:hidden !important}
 
-/* ----- PROJECT SPECIFIC ----- */
+
+/* --- font-styles --- */
 
 .b{font-weight:bold}
 .em{font-style:italic}
-.big{font-size:1.5em; line-height:1.33em}
-.small{font-size:.5em; line-height:1.33em}
+.big{font-size:1.166em}
+.small{font-size:.833em}
 .del{text-decoration:line-through}
-.center{text-align:center}
 
-.btn{cursor:pointer}
-.disabled{cursor:default !important}
 
-.nav, nav ul, .nav li, nav li{list-style:none; padding:0; margin:0; list-style-image:none}
+/* --- lists --- */
 
-.code{font-family:"Courier New", monospace}
-ul.code li{padding-left:1em; background:url("../img/li.gif") no-repeat left 10px; line-height:24px}
+.nav, .nav > li{padding:0; margin:0}
+.hlnav > li{float:left; margin-right:1em}
+.hrnav > li{float:right; margin-left:1em}
+
+.simpleList{padding-left:2em; margin:1em 0}
+ol.simpleList{list-style:decimal}
+ul.simpleList{list-style:disc}
+.simpleList > li{margin:.5em 0}
+.simpleList > li ul{margin:0 0 1em}
+.simpleList > dt{margin:1em 0 .2em}
+.simpleList > dd{margin:.5em 0; padding-left:2em}
+
+
+/* ----- PROJECT SPECIFIC ----- */
 
 .h1-2, .h2-1, .h3-1{color:#c01458}
-.h1-2, .h2-1{text-transform:uppercase; font-weight:100}
+.h1-2, .h2-1{text-transform:uppercase; font-family:'LaneNarrowRegular', 'Helvetica Neue', 'Helvetica', sans-serif; font-weight:100}
 .h3-1{letter-spacing:-0.02em; margin-bottom:24px}
 .h3-1 em{font-weight:normal; color:#898989}
 .h4-1{font-size:12px; font-weight:bold; margin:2.5em 0 1.5em}
 
+.code{font-family:"Courier New", monospace}
+ul.code{margin:1em 0}
+ul.code li{padding-left:1em; background:url("../img/li.gif") no-repeat left 10px; line-height:24px}
+
+.doc dt em{color:#898989}
+dl.doc{margin-bottom:2em}
+
+.cite{margin:2em 0; background-color:#fff; padding:1em 2em; border-left:3px solid #cfe3df}
 
 /* ====================== STRUCTURE/CONTENT ====================== */
 
-#introduction{background:url("../img/bg-r1.gif") no-repeat right 50%; display:block}
-#documentation{background:url("../img/bg-l1.gif") no-repeat left 50%; display:block}
+#introduction{background:url("../img/bg-r1.gif") no-repeat right 50%}
+#documentation{background:url("../img/bg-l1.gif") no-repeat left 50%}
 
 .innerwrapper{max-width:780px; padding:0 20px; margin:0 auto; background-color:#e7fdf8}
 .ribbon .innerwrapper, #footer .innerwrapper{background-color:transparent}
 
 h1.logo{height:156px; background:url("../img/logo.gif") no-repeat center center; margin-top:72px}
 .ribbon{background-color:#fff; border-bottom:6px solid #cfe3df; padding:36px 0; margin:90px 0 60px}
-
-.doc dt em{color:#898989}
 
 #footer{padding:24px 0 120px; background-color:#d3f2ec; display:block; margin-top:90px; color:#898989; font-size:10px}
 
