@@ -409,6 +409,22 @@ YUI().use('node', 'console', 'test', function (Y){
 			
 		},
 		
+		testRouteWithRegExpPattern3 : function(){
+			var t1, t2, t3, t4;
+			
+			var a = crossroads.addRoute(/^\/()\/([0-9]+)$/); //capturing groups becomes params
+			a.matched.add(function(foo, bar){
+				t1 = foo;
+				t2 = bar;
+			});
+			
+			crossroads.parse('//456');
+			
+			Y.Assert.isUndefined(t1);
+			Y.Assert.areSame(456, t2);
+			
+		},
+		
 		//------------------------------ Priority --------------------------------------------//
 		
 		testRouteWithPriority : function(){
