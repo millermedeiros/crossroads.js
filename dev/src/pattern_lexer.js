@@ -20,9 +20,10 @@
 	
 		function compilePattern(pattern){
 			pattern = pattern? saveParams(pattern) : '';
+			pattern = pattern.replace(/\/$/, ''); //remove trailing slash
 			pattern = escapePattern(pattern); //make sure chars that need to be escaped are properly converted
 			pattern = convertSavedParams(pattern);
-			return new RegExp('^'+ pattern + '$');
+			return new RegExp('^'+ pattern + '/?$'); //trailing slash is optional
 		}
 		
 		function saveParams(pattern){

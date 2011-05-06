@@ -3,7 +3,7 @@
  * Released under the MIT license <http://www.opensource.org/licenses/mit-license.php>
  * @author Miller Medeiros
  * @version 0.3
- * @build 18 (05/03/2011 04:01 AM)
+ * @build 22 (05/06/2011 08:57 PM)
  */
 define(['signals'], function(signals){
 		
@@ -221,9 +221,10 @@ define(['signals'], function(signals){
 	
 		function compilePattern(pattern){
 			pattern = pattern? saveParams(pattern) : '';
+			pattern = pattern.replace(/\/$/, ''); //remove trailing slash
 			pattern = escapePattern(pattern); //make sure chars that need to be escaped are properly converted
 			pattern = convertSavedParams(pattern);
-			return new RegExp('^'+ pattern + '$');
+			return new RegExp('^'+ pattern + '/?$'); //trailing slash is optional
 		}
 		
 		function saveParams(pattern){

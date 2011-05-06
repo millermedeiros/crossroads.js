@@ -1,5 +1,12 @@
 # Crossroads.js Changelog #
 
+
+## ?? ##
+
+ - changed behavior of trailing slash at the end of string pattern so ti doesn't affect route anymore (#12).
+
+
+
 ## v0.3 (2011/05/03) ##
 
 ### API Changes ###
