@@ -146,7 +146,7 @@ ul.simpleList{list-style:disc}
 .simpleList > li{margin:.5em 0}
 .simpleList > li ul{margin:0 0 1em}
 .simpleList > dt{margin:1em 0 .2em}
-.simpleList > dd{margin:.5em 0; padding-left:2em}
+.simpleList > dd{margin:1em 0; padding-left:2em}
 
 
 /* ----- PROJECT SPECIFIC ----- */

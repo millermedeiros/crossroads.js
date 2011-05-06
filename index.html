@@ -34,7 +34,8 @@
 						action should be executed by matching the string against multiple patterns.
 					</p>
 					<p>
-						If used properly it can reduce code complexity by decoupling objects and also by abstracting navigation paths.
+						It is a <strong>powerful</strong> and <strong>flexible</strong> rounting system. If used properly it can reduce code complexity by 
+						decoupling objects and also by abstracting navigation paths and server requests.
 					</p>
 				</div>
 			</div>
@@ -69,14 +70,15 @@
 					<h2 class="h2-1">Why isn't it a plugin for one of the famous JS Libraries/Frameworks?</h2>
 					<p>
 						Extending a library to do things it isn't supposed to do and that are not directly related with its core goal defeats 
-						the <a href="http://en.wikipedia.org/wiki/Single_responsibility_principle">Single Responsibility Principle</a> and is considered a bad practice besides its broad use.
+						the <a href="http://en.wikipedia.org/wiki/Single_responsibility_principle">Single Responsibility Principle</a> and is 
+						considered a bad practice besides its broad use.
 					</p>
 					<p>
 						DOM manipulation libraries should be used only for manipulating the DOM. Routing libraries shouldn't do anything 
 						besides routing...
 					</p>
 					<blockquote class="cite">
-						<em>A duck can walk, fly and swim, but he doesn't do any of those things well...</em>
+						<em>A duck can walk, fly and swim, but he can't do any of these things well...</em>
 					</blockquote>
 					<p>
 						Another reason for not extending an existing library/framework is that the amount of code reused would be so minimal 
@@ -87,19 +89,22 @@
 					<h2 class="h2-1">Dependencies</h2>
 					<p>
 						The only dependency is <a href="http://millermedeiros.github.com/js-signals/">JS-Signals</a> which is used for the event 
-						system to allow greater flexibility and also to provide advanced features that wouldn't be available with simple callbacks.
+						system to allow greater flexibility and also to provide advanced features that wouldn't be available with simple callbacks. 
+						Although JS-Signals dependency can be easily removed if needed.
 					</p>
 					<hr />
 					
 					<h2 class="h2-1">Should I use it for every kind of project?</h2>
 					<p>
-						Certainly not. If your project have just a few static pages a simple switch statement may be enough to solve your 
+						<strong>Certainly no.</strong> If your project have just a few static pages a simple switch statement may be enough to solve your 
 						problems, but as applications start to grow and you have a slightly more complex flow, having a system that supports 
-						dynamic variable parsing and a flexible validation schema may help you to reduce the overhead of doing those things manually.
+						dynamic variable parsing and a flexible validation schema may help you to reduce the overhead of doing those things manually 
+						and also reduce chance of errors.
 					</p>
 					<p>
 						I consider the main target to be single page applications with complex navigation paths and also large websites that shares 
-						the same JS files across multiple pages or would benefit from this kind of approach.
+						the same JS files across multiple pages or would benefit from this kind of approach. It is also very useful for server-side
+						and RESTful applications.
 					</p>
 					<hr />
 					
@@ -135,10 +140,11 @@
 				<div class="innerwrapper">
 					<p>
 						<strong>Crossroads.js</strong> comes in three different flavors, a regular JS file that creates a variable called <code>crossroads</code> on the global 
-						scope, an AMD module which doesn’t generate any global variables and also as a CommonJS module. All versions shares exactly the same code base the 
-						only thing that differs is the way that the code is wrapped for deployment.
+						scope, an AMD module which doesn’t generate any global variables and also as a CommonJS module. 
+						All versions shares exactly the same code base the only thing that differs is the way that the code is wrapped for deployment.
 					</p>
 					<hr />
+					
 					<h2 class="h2-1" id="api">API</h2>
 					<nav class="clearfix">
 						<ul class="col col-1_2 code">
@@ -158,24 +164,38 @@
 						</ul>
 					</nav>
 					<hr />
+					
 					<h3 class="h3-1 code" id="crossroads-add_route">crossroads.addRoute(<em>pattern, handler, priority</em>)<em>:Route</em></h3>
 					<p>Creates a new route pattern listener and add it to crossroads routes collection.</p>
 					<h4 class="h4-1">Parameters</h4>
 					<dl class="simpleList doc">
 						<dt>pattern<em>:String|RegExp</em></dt>
-							<dd>String pattern or Regular Expression that should be used to match against requests. 
-								If pattern is a String it can contain named variables surrounded by `{}` that will be evaluated 
-								and passed to handlers as parameters. If pattern is a RegExp, capturing groups will be passed as 
-								parameters to handlers as well.
+							<dd>
+								String pattern or Regular Expression that should be used to match against requests.
+							</dd>
+							<dd> 
+								If pattern is a String it can contain named variables surrounded by <code>"{}"</code> that will be evaluated 
+								and passed to handlers as parameters. Each pattern segment is limited by the <code>"/"</code> char, so named variables will 
+								match anything until it finds a <code>"/"</code> char or the next string token located after the variable. 
+								The pattern <code>"{foo}/{bar}"</code> will match <code>"lorem/ipsum-dolor"</code> but won't match <code>"lorem/ipsum-dolor/sit"</code>. 
+								The patterns <code>"{foo}{bar}"</code> and <code>"{foo}/{bar}"</code> match exactly the same requests. - If you need to 
+								match segments that may contain "/" use a regular expression instead of a string pattern.
+							</dd>
+							<dd>
+								If pattern is a RegExp, capturing groups will be passed as parameters to handlers on the same order as they were matched.
 							</dd>
 						<dt>handler<em>:Function (optional)</em></dt>
 							<dd>
 								Function that should be executed when a request matches the Route pattern. 
-								<small>(This is just a helper to attach a handler to the <a href="#route-matched">Route.matched</a> Signal.)</small>
+								<small>(This is just a convenient way to attach a handler to the <a href="#route-matched">Route.matched</a> Signal)</small>
 							</dd>
 						<dt>priority<em>:Number (optional)</em></dt>
-							<dd>Route execution priority. Routes with higher priority will be tested before. 
-								It is important to note that crossroads will stop pattern match test as soon as 
+							<dd>
+								Route execution priority.
+							</dd>
+							<dd>
+								Routes with higher priority will be tested before during <a href="#crossroads-parse">crossroads.parse</a>. 
+								It is important to note that crossroads will stop pattern tests as soon as 
 								it finds a Route that matches the request. Setting the priority is a way to invert 
 								“natural” test order. Routes are tested by order of creation if priority is omitted.
 							</dd>
@@ -198,6 +218,7 @@ var route2 = crossroads.addRoute(/^\/lorem\/([a-z]+)$/, function(id){
 });
 </pre>
 					<hr />
+
 					<h3 class="h3-1 code" id="crossroads-remove_route">crossroads.removeRoute(<em>route</em>)</h3>
 					<p>Remove a single route from crossroads collection.</p>
 					<h4 class="h4-1">Parameters</h4>
@@ -209,14 +230,25 @@ var route2 = crossroads.addRoute(/^\/lorem\/([a-z]+)$/, function(id){
 					</dl>
 					<p class="small em">
 						PS: It is important to note that Route object will be destroyed during removal so trying to call any method or accessing any
-						property on the Route object will throw errors.
+						property of the Route object will throw errors.
 					</p>
 					<hr />
+
 					<h3 class="h3-1 code" id="crossroads-remove_all_routes">crossroads.removeAllRoutes()</h3>
 					<p>Remove all routes from crossroads collection.</p>
+					<p class="small em">
+						PS: It is important to note that Route object will be destroyed during removal so trying to call any method or accessing any
+						property of the Route object will throw errors.
+					</p>
 					<hr />
+
 					<h3 class="h3-1 code" id="crossroads-parse">crossroads.parse(<em>request</em>)</h3>
-					<p>Parse a string input and dispatch <a href="#route-matched">matched</a> Signal of the first Route that matches the request pattern.</p>
+					<p>
+						Parse a string input and dispatch <a href="#route-matched">matched</a> Signal of the <strong>first</strong> Route that matches the request.
+					</p>
+					<p>
+						Routing priority is defined by order or insertion or by the <code>priority</code> parameter of the <a href="#crossroads-add_route">crossroads.addRoute</a> method.  
+					</p>
 					<h4 class="h4-1">Parameters</h4>
 					<dl class="simpleList doc">
 						<dt>request<em>:String</em></dt>
@@ -227,16 +259,19 @@ var route2 = crossroads.addRoute(/^\/lorem\/([a-z]+)$/, function(id){
 					</dl>
 					<h4 class="h4-1">Example</h4>
 <pre class="brush: js; gutter:false; toolbar:false">
-var route1 = crossroads.addRoute('/news/{id}');
-route1.matched.add(function(id){
-  console.log(id);
-});
-crossroads.parse('/news/123'); //will match `route1` and call handlers
+var sectionRoute = crossroads.addRoute('/{section}/{id}');
+function onSectionMatch(section, id){
+  console.log(section +' - '+ id);
+}
+sectionRoute.matched.add(onSectionMatch);
+crossroads.parse('/news/123'); //will match `sectionRoute` passing "news" and `123` as param
 </pre>
 					<hr />
+
 					<h3 class="h3-1 code" id="crossroads-get_num_routes">crossroads.getNumRoutes()<em>:Number</em></h3>
 					<p>Get number of Routes contained on the crossroads collection.</p>
 					<hr />
+
 					<h3 class="h3-1 code" id="crossroads-bypassed">crossroads.bypassed<em>:Signal</em></h3>
 					<p>
 						Signal dispatched every time that <a href="#crossroads-parse">crossroads.parse</a> can't find a Route that matches the request. 
@@ -258,16 +293,17 @@ crossroads.bypassed.add(function(request){
 crossroads.parse('/foo'); //won't match any route, triggering `bypassed` Signal
 </pre>
 					<hr />
+
 					<h3 class="h3-1 code" id="crossroads-routed">crossroads.routed<em>:Signal</em></h3>
 					<p>
 						Signal dispatched every time that <a href="#crossroads-parse">crossroads.parse</a> find a Route that matches the request. 
-						Useful for debuging.
+						Useful for debuging and for executing tasks that should happen at each routing.
 					</p>
 					<h4 class="h4-1">Signal Handler Parameters</h4>
 					<dl class="simpleList doc">
 						<dt>request<em>:String</em></dt>
 							<dd>
-								String passed to the crossroads.parse method.
+								String passed to the <a href="#crossroads-parse">crossroads.parse</a> method.
 							</dd>
 						<dt>route<em>:Route</em></dt>
 							<dd>
@@ -287,6 +323,7 @@ crossroads.routed.add(function(request, route, params){
 crossroads.parse('/news/123'); //match `route1`, triggering `routed` Signal
 </pre>
 					<hr />
+
 					<h3 class="h3-1 code" id="route-matched">Route.matched<em>:Signal</em></h3>
 					<p>Signal dispatched every time a request matches the route pattern.</p>
 					<p>
@@ -303,9 +340,10 @@ route1.matched.add(function(id){
 route1.matched.add(function(id){
   console.log('handler 2: '+ id);
 });
-crossroads.parse('/news/123'); //you trigger both handlers of `route1`
+crossroads.parse('/news/123'); //will trigger both handlers of `route1`
 </pre>
 					<hr />
+
 					<h3 class="h3-1 code" id="route-rules">Route.rules<em>:Object</em></h3>
 					<p>
 						Object used to configure parameters/segments validation rules. <strong>This Object is only used if Route pattern is a String.</strong>
@@ -336,6 +374,7 @@ route1.rules = {
 	 * @param {String|Number} value  Request segment value.
 	 * @param {String} request  String passed to the crossroads.parse method.
 	 * @param {Object} valuesObj  Object containing values of all pattern segments.
+	 * @return {Boolean} If segment value is valid.
 	 */
 	id : function(value, request, valuesObj){
 		if(isNaN(value)){
@@ -353,17 +392,19 @@ route1.rules = {
 	
 };
 
-crossroads.route("/foo/2011-05-04/2"); //won't match. {section} doesn't have a valid value
-crossroads.route("/blog/20110504/2"); //won't match. {date} is on the wrong format
-crossroads.route("/blog/2011-05-04/999"); //won't match. {id} is too high
-crossroads.route("/blog/2011-05-04/2"); //matches `route1` since all segments validate
+route1.match("/foo/2011-05-04/2"); //false. {section} doesn't have a valid value
+route1.match("/blog/20110504/2"); //false. {date} is on the wrong format
+route1.match("/blog/2011-05-04/999"); //false. {id} is too high
+route1.match("/blog/2011-05-04/2"); //true. all segments validate
 </pre>
 					<hr />
-					<h3 class="h3-1 code" id="route-dispose">Route.dispose</h3>
+
+					<h3 class="h3-1 code" id="route-dispose">Route.dispose()</h3>
 					<p>
 						Remove route from crossroads and destroy it, releasing memory.
 					</p>
 					<hr />
+
 					<h3 class="h3-1 code" id="route-match">Route.match(<em>request</em>):<em>Boolean</em></h3>
 					<p>
 						Test if Route matches against request. Return <code>true</code> if request validate against route rules and pattern.
@@ -373,8 +414,10 @@ crossroads.route("/blog/2011-05-04/2"); //matches `route1` since all segments va
 var route1 = crossroads.addRoute('/news/{id}');
 route1.match('/foo/bar'); //false
 route1.match('/news/123'); //true
+route1.match('/news/foo-bar'); //true
 </pre>
 					<hr />
+
 					<h2 class="h2-1">Examples</h2>
 					<p>
 						If you want to see more usage examples check the <a href="https://github.com/millermedeiros/crossroads.js/wiki/Examples">examples wiki page</a> and also the <a href="https://github.com/millermedeiros/crossroads.js/blob/master/dev/tests/unit-01.js">unit tests</a>.
