@@ -237,6 +237,64 @@ YUI().use('node', 'console', 'test', function (Y){
 			Y.Assert.areSame(true, s.match('/123/45/67'));
 		},
 		
+		testMatchMixedRules : function(){
+			var s = crossroads.addRoute('/{foo}/{bar}/{ipsum}');
+			
+			s.rules = {
+				foo : function(val, request, params){
+					return (val === 'lorem-ipsum' || val === 123);
+				},
+				bar : ['dolor', 45],
+				ipsum : /(sit-amet|67)/
+			};
+			
+			Y.Assert.areSame(false, s.match('/lorem-ipsum'));
+			Y.Assert.areSame(true, s.match('/lorem-ipsum/dolor/sit-amet'));
+			Y.Assert.areSame(false, s.match('lorem-ipsum'));
+			Y.Assert.areSame(false, s.match('/123'));
+			Y.Assert.areSame(false, s.match('123'));
+			Y.Assert.areSame(true, s.match('/123/45/67'));
+		},
+		
+		testMatchMagicRule : function(){
+			var s = crossroads.addRoute('/{foo}/{bar}/{ipsum}');
+			
+			s.rules = {
+				foo : function(val, request, params){
+					return (val === 'lorem-ipsum' || val === 123);
+				},
+				bar : ['dolor', 45],
+				ipsum : /(sit-amet|67|555)/,
+				afterRules_ : function(request){ //this gets executed after all other validations
+					return request !== '/123/45/555';
+				}
+			};
+			
+			Y.Assert.areSame(false, s.match('/lorem-ipsum'));
+			Y.Assert.areSame(true, s.match('/lorem-ipsum/dolor/sit-amet'));
+			Y.Assert.areSame(false, s.match('lorem-ipsum'));
+			Y.Assert.areSame(false, s.match('/123'));
+			Y.Assert.areSame(false, s.match('123'));
+			Y.Assert.areSame(true, s.match('/123/45/67'));
+			Y.Assert.areSame(false, s.match('/123/45/555'), 'check if magic rule blocked normal validation');
+		},
+		
+		testMatchMagicRule2 : function(){
+			var s = crossroads.addRoute(/^([a-z0-9]+)$/);
+			
+			s.rules = {
+				afterRules_ : function(request){ //this gets executed after all other validations
+					return request !== '555';
+				}
+			};
+			
+			Y.Assert.areSame(true, s.match('lorem'));
+			Y.Assert.areSame(false, s.match('lorem/dolor/sit-amet'));
+			Y.Assert.areSame(false, s.match('lorem-ipsum'));
+			Y.Assert.areSame(true, s.match('123'));
+			Y.Assert.areSame(false, s.match('555'), 'check if magic rule blocked normal validation');
+		},
+		
 		
 		//-------------------------- Route ---------------------------------------//
 		

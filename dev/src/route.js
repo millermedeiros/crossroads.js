@@ -3,8 +3,10 @@
 	//=====================
 	 
 	Route = function (pattern, callback, priority){
+		var isRegexPattern = isRegExp(pattern);
 		this._pattern = pattern;
-		this._matchRegexp = isRegExp(pattern)? pattern : patternLexer.compilePattern(pattern);
+		this._paramsIds = isRegexPattern? null : patternLexer.getParamIds(this._pattern);
+		this._matchRegexp = isRegexPattern? pattern : patternLexer.compilePattern(pattern);
 		this.matched = new signals.Signal();
 		if(callback) this.matched.add(callback);
 		this._priority = priority || 0;
@@ -15,7 +17,7 @@
 		rules : void(0),
 		
 		match : function(request){
-			return this._matchRegexp.test(request) && (isRegExp(this._pattern) || this._validateParams(request)); //if regexp no need to validate params
+			return this._matchRegexp.test(request) && (isRegExp(this._pattern) || this._validateParams(request)) && this._postValidation(request); //if regexp no need to validate params
 		},
 		
 		_validateParams : function(request){
@@ -35,11 +37,13 @@
 				val = values[prop],
 				isValid;
 			
-			if(isRegExp(validationRule)){
+			if (isRegExp(validationRule)) {
 				isValid = validationRule.test(val);
-			}else if(isArray(validationRule)){
+			}
+			else if (isArray(validationRule)) {
 				isValid = arrayIndexOf(validationRule, val) !== -1;
-			}else if(isFunction(validationRule)){
+			}
+			else if (isFunction(validationRule)) {
 				isValid = validationRule(val, request, values);
 			}
 			
@@ -47,7 +51,7 @@
 		},
 		
 		_getParamValuesObject : function(request){
-			var ids = patternLexer.getParamIds(this._pattern),
+			var ids = this._paramsIds,
 				values = patternLexer.getParamValues(request, this._matchRegexp),
 				o = {}, 
 				n = ids.length;
@@ -55,6 +59,11 @@
 				o[ids[n]] = values[n];
 			}
 			return o;
+		},
+		
+		_postValidation : function(request){
+			var fn = this.rules? this.rules.afterRules_ : null; //validate against "magic" rule (#14)
+			return fn? fn(request) : true;
 		},
 		
 		dispose : function(){
