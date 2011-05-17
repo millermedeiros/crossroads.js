@@ -2,8 +2,8 @@
  * Crossroads - JavaScript Routes
  * Released under the MIT license <http://www.opensource.org/licenses/mit-license.php>
  * @author Miller Medeiros
- * @version 0.3
- * @build 22 (05/06/2011 08:57 PM)
+ * @version 0.4pre
+ * @build 24 (05/17/2011 12:03 AM)
  */
 	var signals = require('signals');
 		
@@ -209,7 +209,8 @@
 			SEGMENT_REGEXP = /([^\/]+)/,
 			PARAMS_REGEXP = /\{([^\}]+)\}/g,
 			SAVE_PARAMS = '___CR_PARAM___',
-			SAVED_PARAM_REGEXP = new RegExp(SAVE_PARAMS, 'g');
+			SAVED_PARAM_REGEXP = new RegExp(SAVE_PARAMS, 'g'),
+			BOOL_REGEXP = /^(true|false)$/i;
 		
 		function getParamIds(pattern){
 			var ids = [], match;
@@ -253,7 +254,11 @@
 				result = [],
 				val;
 			while(val = values[--n]){
-				result[n] = (val === null || val === '' || isNaN(val))? val : parseFloat(val); //parseFloat(null || '') returns NaN
+				result[n] = (val === null)? val : (
+						BOOL_REGEXP.test(val)? (val.toLowerCase() === 'true') : (
+							(val === '' || isNaN(val))? val : parseFloat(val) //parseFloat(null || '') returns NaN, isNaN('') returns false
+						)
+					);
 			}
 			return result;
 		}

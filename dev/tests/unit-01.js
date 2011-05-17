@@ -317,6 +317,26 @@ YUI().use('node', 'console', 'test', function (Y){
 			Y.Assert.areSame('ullamcor', t3);
 		},
 		
+		testRouteSimple6 : function(){
+			var t1, t2, t3, t4;
+			
+			var a = crossroads.addRoute('{lorem}/{ipsum}/{dolor}/{sit}');
+			a.matched.add(function(a, b, c, d){
+				t1 = a;
+				t2 = b;
+				t3 = c;
+				t4 = d;
+			});
+			
+			crossroads.parse('lorem/123/true/false');
+			
+			Y.Assert.areSame('lorem', t1);
+			Y.Assert.areSame(123, t2);
+			Y.Assert.areSame(true, t3);
+			Y.Assert.areSame(false, t4);
+		},
+		
+		
 		testRouteWithTrailingChar : function(){
 			var t1, t2, t3;
 			
