@@ -48,7 +48,7 @@ sub{bottom:-0.25em}
 /* ========================= GENERAL TAGS ======================== */
 
 html{font-family:'Helvetica Neue', Helvetica, Arial, sans-serif; overflow-y:scroll}
-body{background-color:#e7fdf8; color:#333; font-size:small; line-height:1.5em}
+body{background-color:#e7fdf8; color:#333; font-size:14px; line-height:1.5em}
 
 h1, h2, h3, h4, h5, h6{font-weight:normal; line-height:1em}
 h1, .h1{font-size:4em; margin:1em 0 0.75px}
@@ -58,7 +58,7 @@ h4, .h4{font-size:1.5em; margin:1em 0 0.66em}
 h5, .h5{font-size:1.5em; margin:1em 0 0.66em}
 h6, .h6{font-size:1em; margin:1em 0 .5em}
 
-p{margin:1em 0}
+p{margin:1.25em 0}
 small{font-size:.833em}
 em{font-style:italic}
 strong, b{font-weight:bold}
@@ -176,6 +176,7 @@ dl.doc{margin-bottom:2em}
 
 h1.logo{height:156px; background:url("../img/logo.gif") no-repeat center center; margin-top:72px; margin-bottom:-1em}
 .ribbon{background-color:#fff; border-bottom:6px solid #cfe3df; padding:3em 0; margin:7.5em 0 5em}
+.ribbon.big{padding:2em 0}
 
 .fork{position:absolute; right:0; top:0; width:150px; height:150px}
 #footer{padding:2em 0 10em; background-color:#d3f2ec; display:block; margin-top:7.5em; color:#898989; font-size:0.833em}
