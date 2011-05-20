@@ -48,17 +48,17 @@ sub{bottom:-0.25em}
 /* ========================= GENERAL TAGS ======================== */
 
 html{font-family:'Helvetica Neue', Helvetica, Arial, sans-serif; overflow-y:scroll}
-body{background-color:#e7fdf8; color:#333; font-size:12px; line-height:18px}
+body{background-color:#e7fdf8; color:#333; font-size:small; line-height:1.5em}
 
 h1, h2, h3, h4, h5, h6{font-weight:normal; line-height:1em}
-h1, .h1{font-size:48px; margin:1em 0 36px}
-h2, .h2{font-size:30px; margin:1em 0 24px}
-h3, .h3{font-size:24px; margin:1em 0 18px}
-h4, .h4{font-size:18px; margin:1em 0 12px} 
-h5, .h5{font-size:18px; margin:1em 0 12px}
-h6, .h6{font-size:12px; margin:1em 0 6px}
+h1, .h1{font-size:4em; margin:1em 0 0.75px}
+h2, .h2{font-size:2.5em; margin:1em 0 0.8px}
+h3, .h3{font-size:2em; margin:1em 0 0.75em}
+h4, .h4{font-size:1.5em; margin:1em 0 0.66em} 
+h5, .h5{font-size:1.5em; margin:1em 0 0.66em}
+h6, .h6{font-size:1em; margin:1em 0 .5em}
 
-p{margin:12px 0}
+p{margin:1em 0}
 small{font-size:.833em}
 em{font-style:italic}
 strong, b{font-weight:bold}
@@ -151,20 +151,20 @@ ul.simpleList{list-style:disc}
 
 /* ----- PROJECT SPECIFIC ----- */
 
-.h1-2, .h2-1, .h3-1{color:#c01458}
+.h1-2, .h2-1, .h3-1{color:#c01458; word-wrap:break-word}
 .h1-2, .h2-1{text-transform:uppercase; font-family:'LaneNarrowRegular', 'Helvetica Neue', 'Helvetica', sans-serif; font-weight:100}
-.h3-1{letter-spacing:-0.02em; margin-bottom:24px}
+.h3-1{letter-spacing:-0.02em; margin-bottom:2em}
 .h3-1 em{font-weight:normal; color:#898989}
-.h4-1{font-size:12px; font-weight:bold; margin:2.5em 0 1.5em}
+.h4-1{font-size:1em; font-weight:bold; margin:2.5em 0 1.5em}
 
-.code{font-family:"Courier New", monospace}
+.code{font-family:"Courier New", monospace;}
 ul.code{margin:1em 0}
-ul.code li{padding-left:1em; background:url("../img/li.gif") no-repeat left 10px; line-height:24px}
+ul.code li{padding-left:1em; background:url("../img/li.gif") no-repeat left 0.833em; line-height:2em}
 
 .doc dt em{color:#898989}
 dl.doc{margin-bottom:2em}
 
-.cite{margin:2em 0; background-color:#fff; padding:1em 2em; border-left:3px solid #cfe3df}
+.cite{margin:2em 0; background-color:#fff; padding:1em 2em; border-left:0.25em solid #cfe3df}
 
 /* ====================== STRUCTURE/CONTENT ====================== */
 
@@ -174,13 +174,25 @@ dl.doc{margin-bottom:2em}
 .innerwrapper{max-width:780px; padding:0 20px; margin:0 auto; background-color:#e7fdf8}
 .ribbon .innerwrapper, #footer .innerwrapper{background-color:transparent}
 
-h1.logo{height:156px; background:url("../img/logo.gif") no-repeat center center; margin-top:72px}
-.ribbon{background-color:#fff; border-bottom:6px solid #cfe3df; padding:36px 0; margin:90px 0 60px}
+h1.logo{height:156px; background:url("../img/logo.gif") no-repeat center center; margin-top:72px; margin-bottom:-1em}
+.ribbon{background-color:#fff; border-bottom:6px solid #cfe3df; padding:3em 0; margin:7.5em 0 5em}
 
-#footer{padding:24px 0 120px; background-color:#d3f2ec; display:block; margin-top:90px; color:#898989; font-size:10px}
+.fork{position:absolute; right:0; top:0; width:150px; height:150px}
+#footer{padding:2em 0 10em; background-color:#d3f2ec; display:block; margin-top:7.5em; color:#898989; font-size:0.833em}
 
 /* ============================ DEBUG ============================ */
 
+
+/* ======================== MEDIA QUERIES ======================== */
+
+@media screen and (max-width:640px) {
+  .col{float:none; width:100% !important; word-wrap:break-word}
+  h1.logo{height:90px; background:url("../img/logo-m.gif") no-repeat center center; margin-top:54px}
+}
+
+@media screen and (max-width:480px) {
+  .fork, .fork img{width:100px; height:100px}
+}
 
 /* ============================ SYNTAX HIGHLIGHTER ============================ */
 

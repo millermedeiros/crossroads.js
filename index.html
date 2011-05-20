@@ -2,7 +2,8 @@
 <html>
 	<head>
 		<meta charset="utf-8">
-		<link rel="shortcut icon" href="./favicon.ico" type="image/x-icon" />
+		<link rel="shortcut icon" href="./favicon.ico" type="image/x-icon">
+    <meta name="viewport" content="width=device-width">
 		<!--[if lt IE 9]>
 		<script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
 		<![endif]-->
@@ -10,7 +11,7 @@
 		<title>Crossroads.js: JavaScript Routes System</title>
 		<script type="text/javascript">
 		  var _gaq = _gaq || [];
-		  _gaq.push(['_setAccount', 'UA-1247729-19']);
+		  if(document.location.hostname.indexOf('millermedeiros.github.com') !== -1) _gaq.push(['_setAccount', 'UA-1247729-19']); //safeguard against dumb source code copy breaking metrics
 		  _gaq.push(['_trackPageview']);
 		  _gaq.push(['_trackPageLoadTime']);
 		  (function() {
@@ -63,7 +64,7 @@
 						the application state unless you want to. &mdash; <strong>A routes system shouldn't do anything else besides routing.</strong>
 					</p>
 					<p>
-						It also has many advanced features to enable easy mapping of strings to actions that aren't present 
+						It also has many advanced features to enable easy and robust mapping of strings to actions that aren't present 
 						on most JavaScript solutions.
 					</p>
 					<hr />
@@ -98,13 +99,13 @@
 					<h2 class="h2-1">Should I use it for every kind of project?</h2>
 					<p>
 						<strong>Certainly no.</strong> If your project have just a few static pages a simple switch statement may be enough to solve your 
-						problems, but as applications start to grow and you have a slightly more complex flow, having a system that supports 
+            problems, but as applications start to grow and you have a slightly more complex <em>flow</em>, having a system that supports 
 						dynamic variable parsing and a flexible validation schema may help you to reduce the overhead of doing those things manually 
 						and also reduce chance of errors.
 					</p>
 					<p>
 						I consider the main target to be single page applications with complex navigation paths and also large websites that shares 
-						the same JS files across multiple pages or would benefit from this kind of approach. It is also very useful for server-side
+            the same JS files across multiple pages or would <a href="http://blog.millermedeiros.com/2011/05/single-entry-point-ftw/">benefit from this kind of approach</a>. It is also very useful for server-side
 						and RESTful applications.
 					</p>
 					<hr />
@@ -381,7 +382,7 @@ route1.rules = {
 		if(isNaN(value)){
 			return false;			
 		}else{
-			if(value < 100 &amp;&amp; valuesObj.section == 'blog'){
+			if(value &lt; 100 &amp;&amp; valuesObj.section == 'blog'){
 				return true;
 			}else if(valuesObj.section == 'news'){
 				return true;
@@ -443,8 +444,8 @@ $ git clone git://github.com/millermedeiros/crossroads.js.git
 					&copy; Copyright 2011, <a href="http://blog.millermedeiros.com/">Miller Medeiros</a>.
 				</div>
 			</footer>
-			<a href="http://github.com/millermedeiros/crossroads.js">
-				<img alt="Fork me on GitHub" src="http://s3.amazonaws.com/github/ribbons/forkme_right_darkblue_121621.png" style="position: absolute; top: 0pt; right: 0pt; border: 0pt none;">
+			<a class="fork"href="http://github.com/millermedeiros/crossroads.js">
+        <img alt="Fork me on GitHub" src="http://s3.amazonaws.com/github/ribbons/forkme_right_darkblue_121621.png"> 
 			</a>
 		</div>
 		<script src="scripts/main.js"></script>
