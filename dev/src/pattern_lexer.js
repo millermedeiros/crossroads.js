@@ -8,8 +8,7 @@
             SEGMENT_REGEXP = /([^\/]+)/,
             PARAMS_REGEXP = /\{([^\}]+)\}/g,
             SAVE_PARAMS = '___CR_PARAM___',
-            SAVED_PARAM_REGEXP = new RegExp(SAVE_PARAMS, 'g'),
-            BOOL_REGEXP = /^(true|false)$/i;
+            SAVED_PARAM_REGEXP = new RegExp(SAVE_PARAMS, 'g');
         
         function getParamIds(pattern){
             var ids = [], match;
@@ -50,14 +49,9 @@
         
         function typecastValues(values){
             var n = values.length, 
-                result = [],
-                val;
-            while(val = values[--n]){
-                result[n] = (val === null)? val : (
-                        BOOL_REGEXP.test(val)? (val.toLowerCase() === 'true') : (
-                            (val === '' || isNaN(val))? val : parseFloat(val) //parseFloat(null || '') returns NaN, isNaN('') returns false
-                        )
-                    );
+                result = [];
+            while(n--){
+                result[n] = typecastValue(values[n]); 
             }
             return result;
         }

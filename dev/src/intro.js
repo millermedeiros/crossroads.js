@@ -2,7 +2,8 @@
     var crossroads,
         Route,
         patternLexer,
-        _toString = Object.prototype.toString;
+        _toString = Object.prototype.toString,
+        BOOL_REGEXP = /^(true|false)$/i;
     
     // Helpers -----------
     //====================
@@ -30,4 +31,12 @@
     
     function isFunction(val){
         return isType('Function', val);
+    }
+
+    function typecastValue(val){
+        return (val === null)? val : (
+                    BOOL_REGEXP.test(val)? (val.toLowerCase() === 'true') : (
+                        (val === '' || isNaN(val))? val : parseFloat(val) //parseFloat(null || '') returns NaN, isNaN('') returns false
+                    )
+                );
     }
