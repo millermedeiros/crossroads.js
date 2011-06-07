@@ -265,7 +265,7 @@ YUI().use('node', 'console', 'test', function (Y){
                 },
                 bar : ['dolor', 45],
                 ipsum : /(sit-amet|67|555)/,
-                afterRules_ : function(request){ //this gets executed after all other validations
+                request_ : function(request){ //this gets executed after all other validations
                     return request !== '/123/45/555';
                 }
             };
@@ -283,7 +283,7 @@ YUI().use('node', 'console', 'test', function (Y){
             var s = crossroads.addRoute(/^([a-z0-9]+)$/);
             
             s.rules = {
-                afterRules_ : function(request){ //this gets executed after all other validations
+                request_ : function(request){ //this gets executed after all other validations
                     return request !== '555';
                 }
             };

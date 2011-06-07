@@ -17,7 +17,7 @@
         rules : void(0),
         
         match : function(request){
-            return this._matchRegexp.test(request) && (isRegExp(this._pattern) || this._validateParams(request)) && this._postValidation(request); //if regexp no need to validate params
+            return this._matchRegexp.test(request) && (isRegExp(this._pattern) || this._validateParams(request)) && this._posValidation(request); //if regexp no need to validate params
         },
         
         _validateParams : function(request){
@@ -61,8 +61,8 @@
             return o;
         },
         
-        _postValidation : function(request){
-            var fn = this.rules? this.rules.afterRules_ : null; //validate against "magic" rule (#14)
+        _posValidation : function(request){
+            var fn = this.rules? this.rules.request_ : null; //validate against "magic" rule (#14)
             return fn? fn(request) : true;
         },
         
