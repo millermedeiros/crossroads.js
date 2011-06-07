@@ -1,7 +1,13 @@
 # Crossroads.js Changelog #
 
 
-## ?? ##
+## v0.4 (??) ##
+
+### API Changes ###
+
+ - added magic rule to validate whole request `rules.request_`. (#14)
+
+### Other ###
 
  - changed behavior of trailing slash at the end of string pattern so ti doesn't affect route anymore (#12).
 
