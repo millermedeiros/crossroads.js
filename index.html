@@ -178,9 +178,12 @@
 							<dd> 
 								If pattern is a String it can contain named variables surrounded by <code>"{}"</code> that will be evaluated 
 								and passed to handlers as parameters. Each pattern segment is limited by the <code>"/"</code> char, so named variables will 
-								match anything until it finds a <code>"/"</code> char or the next string token located after the variable. 
+                                match anything until it finds a <code>"/"</code> char or the next string token located after the variable.
+                            </dd>
+                            <dd>
 								The pattern <code>"{foo}/{bar}"</code> will match <code>"lorem/ipsum-dolor"</code> but won't match <code>"lorem/ipsum-dolor/sit"</code>. 
-								The patterns <code>"{foo}{bar}"</code> and <code>"{foo}/{bar}"</code> match exactly the same requests. - If you need to 
+                                The patterns <code>"{foo}{bar}"</code> and <code>"{foo}/{bar}"</code> match exactly the same requests, a single trailing slash at
+                                the end of the request is ignored, so <code>{foo}/</code> matches same requests as <code>{foo}</code>. - If you need to 
 								match segments that may contain "/" use a regular expression instead of a string pattern.
 							</dd>
 							<dd>
@@ -348,7 +351,7 @@ crossroads.parse('/news/123'); //will trigger both handlers of `route1`
 
 					<h3 class="h3-1 code" id="route-rules">Route.rules<em>:Object</em></h3>
 					<p>
-						Object used to configure parameters/segments validation rules. <strong>This Object is only used if Route pattern is a String.</strong>
+						Object used to configure parameters/segments validation rules. <strong>This Object only validate parameters if Route pattern is a String.</strong>
 					</p>
 					<p>
 						Validation rules can be an Array, a RegExp or a Function:
@@ -359,7 +362,10 @@ crossroads.parse('/news/123'); //will trigger both handlers of `route1`
 						<li>If rule is a Function, crossroads will base validation on value returned by Function (should return a Boolean).</li>
 					</ul>
 					<p>
-						Rules <em>keys</em> should match route pattern segment names.
+                        Rules <em>keys</em> should match route pattern segment names.
+                    </p>
+                    <p>
+                        It is important to note that values are typecasted.
 					</p>
 					<h4 class="h4-1">Example</h4>
 <pre class="brush: js; gutter:false; toolbar:false">
@@ -368,7 +374,7 @@ var route1 = crossroads.addRoute('/{section}/{date}/{id}');
 //note that `rules` keys should be the same as route pattern segments names 
 route1.rules = {
 	
-	section : ['blog', 'news'], //match only values inside array
+	section : ['blog', 'news', 123], //match only values inside array
 	
 	date : /^[0-9]{4}-[0-9]{2}-[0-9]{2}$/,  //validate dates on the format "yyyy-mm-dd"
 	
@@ -390,7 +396,17 @@ route1.rules = {
 				return false;
 			}
 		}
-	}
+    },
+    
+    /**
+     * `request_` is a special rule used to validate whole request and it is the
+     * only rules which gets executed if pattern is a RegExp.
+     * It can be an Array, RegExp or Function. Note that request will be typecasted
+     * if value is a boolean or number.
+     */
+    request_ : function(request){
+        return (request != 123);
+    }
 	
 };
 
@@ -436,6 +452,12 @@ route1.match('/news/foo-bar'); //true
 					</p>
 <pre class="syntaxhighlighter">
 $ git clone git://github.com/millermedeiros/crossroads.js.git
+</pre>
+                    <p>
+                    Or install it on <a href="http://nodejs.org/">node.js</a> using <a href="http://npmjs.org/">npm</a>:
+                    </p>
+<pre class="syntaxhighlighter">
+$ npm install crossroads
 </pre>
 				</div>
 			</section>
