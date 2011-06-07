@@ -3,14 +3,15 @@
  * Released under the MIT license <http://www.opensource.org/licenses/mit-license.php>
  * @author Miller Medeiros
  * @version 0.4
- * @build 30 (06/06/2011 11:15 PM)
+ * @build 31 (06/07/2011 12:15 AM)
  */
 define(['signals'], function(signals){
         
     var crossroads,
         Route,
         patternLexer,
-        _toString = Object.prototype.toString;
+        _toString = Object.prototype.toString,
+        BOOL_REGEXP = /^(true|false)$/i;
     
     // Helpers -----------
     //====================
@@ -38,6 +39,14 @@ define(['signals'], function(signals){
     
     function isFunction(val){
         return isType('Function', val);
+    }
+
+    function typecastValue(val){
+        return (val === null)? val : (
+                    BOOL_REGEXP.test(val)? (val.toLowerCase() === 'true') : (
+                        (val === '' || isNaN(val))? val : parseFloat(val) //parseFloat(null || '') returns NaN, isNaN('') returns false
+                    )
+                );
     }
 
             
@@ -146,15 +155,15 @@ define(['signals'], function(signals){
         rules : void(0),
         
         match : function(request){
-            return this._matchRegexp.test(request) && (isRegExp(this._pattern) || this._validateParams(request)) && this._posValidation(request); //if regexp no need to validate params
+            return this._matchRegexp.test(request) && this._validateParams(request); //validate params even if regexp because of `request_` rule.
         },
         
         _validateParams : function(request){
             var rules = this.rules, 
                 prop;
             for(prop in rules){
-                if(rules.hasOwnProperty(prop)){ //filter prototype
-                    if(! this._isValidParam(request, prop) ) return false;
+                if(rules.hasOwnProperty(prop) && ! this._isValidParam(request, prop)){ //filter prototype
+                    return false;
                 }
             }
             return true;
@@ -183,18 +192,14 @@ define(['signals'], function(signals){
             var ids = this._paramsIds,
                 values = patternLexer.getParamValues(request, this._matchRegexp),
                 o = {}, 
-                n = ids.length;
+                n = ids? ids.length : 0;
             while(n--){
                 o[ids[n]] = values[n];
             }
+            o.request_ = typecastValue(request);
             return o;
         },
-        
-        _posValidation : function(request){
-            var fn = this.rules? this.rules.request_ : null; //validate against "magic" rule (#14)
-            return fn? fn(request) : true;
-        },
-        
+                
         dispose : function(){
             crossroads.removeRoute(this);
         },
@@ -221,8 +226,7 @@ define(['signals'], function(signals){
             SEGMENT_REGEXP = /([^\/]+)/,
             PARAMS_REGEXP = /\{([^\}]+)\}/g,
             SAVE_PARAMS = '___CR_PARAM___',
-            SAVED_PARAM_REGEXP = new RegExp(SAVE_PARAMS, 'g'),
-            BOOL_REGEXP = /^(true|false)$/i;
+            SAVED_PARAM_REGEXP = new RegExp(SAVE_PARAMS, 'g');
         
         function getParamIds(pattern){
             var ids = [], match;
@@ -263,14 +267,9 @@ define(['signals'], function(signals){
         
         function typecastValues(values){
             var n = values.length, 
-                result = [],
-                val;
-            while(val = values[--n]){
-                result[n] = (val === null)? val : (
-                        BOOL_REGEXP.test(val)? (val.toLowerCase() === 'true') : (
-                            (val === '' || isNaN(val))? val : parseFloat(val) //parseFloat(null || '') returns NaN, isNaN('') returns false
-                        )
-                    );
+                result = [];
+            while(n--){
+                result[n] = typecastValue(values[n]); 
             }
             return result;
         }

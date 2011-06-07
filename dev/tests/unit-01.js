@@ -284,8 +284,36 @@ YUI().use('node', 'console', 'test', function (Y){
             
             s.rules = {
                 request_ : function(request){ //this gets executed after all other validations
-                    return request !== '555';
+                    return request !== 555;
                 }
+            };
+            
+            Y.Assert.areSame(true, s.match('lorem'));
+            Y.Assert.areSame(false, s.match('lorem/dolor/sit-amet'));
+            Y.Assert.areSame(false, s.match('lorem-ipsum'));
+            Y.Assert.areSame(true, s.match('123'));
+            Y.Assert.areSame(false, s.match('555'), 'check if magic rule blocked normal validation');
+        },
+
+        testMatchMagicRule3 : function(){
+            var s = crossroads.addRoute(/^([a-z0-9]+)$/);
+            
+            s.rules = {
+                request_ : ['lorem', 123]
+            };
+            
+            Y.Assert.areSame(true, s.match('lorem'));
+            Y.Assert.areSame(false, s.match('lorem/dolor/sit-amet'));
+            Y.Assert.areSame(false, s.match('lorem-ipsum'));
+            Y.Assert.areSame(true, s.match('123'));
+            Y.Assert.areSame(false, s.match('555'), 'check if magic rule blocked normal validation');
+        },
+
+        testMatchMagicRule4 : function(){
+            var s = crossroads.addRoute(/^([a-z0-9]+)$/);
+            
+            s.rules = {
+                request_ : /(lorem|123)/
             };
             
             Y.Assert.areSame(true, s.match('lorem'));
@@ -580,7 +608,7 @@ YUI().use('node', 'console', 'test', function (Y){
             
             crossroads.parse('//456');
             
-            Y.Assert.isUndefined(t1);
+            Y.Assert.areSame('', t1);
             Y.Assert.areSame(456, t2);
             
         },

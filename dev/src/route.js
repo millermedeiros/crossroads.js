@@ -58,7 +58,7 @@
             while(n--){
                 o[ids[n]] = values[n];
             }
-            o.request_ = request;
+            o.request_ = typecastValue(request);
             return o;
         },
                 
