@@ -1,16 +1,16 @@
 
-# Crossroads - JavaScript Routes #
-
-**IMPORTANT: API isn't totally defined yet, some features may be added/removed and methods/properties renamed.**
-
+![Crossroads - JavaScript Routes](https://github.com/millermedeiros/crossroads.js/raw/master/_assets/crossroads_logo.png)
 
 
 ## Introduction ##
 
-Crossroads.js is a routing system that isn't strictly related with the URL, location.hash and/or server requests. 
-The idea is to process any kind of string input and dispatch events if it matches any of the desired patterns.
+Crossroads.js is a routing library inspired by URL Route/Dispatch utilities present on frameworks like Rails, Pyramid, Django, CakePHP, CodeIgniter, etc... 
+It parses a string input and decides which action should be executed by matching the string against multiple patterns.
 
-It should be *robust* and as flexible as possible while still being simple to use.
+If used properly it can reduce code complexity by decoupling objects and also by abstracting navigation paths.
+
+See [project page](http://millermedeiros.github.com/crossroads.js/) for documentation and more details.
+
 
 
 
@@ -18,6 +18,7 @@ It should be *robust* and as flexible as possible while still being simple to us
 
  - [Project page and documentation](http://millermedeiros.github.com/crossroads.js/)
  - [Usage examples](https://github.com/millermedeiros/crossroads.js/wiki/Examples)
+ - [Changelog](https://github.com/millermedeiros/crossroads.js/blob/master/CHANGELOG.md)
 
 
 
@@ -78,4 +79,5 @@ This project uses [Apache Ant](http://ant.apache.org/) for the build process. If
 This will delete all JS files inside the `dist` folder, merge/update/compress source files and copy the output to the `dist` folder.
 
 **IMPORTANT:** `dist` folder always contain the latest version, regular users should **not** need to run build task.
+
 

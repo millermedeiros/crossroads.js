@@ -14,9 +14,12 @@
             "web" : "https://github.com/millermedeiros/crossroads.js/issues"
         },
         "licenses" : [
-        {
-            "type" : "MIT",
-            "url" : "http://www.opensource.org/licenses/mit-license.php"
+            {
+                "type" : "MIT",
+                "url" : "http://www.opensource.org/licenses/mit-license.php"
+            }
+        ],
+        "dependencies" : {
+            "signals" : "*"
         }
-    ]
 }
