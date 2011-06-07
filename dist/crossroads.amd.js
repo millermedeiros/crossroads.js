@@ -2,8 +2,8 @@
  * Crossroads - JavaScript Routes
  * Released under the MIT license <http://www.opensource.org/licenses/mit-license.php>
  * @author Miller Medeiros
- * @version 0.4rc1
- * @build 28 (06/06/2011 10:17 PM)
+ * @version 0.4
+ * @build 30 (06/06/2011 11:15 PM)
  */
 define(['signals'], function(signals){
         
