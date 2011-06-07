@@ -18,6 +18,7 @@ See [project page](http://millermedeiros.github.com/crossroads.js/) for document
 
  - [Project page and documentation](http://millermedeiros.github.com/crossroads.js/)
  - [Usage examples](https://github.com/millermedeiros/crossroads.js/wiki/Examples)
+ - [Changelog](https://github.com/millermedeiros/crossroads.js/blob/master/CHANGELOG.md)
 
 
 
