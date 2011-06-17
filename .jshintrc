@@ -1,0 +1,12 @@
+{
+    "onevar" : true, 
+    "undef" : false, 
+    "newcap" : true, 
+    "regexp" : false, 
+    "bitwise" : true, 
+    "maxerr" : 50, 
+    "indent" : 4, 
+    "white" : false, 
+    "nomen" : false, 
+    "plusplus" : false
+}
