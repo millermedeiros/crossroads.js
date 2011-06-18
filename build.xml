@@ -35,7 +35,8 @@
 		<copy file="${src.dir}/wrapper_closure.js" tofile="${dist.dir}/${dist.name}" />	
 		<copy file="${src.dir}/wrapper_amd.js" tofile="${dist.dir}/${dist.amd.name}" />
 		<copy file="${src.dir}/wrapper_cjs.js" tofile="${dist.dir}/${dist.cjs.name}" />
-		
+        
+        <!-- replace tokens -->
 		<replace>
 			<fileset dir="${dist.dir}" includes="${dist.name} ${dist.amd.name} ${dist.cjs.name}" />
 			<replacefilter token="//::LICENSE:://" value="${license.txt}" />
@@ -48,7 +49,7 @@
 			<replacefilter token="::BUILD_NUMBER::" value="${build.number}" />
 			<replacefilter token="::BUILD_DATE::" value="${build.date}" />
 		</replace>
-		
+
 		<echo message="${dist.name} built." />
 	</target> 
 	
