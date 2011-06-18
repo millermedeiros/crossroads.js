@@ -181,9 +181,71 @@ YUI().use('node', 'console', 'test', function (Y){
             Y.Assert.areSame(false, s.match('123'));
             Y.Assert.areSame(false, s.match('123/45'));
         },
+
+        testMatchSimple4 : function(){
+            var s = crossroads.addRoute('/{foo}/:bar:');
+            Y.Assert.areSame(true, s.match('/lorem-ipsum')); 
+        },
+
+        testMatchSimple5 : function(){
+            var s = crossroads.addRoute('/{foo}/:bar:');
+            Y.Assert.areSame(true, s.match('/lorem-ipsum/'));
+        },
+
+        testMatchSimple6 : function(){
+            var s = crossroads.addRoute('/{foo}/:bar:');
+            Y.Assert.areSame(true, s.match('/lorem-ipsum/dolor'));
+        },
+
+        testMatchSimple7 : function(){
+            var s = crossroads.addRoute('/{foo}:bar:');
+            Y.Assert.areSame(true, s.match('/lorem-ipsum/dolor'));
+        },
+
+        testMatchSimple8 : function(){
+            var s = crossroads.addRoute('/{foo}:bar::ipsum:');
+            Y.Assert.areSame(true, s.match('/123'));
+        },
+
+        testMatchSimple9 : function(){
+            var s = crossroads.addRoute('/{foo}:bar::ipsum:');
+            Y.Assert.areSame(true, s.match('/123/asd'));
+        },
+
+        testMatchSimple10 : function(){
+            var s = crossroads.addRoute('/{foo}:bar::ipsum:');
+            Y.Assert.areSame(true, s.match('/123/asd/qwe'));
+        },
+
+        testMatchSimple11 : function(){
+            var s = crossroads.addRoute('/{foo}/:bar:');
+            Y.Assert.areSame(false, s.match('123/45'));
+        },
+
+        testMatchSimple12 : function(){
+            var s = crossroads.addRoute('/{foo}:bar:{ipsum}'); //bad use!
+            Y.Assert.areSame(false, s.match('/123/45/asd'));
+        },
         
         testMatchArrayOptions : function(){
             var s = crossroads.addRoute('/{foo}/{bar}');
+            
+            s.rules = {
+                foo : ['lorem-ipsum', 123],
+                bar : ['dolor', 45]
+            };
+            
+            Y.Assert.areSame(false, s.match('/lorem-ipsum'));
+            Y.Assert.areSame(true, s.match('/lorem-ipsum/dolor'));
+            Y.Assert.areSame(false, s.match('lorem-ipsum'));
+            Y.Assert.areSame(false, s.match('/123'));
+            Y.Assert.areSame(false, s.match('123'));
+            Y.Assert.areSame(false, s.match('/123/123'));
+            Y.Assert.areSame(true, s.match('/123/45'));
+        },
+
+        testMatchArrayOptionsOptional : function(){
+            var s = crossroads.addRoute('/:foo:/:bar:');
             
             s.rules = {
                 foo : ['lorem-ipsum', 123],
