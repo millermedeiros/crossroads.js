@@ -32,7 +32,7 @@ YUI().use('node', 'console', 'test', function (Y){
          * Cleans up everything that was created by setUp().
          */
         tearDown : function(){
-            
+
         },
         
         //---------------------------------------------------------------------
@@ -105,6 +105,7 @@ YUI().use('node', 'console', 'test', function (Y){
             crossroads.removeAllRoutes();
             crossroads.bypassed.removeAll();
             crossroads.routed.removeAll();
+            crossroads.shouldTypecast = true;
         },
         
         //---------------------------------------------------------------------
@@ -255,7 +256,29 @@ YUI().use('node', 'console', 'test', function (Y){
             Y.Assert.areSame(false, s.match('123'));
             Y.Assert.areSame(true, s.match('/123/45/67'));
         },
-        
+
+        testMatchMixedRulesNoTypecast : function(){
+            var s = crossroads.addRoute('/{foo}/{bar}/{ipsum}');
+            
+            crossroads.shouldTypecast = false;
+
+            s.rules = {
+                foo : function(val, request, params){
+                    return (val === 'lorem-ipsum' || val === '123');  //only string validates
+                },
+                bar : ['dolor', '45'], //only string validates
+                ipsum : /(sit-amet|67)/
+            };
+            
+            Y.Assert.areSame(false, s.match('/lorem-ipsum'));
+            Y.Assert.areSame(true, s.match('/lorem-ipsum/dolor/sit-amet'));
+            Y.Assert.areSame(false, s.match('lorem-ipsum'));
+            Y.Assert.areSame(false, s.match('/123'));
+            Y.Assert.areSame(false, s.match('123'));
+            Y.Assert.areSame(true, s.match('/123/45/67'));
+
+        },
+
         testMatchMagicRule : function(){
             var s = crossroads.addRoute('/{foo}/{bar}/{ipsum}');
             
@@ -420,6 +443,27 @@ YUI().use('node', 'console', 'test', function (Y){
             Y.Assert.areSame(123, t2);
             Y.Assert.areSame(true, t3);
             Y.Assert.areSame(false, t4);
+        },
+
+        testRouteSimple6_NoTypecast : function(){
+            var t1, t2, t3, t4;
+            
+            crossroads.shouldTypecast = false;
+
+            var a = crossroads.addRoute('{lorem}/{ipsum}/{dolor}/{sit}');
+            a.matched.add(function(a, b, c, d){
+                t1 = a;
+                t2 = b;
+                t3 = c;
+                t4 = d;
+            });
+            
+            crossroads.parse('lorem/123/true/false');
+            
+            Y.Assert.areSame('lorem', t1);
+            Y.Assert.areSame('123', t2);
+            Y.Assert.areSame('true', t3);
+            Y.Assert.areSame('false', t4);
         },
         
         

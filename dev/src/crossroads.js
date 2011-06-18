@@ -5,6 +5,8 @@
     crossroads = (function(){
         
         var _crossroads = {
+            
+            shouldTypecast : true,
 
             _routes : [],
             

@@ -58,7 +58,7 @@
             while(n--){
                 o[ids[n]] = values[n];
             }
-            o.request_ = typecastValue(request);
+            o.request_ = crossroads.shouldTypecast? typecastValue(request) : request;
             return o;
         },
                 
