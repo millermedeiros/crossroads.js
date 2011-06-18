@@ -41,7 +41,7 @@
                 isValid = validationRule.test(val);
             }
             else if (isArray(validationRule)) {
-                isValid = arrayIndexOf(validationRule, val) !== -1;
+                isValid = arrayIndexOf(validationRule, val || '') !== -1; //adding empty string since optional rule can be empty
             }
             else if (isFunction(validationRule)) {
                 isValid = validationRule(val, request, values);

@@ -1,3 +1,5 @@
+/*jshint onevar:false*/
+
 YUI().use('node', 'console', 'test', function (Y){
     
     //==============================================================================
@@ -45,17 +47,29 @@ YUI().use('node', 'console', 'test', function (Y){
             Y.Assert.areSame('dolor', ids[1]);
         },
         
+        //no point in testing the actual pattern value, better to just test
+        //if compiled pattern validates against original input.
+        //refactoring will change pattern a lot, important is if value
+        //still validates.
+
         testLexerCompilePattern : function(){
             var pattern = '/lorem/{ipsum}/{dolor}',
                 regex = crossroads.patternLexer.compilePattern(pattern);
-            Y.Assert.areEqual(/^\/lorem\/([^\/]+)\/([^\/]+)\/?$/.source, regex.source);
+            //Y.Assert.areEqual(/^\/lorem\/([^\/]+)\/([^\/]+)\/?$/.source, regex.source);
             Y.Assert.isTrue(regex.test(pattern));
         },
         
         testLexerCompilePatternWithSpecialChars : function(){
             var pattern = '/lo[rem](ipsum)/{ipsum}/{dolor}',
                 regex = crossroads.patternLexer.compilePattern(pattern);
-            Y.Assert.areEqual(/^\/lo\[rem\]\(ipsum\)\/([^\/]+)\/([^\/]+)\/?$/.source, regex.source);
+            //Y.Assert.areEqual(/^\/lo\[rem\]\(ipsum\)\/([^\/]+)\/([^\/]+)\/?$/.source, regex.source);
+            Y.Assert.isTrue(regex.test(pattern));
+        },
+
+        testLexerCompilePatternWithOptionalParams : function(){
+            var pattern = '/lo[rem](ipsum)/{ipsum}/{dolor}:foo::bar:/:blah:/maecennas',
+                regex = crossroads.patternLexer.compilePattern(pattern);
+            //Y.Assert.areEqual(/^\/lo\[rem\]\(ipsum\)\/([^\/]+)\/([^\/]+)\/?$/.source, regex.source);
             Y.Assert.isTrue(regex.test(pattern));
         },
         
@@ -182,49 +196,124 @@ YUI().use('node', 'console', 'test', function (Y){
             Y.Assert.areSame(false, s.match('123/45'));
         },
 
-        testMatchSimple4 : function(){
+        testMatchOptional1 : function(){
+            var s = crossroads.addRoute(':bar:');
+            Y.Assert.areSame(true, s.match('lorem-ipsum')); 
+        },
+
+        testMatchOptional1_2 : function(){
+            var s = crossroads.addRoute(':bar:');
+            Y.Assert.areSame(true, s.match('')); 
+        },
+
+        testMatchOptional1_3 : function(){
+            var s = crossroads.addRoute(':bar:');
+            Y.Assert.areSame(false, s.match('/lorem-ipsum/')); 
+        },
+
+        testMatchOptional2 : function(){
             var s = crossroads.addRoute('/{foo}/:bar:');
             Y.Assert.areSame(true, s.match('/lorem-ipsum')); 
         },
 
-        testMatchSimple5 : function(){
+        testMatchOptional2_2 : function(){
             var s = crossroads.addRoute('/{foo}/:bar:');
             Y.Assert.areSame(true, s.match('/lorem-ipsum/'));
         },
 
-        testMatchSimple6 : function(){
+        testMatchOptional2_3 : function(){
             var s = crossroads.addRoute('/{foo}/:bar:');
             Y.Assert.areSame(true, s.match('/lorem-ipsum/dolor'));
         },
 
-        testMatchSimple7 : function(){
-            var s = crossroads.addRoute('/{foo}:bar:');
-            Y.Assert.areSame(true, s.match('/lorem-ipsum/dolor'));
-        },
-
-        testMatchSimple8 : function(){
-            var s = crossroads.addRoute('/{foo}:bar::ipsum:');
-            Y.Assert.areSame(true, s.match('/123'));
-        },
-
-        testMatchSimple9 : function(){
-            var s = crossroads.addRoute('/{foo}:bar::ipsum:');
-            Y.Assert.areSame(true, s.match('/123/asd'));
-        },
-
-        testMatchSimple10 : function(){
-            var s = crossroads.addRoute('/{foo}:bar::ipsum:');
-            Y.Assert.areSame(true, s.match('/123/asd/qwe'));
-        },
-
-        testMatchSimple11 : function(){
+        testMatchOptional2_4 : function(){
             var s = crossroads.addRoute('/{foo}/:bar:');
             Y.Assert.areSame(false, s.match('123/45'));
         },
 
-        testMatchSimple12 : function(){
+        testMatchOptional3 : function(){
+            var s = crossroads.addRoute('/{foo}:bar:');
+            Y.Assert.areSame(true, s.match('/lorem-ipsum/dolor'));
+        },
+
+        testMatchOptional4 : function(){
+            var s = crossroads.addRoute('/{foo}:bar::ipsum:');
+            Y.Assert.areSame(true, s.match('/123'));
+        },
+
+        testMatchOptional4_2 : function(){
+            var s = crossroads.addRoute('/{foo}:bar::ipsum:');
+            Y.Assert.areSame(true, s.match('/123/asd'));
+        },
+
+        testMatchOptional4_3 : function(){
+            var s = crossroads.addRoute('/{foo}:bar::ipsum:');
+            Y.Assert.areSame(true, s.match('/123/asd/qwe'));
+        },
+
+        testMatchOptional5 : function(){
+            var s = crossroads.addRoute('/{foo}/:bar:/:ipsum:');
+            Y.Assert.areSame(true, s.match('/123'));
+        },
+
+        testMatchOptional5_2 : function(){
+            var s = crossroads.addRoute('/{foo}/:bar:/:ipsum:');
+            Y.Assert.areSame(true, s.match('/123/'));
+        },
+
+        testMatchOptional5_3 : function(){
+            var s = crossroads.addRoute('/{foo}/:bar:/:ipsum:');
+            Y.Assert.areSame(true, s.match('/123/asd'));
+        },
+
+        testMatchOptional5_4 : function(){
+            var s = crossroads.addRoute('/{foo}/:bar:/:ipsum:');
+            Y.Assert.areSame(true, s.match('/123/asd/45'));
+        },
+
+        testMatchOptional5_5 : function(){
+            var s = crossroads.addRoute('/{foo}/:bar:/:ipsum:');
+            Y.Assert.areSame(true, s.match('/123/asd/45/'));
+        },
+
+        testMatchOptional6 : function(){
+            var s = crossroads.addRoute('/{foo}/:bar:/{ipsum}'); //bad use!
+            Y.Assert.areSame(true, s.match('/123/45/asd'));
+        },
+
+        testMatchOptional6_2 : function(){
+            var s = crossroads.addRoute('/{foo}/:bar:/{ipsum}'); //bad use!
+            Y.Assert.areSame(true, s.match('/123/asd'));
+        },
+
+        testMatchOptional7 : function(){
             var s = crossroads.addRoute('/{foo}:bar:{ipsum}'); //bad use!
-            Y.Assert.areSame(false, s.match('/123/45/asd'));
+            Y.Assert.areSame(true, s.match('/123/45/asd'));
+        },
+
+        testMatchOptional7_2 : function(){
+            var s = crossroads.addRoute('/{foo}:bar:{ipsum}'); //bad use!
+            Y.Assert.areSame(true, s.match('/123/45'));
+        },
+
+        testMatchOptional8 : function(){
+            var s = crossroads.addRoute('/{foo}:bar:/ipsum');
+            Y.Assert.areSame(true, s.match('/123/45/ipsum'));
+        },
+
+        testMatchOptional8_2 : function(){
+            var s = crossroads.addRoute('/{foo}:bar:/ipsum');
+            Y.Assert.areSame(true, s.match('/123/ipsum'));
+        },
+
+        testMatchOptional9 : function(){
+            var s = crossroads.addRoute('/{foo}:bar:ipsum'); //weird use!
+            Y.Assert.areSame(true, s.match('/123/ipsum'));
+        },
+
+        testMatchOptional9_2 : function(){
+            var s = crossroads.addRoute('/{foo}:bar:ipsum'); //weird use!
+            Y.Assert.areSame(true, s.match('/123/45/ipsum'));
         },
         
         testMatchArrayOptions : function(){
@@ -276,9 +365,48 @@ YUI().use('node', 'console', 'test', function (Y){
             Y.Assert.areSame(false, s.match('123'));
             Y.Assert.areSame(true, s.match('/123/45'));
         },
+
+        testMatchRegexOptionsOptional : function(){
+            var s = crossroads.addRoute('/{foo}:bar:');
+            
+            s.rules = {
+                foo : /(^[a-z0-9\-]+$)/,
+                bar : /(45|dolor|)/ //optional rule can be empty!
+            };
+            
+            Y.Assert.areSame(true, s.match('/lorem-ipsum'));
+            Y.Assert.areSame(true, s.match('/lorem-ipsum/dolor'));
+            Y.Assert.areSame(false, s.match('lorem-ipsum'));
+            Y.Assert.areSame(true, s.match('/123'));
+            Y.Assert.areSame(false, s.match('123'));
+            Y.Assert.areSame(true, s.match('/123/45'));
+        },
         
         testMatchFunctionOptions : function(){
             var s = crossroads.addRoute('/{foo}/{bar}/{ipsum}');
+            
+            s.rules = {
+                foo : function(val, request, params){
+                    return (val === 'lorem-ipsum' || val === 123);
+                },
+                bar : function(val, request, params){
+                    return (request === '/lorem-ipsum/dolor/sit-amet' || request === '/123/45/67');
+                },
+                ipsum : function(val, request, params){
+                    return (params.foo === 'lorem-ipsum' && params.bar === 'dolor' && params.ipsum === 'sit-amet') || (params.foo === 123 && params.bar === 45 && params.ipsum === 67);
+                }
+            };
+            
+            Y.Assert.areSame(false, s.match('/lorem-ipsum'));
+            Y.Assert.areSame(true, s.match('/lorem-ipsum/dolor/sit-amet'));
+            Y.Assert.areSame(false, s.match('lorem-ipsum'));
+            Y.Assert.areSame(false, s.match('/123'));
+            Y.Assert.areSame(false, s.match('123'));
+            Y.Assert.areSame(true, s.match('/123/45/67'));
+        },
+
+        testMatchFunctionOptionsOptional : function(){
+            var s = crossroads.addRoute('/{foo}/:bar:/:ipsum:');
             
             s.rules = {
                 foo : function(val, request, params){
@@ -317,6 +445,26 @@ YUI().use('node', 'console', 'test', function (Y){
             Y.Assert.areSame(false, s.match('/123'));
             Y.Assert.areSame(false, s.match('123'));
             Y.Assert.areSame(true, s.match('/123/45/67'));
+        },
+
+        testMatchMixedRulesOptional : function(){
+            var s = crossroads.addRoute('/{foo}/:bar:/:ipsum:');
+            
+            s.rules = {
+                foo : function(val, request, params){
+                    return (val === 'lorem-ipsum' || val === 123);
+                },
+                bar : ['dolor', 45, ''], //optinal can be blank!!
+                ipsum : /(sit-amet|67|)/ //optional can be blank!!
+            };
+            
+            Y.Assert.areSame(true, s.match('/lorem-ipsum'), '/$1 - only required');
+            Y.Assert.areSame(true, s.match('/lorem-ipsum/dolor/sit-amet'), '/$1/$2/$3 - all valid');
+            Y.Assert.areSame(false, s.match('/lorem-ipsum/sit-amet'), '/$1/$3 - not valid since second path have value of $3');
+            Y.Assert.areSame(false, s.match('lorem-ipsum'), '$1 - valid value missing paths');
+            Y.Assert.areSame(true, s.match('/123'), '/$1 - only required 2');
+            Y.Assert.areSame(false, s.match('123'), '$1 - valid value missing paths');
+            Y.Assert.areSame(true, s.match('/123/45/67'), '$1/$2/$3 - all valid');
         },
 
         testMatchMixedRulesNoTypecast : function(){
@@ -398,13 +546,27 @@ YUI().use('node', 'console', 'test', function (Y){
             var s = crossroads.addRoute(/^([a-z0-9]+)$/);
             
             s.rules = {
-                request_ : /(lorem|123)/
+                request_ : /^(lorem|123)$/
             };
             
             Y.Assert.areSame(true, s.match('lorem'));
             Y.Assert.areSame(false, s.match('lorem/dolor/sit-amet'));
             Y.Assert.areSame(false, s.match('lorem-ipsum'));
             Y.Assert.areSame(true, s.match('123'));
+            Y.Assert.areSame(false, s.match('555'), 'check if magic rule blocked normal validation');
+        },
+
+        testMatchMagicRuleOptional : function(){
+            var s = crossroads.addRoute(':foo:');
+            
+            s.rules = {
+                request_ : /^(lorem|123)$/
+            };
+            
+            Y.Assert.areSame(true, s.match('lorem'), '$1 - valid string');
+            Y.Assert.areSame(false, s.match('lorem/dolor/sit-amet'), '$1$2$3 - $1 is valid');
+            Y.Assert.areSame(false, s.match('lorem-ipsum'), '$1 - not valid');
+            Y.Assert.areSame(true, s.match('123'), '$1 - valid number');
             Y.Assert.areSame(false, s.match('555'), 'check if magic rule blocked normal validation');
         },
         
@@ -718,7 +880,45 @@ YUI().use('node', 'console', 'test', function (Y){
             Y.Assert.areSame(456, t2);
             
         },
-        
+       
+        testRouteOptional1 : function(){
+            var t1, t2, t3, t4;
+            
+            var a = crossroads.addRoute('foo/:lorem:/:ipsum:/:dolor:/:sit:');
+            a.matched.add(function(a, b, c, d){
+                t1 = a;
+                t2 = b;
+                t3 = c;
+                t4 = d;
+            });
+            
+            crossroads.parse('foo/lorem/123/true/false');
+            
+            Y.Assert.areSame('lorem', t1);
+            Y.Assert.areSame(123, t2);
+            Y.Assert.areSame(true, t3);
+            Y.Assert.areSame(false, t4);
+        },
+
+        testRouteOptional1_2 : function(){
+            var t1, t2, t3, t4;
+            
+            var a = crossroads.addRoute('foo/:lorem:/:ipsum:/:dolor:/:sit:');
+            a.matched.add(function(a, b, c, d){
+                t1 = a;
+                t2 = b;
+                t3 = c;
+                t4 = d;
+            });
+            
+            crossroads.parse('foo/lorem/123');
+            
+            Y.Assert.areSame('lorem', t1);
+            Y.Assert.areSame(123, t2);
+            Y.Assert.isUndefined(t3);
+            Y.Assert.isUndefined(t4);
+        },
+
         //------------------------------ Priority --------------------------------------------//
         
         testRouteWithPriority : function(){
@@ -1014,7 +1214,7 @@ YUI().use('node', 'console', 'test', function (Y){
         
         //-------------------------- toString ---------------------------------------//
         
-        testBypassed : function(){
+        testToString : function(){
             var count = 0, requests = [];
             
             var a = crossroads.addRoute('/{foo}_{bar}');

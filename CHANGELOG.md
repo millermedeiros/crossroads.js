@@ -7,6 +7,7 @@
 
  - added property `crossroads.shouldTypecast` to enable/disable typecasting
    segments values. (issue #18)
+ - added support to optional segments (issue #17)
 
 ### Other ###
 
