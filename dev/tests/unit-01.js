@@ -942,6 +942,18 @@ YUI().use('node', 'console', 'test', function (Y){
             Y.Assert.isUndefined(t4);
         },
 
+        testRouteSimpleInstance : function(){
+            var t1;
+            var cr = crossroads.create();
+            
+            cr.addRoute('/{foo}', function(foo){
+                t1 = foo;
+            });
+            cr.parse('/lorem_ipsum');
+            
+            Y.Assert.areSame('lorem_ipsum', t1);
+        },
+
         //------------------------------ Priority --------------------------------------------//
         
         testRouteWithPriority : function(){
