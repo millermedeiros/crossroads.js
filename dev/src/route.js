@@ -2,15 +2,16 @@
     // Route --------------
     //=====================
      
-    Route = function (pattern, callback, priority){
+    function Route(pattern, callback, priority, router){
         var isRegexPattern = isRegExp(pattern);
+        this._router = router;
         this._pattern = pattern;
         this._paramsIds = isRegexPattern? null : patternLexer.getParamIds(this._pattern);
         this._matchRegexp = isRegexPattern? pattern : patternLexer.compilePattern(pattern);
         this.matched = new signals.Signal();
         if(callback) this.matched.add(callback);
         this._priority = priority || 0;
-    };
+    }
     
     Route.prototype = {
         
@@ -51,19 +52,20 @@
         },
         
         _getParamValuesObject : function(request){
-            var ids = this._paramsIds,
-                values = patternLexer.getParamValues(request, this._matchRegexp),
+            var shouldTypecast = this._router.shouldTypecast,
+                ids = this._paramsIds,
+                values = patternLexer.getParamValues(request, this._matchRegexp, shouldTypecast),
                 o = {}, 
                 n = ids? ids.length : 0;
             while(n--){
                 o[ids[n]] = values[n];
             }
-            o.request_ = crossroads.shouldTypecast? typecastValue(request) : request;
+            o.request_ = shouldTypecast? typecastValue(request) : request;
             return o;
         },
                 
         dispose : function(){
-            crossroads.removeRoute(this);
+            this._router.removeRoute(this);
         },
         
         _destroy : function(){

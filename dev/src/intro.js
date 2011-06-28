@@ -1,6 +1,5 @@
     
     var crossroads,
-        Route,
         patternLexer,
         _toString = Object.prototype.toString,
         BOOL_REGEXP = /^(true|false)$/i;
@@ -39,4 +38,13 @@
                         (val === '' || isNaN(val))? val : parseFloat(val) //parseFloat(null || '') returns NaN, isNaN('') returns false
                     )
                 );
+    }
+
+    function typecastValues(values){
+        var n = values.length, 
+            result = [];
+        while(n--){
+            result[n] = typecastValue(values[n]); 
+        }
+        return result;
     }

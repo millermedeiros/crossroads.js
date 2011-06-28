@@ -40,7 +40,7 @@ Files inside `dist` folder.
 
  * crossroads.js : Uncompressed source code with comments.
  * crossroads.amd.js : Uncompressed source code wrapped as an [asynchronous module](http://wiki.commonjs.org/wiki/Modules/AsynchronousDefinition) to be used together with [RequireJS](http://requirejs.org/) or any other AMD loader.
- * crossroads.js.js : Uncompressed source code wrapped as an [CommonJS module](http://wiki.commonjs.org/wiki/Modules/1.1) to be used on [nodejs](http://nodejs.org/) or any other environment that supports CommonJS modules.
+ * crossroads.cjs.js : Uncompressed source code wrapped as an [CommonJS module](http://wiki.commonjs.org/wiki/Modules/1.1) to be used on [nodejs](http://nodejs.org/) or any other environment that supports CommonJS modules.
  * crossroads.min.js : Compressed code.
 
 You can install Crossroads on Node.js using [NPM](http://npmjs.org/)

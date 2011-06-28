@@ -3,12 +3,11 @@
  * Released under the MIT license <http://www.opensource.org/licenses/mit-license.php>
  * @author Miller Medeiros
  * @version 0.4.0+
- * @build 35 (06/18/2011 03:18 PM)
+ * @build 39 (06/28/2011 05:16 PM)
  */
 define(['signals'], function(signals){
         
     var crossroads,
-        Route,
         patternLexer,
         _toString = Object.prototype.toString,
         BOOL_REGEXP = /^(true|false)$/i;
@@ -49,30 +48,43 @@ define(['signals'], function(signals){
                 );
     }
 
+    function typecastValues(values){
+        var n = values.length, 
+            result = [];
+        while(n--){
+            result[n] = typecastValue(values[n]); 
+        }
+        return result;
+    }
+
             
     // Crossroads --------
     //====================
     
     crossroads = (function(){
         
-        var _crossroads = {
+        function Crossroads(){
+            this._routes = [];
+            this.bypassed = new signals.Signal();
+            this.routed = new signals.Signal();
+        }
+
+        Crossroads.prototype = {
             
+            create : function(){
+                return new Crossroads();
+            },
+
             shouldTypecast : true,
 
-            _routes : [],
-            
-            bypassed : new signals.Signal(),
-            
-            routed : new signals.Signal(),
-
             addRoute : function(pattern, callback, priority){
-                var route = new Route(pattern, callback, priority);
-                sortedInsert(route);
+                var route = new Route(pattern, callback, priority, this);
+                this._sortedInsert(route);
                 return route;
             },
             
             removeRoute : function(route){
-                var i = getRouteIndex(route);
+                var i = arrayIndexOf(this._routes, route);
                 if(i >= 0) this._routes.splice(i, 1);
                 route._destroy();
             },
@@ -87,8 +99,8 @@ define(['signals'], function(signals){
             
             parse : function(request){
                 request = request || '';
-                var route = getMatchedRoute(request),
-                    params = route? getParamValues(request, route) : null;
+                var route = this._getMatchedRoute(request),
+                    params = route? patternLexer.getParamValues(request, route._matchRegexp, this.shouldTypecast) : null;
                 if(route){
                     params? route.matched.dispatch.apply(route.matched, params) : route.matched.dispatch();
                     this.routed.dispatch(request, route, params);
@@ -101,39 +113,31 @@ define(['signals'], function(signals){
                 return this._routes.length;
             },
 
+            _sortedInsert : function (route){
+                //simplified insertion sort
+                var routes = this._routes,
+                    n = routes.length;
+                do { --n; } while (routes[n] && route._priority <= routes[n]._priority);
+                routes.splice(n+1, 0, route);
+            },
+            
+            _getMatchedRoute : function (request){
+                var routes = this._routes,
+                    n = routes.length,
+                    route;
+                while(route = routes[--n]){ //should be decrement loop since higher priorities are added at the end of array  
+                    if(route.match(request)) return route;
+                }
+                return null;
+            },
+
             toString : function(){
                 return '[crossroads numRoutes:'+ this.getNumRoutes() +']';
             }
         };
         
-        function sortedInsert(route){
-            //simplified insertion sort
-            var routes = crossroads._routes,
-                n = routes.length;
-            do { --n; } while (routes[n] && route._priority <= routes[n]._priority);
-            routes.splice(n+1, 0, route);
-        }
-        
-        function getRouteIndex(route){
-            return arrayIndexOf(crossroads._routes, route);
-        }
-        
-        function getMatchedRoute(request){
-            var routes = crossroads._routes,
-                n = routes.length,
-                route;
-            while(route = routes[--n]){ //should be decrement loop since higher priorities are added at the end of array  
-                if(route.match(request)) return route;
-            }
-            return null;
-        }
-        
-        function getParamValues(request, route){
-            return patternLexer.getParamValues(request, route._matchRegexp);
-        }
-        
-        //API
-        return _crossroads;
+        //return "static" instance
+        return new Crossroads();
         
     }());
 
@@ -141,15 +145,16 @@ define(['signals'], function(signals){
     // Route --------------
     //=====================
      
-    Route = function (pattern, callback, priority){
+    function Route(pattern, callback, priority, router){
         var isRegexPattern = isRegExp(pattern);
+        this._router = router;
         this._pattern = pattern;
         this._paramsIds = isRegexPattern? null : patternLexer.getParamIds(this._pattern);
         this._matchRegexp = isRegexPattern? pattern : patternLexer.compilePattern(pattern);
         this.matched = new signals.Signal();
         if(callback) this.matched.add(callback);
         this._priority = priority || 0;
-    };
+    }
     
     Route.prototype = {
         
@@ -190,19 +195,20 @@ define(['signals'], function(signals){
         },
         
         _getParamValuesObject : function(request){
-            var ids = this._paramsIds,
-                values = patternLexer.getParamValues(request, this._matchRegexp),
+            var shouldTypecast = this._router.shouldTypecast,
+                ids = this._paramsIds,
+                values = patternLexer.getParamValues(request, this._matchRegexp, shouldTypecast),
                 o = {}, 
                 n = ids? ids.length : 0;
             while(n--){
                 o[ids[n]] = values[n];
             }
-            o.request_ = crossroads.shouldTypecast? typecastValue(request) : request;
+            o.request_ = shouldTypecast? typecastValue(request) : request;
             return o;
         },
                 
         dispose : function(){
-            crossroads.removeRoute(this);
+            this._router.removeRoute(this);
         },
         
         _destroy : function(){
@@ -251,12 +257,10 @@ define(['signals'], function(signals){
         function compilePattern(pattern){
             pattern = pattern || '';
             if(pattern){
-                ;
                 pattern = pattern.replace(UNNECESSARY_SLASHES_REGEXP, '');
                 pattern = tokenize(pattern);
                 pattern = pattern.replace(ESCAPE_CHARS_REGEXP, '\\$&');
                 pattern = untokenize(pattern);
-                ;
             }
             return new RegExp('^'+ pattern + '/?$'); //trailing slash is optional
         }
@@ -273,24 +277,15 @@ define(['signals'], function(signals){
             return pattern.replace(SAVED_REQUIRED_REGEXP, '([^\\/]+)');
         }
         
-        function getParamValues(request, regexp){
+        function getParamValues(request, regexp, shouldTypecast){
             var vals = regexp.exec(request);
             if(vals){
                 vals.shift();
-                if(crossroads.shouldTypecast){
+                if(shouldTypecast){
                     vals = typecastValues(vals);
                 }
             }
             return vals;
-        }
-        
-        function typecastValues(values){
-            var n = values.length, 
-                result = [];
-            while(n--){
-                result[n] = typecastValue(values[n]); 
-            }
-            return result;
         }
         
         //API
