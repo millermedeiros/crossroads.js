@@ -52,24 +52,15 @@
             return pattern.replace(SAVED_REQUIRED_REGEXP, '([^\\/]+)');
         }
         
-        function getParamValues(request, regexp){
+        function getParamValues(request, regexp, shouldTypecast){
             var vals = regexp.exec(request);
             if(vals){
                 vals.shift();
-                if(crossroads.shouldTypecast){
+                if(shouldTypecast){
                     vals = typecastValues(vals);
                 }
             }
             return vals;
-        }
-        
-        function typecastValues(values){
-            var n = values.length, 
-                result = [];
-            while(n--){
-                result[n] = typecastValue(values[n]); 
-            }
-            return result;
         }
         
         //API

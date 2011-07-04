@@ -135,7 +135,7 @@ YUI().use('node', 'console', 'test', function (Y){
             Y.Assert.isObject(s);
             Y.Assert.isUndefined(s.rules);
             Y.Assert.isUndefined(s.id);
-            Y.Assert.isInstanceOf(signals.Signal, s.matched); //maybe remove signals...
+            Y.Assert.isInstanceOf(signals.Signal, s.matched);
             Y.Assert.areSame(1, crossroads._routes.length);
         },
         
@@ -165,6 +165,29 @@ YUI().use('node', 'console', 'test', function (Y){
             Y.Assert.areSame(1, crossroads._routes.length);
         },
         
+        testAddMultipleInstances : function(){
+            var s = crossroads.addRoute('/{foo}');
+            var cr = crossroads.create();
+            var s2 = cr.addRoute('/{ipsum}');
+            
+            Y.Assert.isObject(s);
+            Y.Assert.isUndefined(s.rules);
+            Y.Assert.isUndefined(s.id);
+            Y.Assert.isInstanceOf(signals.Signal, s.matched);
+            Y.Assert.areSame(1, crossroads._routes.length);
+
+            Y.Assert.isObject(s2);
+            Y.Assert.isUndefined(s2.rules);
+            Y.Assert.isUndefined(s2.id);
+            Y.Assert.isInstanceOf(signals.Signal, s2.matched);
+            Y.Assert.areSame(1, cr._routes.length);
+
+            var s3 = cr.addRoute('/dolor');
+            Y.Assert.areSame(1, crossroads._routes.length);
+            Y.Assert.areSame(2, cr._routes.length);
+
+        },
+
         //-------------------------- Match ---------------------------------------//
         
         testMatchSimple1 : function(){
@@ -917,6 +940,18 @@ YUI().use('node', 'console', 'test', function (Y){
             Y.Assert.areSame(123, t2);
             Y.Assert.isUndefined(t3);
             Y.Assert.isUndefined(t4);
+        },
+
+        testRouteSimpleInstance : function(){
+            var t1;
+            var cr = crossroads.create();
+            
+            cr.addRoute('/{foo}', function(foo){
+                t1 = foo;
+            });
+            cr.parse('/lorem_ipsum');
+            
+            Y.Assert.areSame('lorem_ipsum', t1);
         },
 
         //------------------------------ Priority --------------------------------------------//
