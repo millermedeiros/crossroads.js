@@ -3,7 +3,7 @@
     //=====================
      
     function Route(pattern, callback, priority, router){
-        var isRegexPattern = isRegExp(pattern);
+        var isRegexPattern = utils.isRegExp(pattern);
         this._router = router;
         this._pattern = pattern;
         this._paramsIds = isRegexPattern? null : patternLexer.getParamIds(this._pattern);
@@ -38,13 +38,13 @@
                 val = values[prop],
                 isValid;
             
-            if (isRegExp(validationRule)) {
+            if (utils.isRegExp(validationRule)) {
                 isValid = validationRule.test(val);
             }
-            else if (isArray(validationRule)) {
-                isValid = arrayIndexOf(validationRule, val || '') !== -1; //adding empty string since optional rule can be empty
+            else if (utils.isArray(validationRule)) {
+                isValid = utils.arrayIndexOf(validationRule, val || '') !== -1; //adding empty string since optional rule can be empty
             }
-            else if (isFunction(validationRule)) {
+            else if (utils.isFunction(validationRule)) {
                 isValid = validationRule(val, request, values);
             }
             
@@ -60,7 +60,7 @@
             while(n--){
                 o[ids[n]] = values[n];
             }
-            o.request_ = shouldTypecast? typecastValue(request) : request;
+            o.request_ = shouldTypecast? utils.typecastValue(request) : request;
             return o;
         },
                 

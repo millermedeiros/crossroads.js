@@ -23,7 +23,7 @@
         },
         
         removeRoute : function(route){
-            var i = arrayIndexOf(this._routes, route);
+            var i = utils.arrayIndexOf(this._routes, route);
             if(i >= 0) this._routes.splice(i, 1);
             route._destroy();
         },
