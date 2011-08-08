@@ -133,6 +133,23 @@
 					<p>
 						<a href="http://blog.millermedeiros.com/">Miller Medeiros</a>
 					</p>
+					<hr />
+
+                    <h2 class="h2-1">Saving history state & updating browser URL</h2>
+                    <p>If you are using Crossroads in the browser you may also need a library to handle history state changes. <a href="https://github.com/millermedeiros/hasher/">Hasher</a> is a "sibling" library designed to work together with Crossroads.js, both follow the same principles and use JS-Signals for the event dispatch. Example:</p>
+<pre class="brush: js; gutter:false; toolbar:false">
+//setup crossroads
+crossroads.addRoute('foo');
+crossroads.addRoute('lorem/ipsum');
+crossroads.routed.add(console.log); //log all routes
+
+//setup hasher
+hasher.changed.add(crossroads.parse, crossroads); //parse hash changes
+hasher.init(); //start listening for history change
+
+hasher.setHash('lorem/ipsum'); //update URL fragment generating new history record
+</pre>
+
 				</div>
 			</section>
 			<section id="documentation">
