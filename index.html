@@ -141,7 +141,7 @@
 //setup crossroads
 crossroads.addRoute('foo');
 crossroads.addRoute('lorem/ipsum');
-crossroads.routed.add(console.log); //log all routes
+crossroads.routed.add(console.log, console); //log all routes
 
 //setup hasher
 hasher.changed.add(crossroads.parse, crossroads); //parse hash changes
@@ -370,7 +370,9 @@ crossroads.parse('/news/123'); //match `route1`, triggering `routed` Signal
 <h4 class="h4-1">Basic Example</h4>
 <pre class="brush: js; gutter:false; toolbar:false">
 var otherRouter = crossroads.create();
-otherRouter.addRoute('/news/{id}', console.log);
+otherRouter.addRoute('/news/{id}', function(id){
+    console.log(id);
+});
 otherRouter.parse('/news/123');
 </pre>
 <h4 class="h4-1">Chain Routers</h4>
