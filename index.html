@@ -243,14 +243,14 @@ var route1 = crossroads.addRoute('/news/{id}', function(id){
 //String rule with optional param: 
 //match '/foo/123/bar' passing 123 and "bar" as param
 //match '/foo/45' passing 45 as param (slug is optional)
-var route1 = crossroads.addRoute('/foo/{id}/:slug:', function(id, slug){
-  console.log(id, slug);
-});
+var route2 = crossroads.addRoute('/foo/{id}/:slug:');
+//addRoute returns a Route object
+route2.matched.add(console.log, console);
 
 //RegExp rule: 
 //match '/lorem/ipsum' passing "ipsum" as param to handler
 //note the capturing group around segment
-var route2 = crossroads.addRoute(/^\/lorem\/([a-z]+)$/, function(id){
+var route3 = crossroads.addRoute(/^\/lorem\/([a-z]+)$/, function(id){
   console.log(id);
 });
 </pre>
