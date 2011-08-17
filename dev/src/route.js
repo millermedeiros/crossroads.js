@@ -1,7 +1,10 @@
         
     // Route --------------
     //=====================
-     
+    
+    /**
+     * @constructor
+     */
     function Route(pattern, callback, priority, router){
         var isRegexPattern = isRegExp(pattern);
         this._router = router;

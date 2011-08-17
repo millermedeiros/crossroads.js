@@ -1,10 +1,10 @@
-/*!!
- * Crossroads - JavaScript Routes
- * Released under the MIT license <http://www.opensource.org/licenses/mit-license.php>
- * @author Miller Medeiros
- * @version 0.4.0+
- * @build 43 (08/17/2011 12:45 AM)
+/** @license
+ * Crossroads.js <http://millermedeiros.github.com/crossroads.js>
+ * Released under the MIT license
+ * Author: Miller Medeiros
+ * Version 0.5.0 - Build: 58 (2011/08/17 02:00 AM)
  */
+
 define(['signals'], function(signals){
         
     var crossroads,
@@ -60,6 +60,9 @@ define(['signals'], function(signals){
     // Crossroads --------
     //====================
     
+    /**
+     * @constructor
+     */
     function Crossroads(){
         this._routes = [];
         this.bypassed = new signals.Signal();
@@ -140,7 +143,10 @@ define(['signals'], function(signals){
             
     // Route --------------
     //=====================
-     
+    
+    /**
+     * @constructor
+     */
     function Route(pattern, callback, priority, router){
         var isRegexPattern = isRegExp(pattern);
         this._router = router;

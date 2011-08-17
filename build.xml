@@ -6,7 +6,9 @@
     <property file="dev/build/build.properties" />
 	
 	<!-- custom tasks -->
-	
+
+    <taskdef name="jscomp" classname="com.google.javascript.jscomp.ant.CompileTask" classpath="${closure_compiler.jar}"/>
+    
 	
 	<!-- targets -->
 	
@@ -23,7 +25,7 @@
 		<buildnumber file="${build.dir}/build.number"/>
 		
 		<tstamp>
-			<format property="build.date" pattern="MM/dd/yyyy hh:mm aa" unit="hour"/>
+            <format property="build.date" pattern="yyyy/MM/dd hh:mm aa" unit="hour"/>
 		</tstamp>
 		
 		<loadfile property="license.txt" srcFile="${src.dir}/license.txt"/>
@@ -55,21 +57,16 @@
 	
 	<target name="minify">
 		<echo message="Building ${dist.min.name}..." />
-		
-		<apply executable="java" parallel="false" verbose="true" dest="${dist.dir}">
-		    <fileset dir="${dist.dir}">
-		        <include name="${dist.name}" />
-		    </fileset>
-		    <arg line="-jar" />
-		    <arg path="${yuicompressor.jar}" />
-		    <arg value="--charset" />
-		    <arg value="UTF8" />
-		    <arg value="-v" />
-		    <arg value="-o" />
-		    <targetfile />
-		    <mapper type="glob" from="${dist.name}" to="${dist.min.name}" />
-		</apply>
-		
+
+        <jscomp compilationLevel="simple" warning="verbose" debug="false" output="${dist.dir}/${dist.min.name}">
+            <externs dir="${build.dir}">
+                <file name="externs.js"/>
+            </externs>
+            <sources dir="${dist.dir}">
+                <file name="${dist.name}"/>
+            </sources>
+        </jscomp>
+
 		<echo message="${dist.min.name} built." />
 	</target>
 	

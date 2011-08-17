@@ -2,6 +2,9 @@
     // Crossroads --------
     //====================
     
+    /**
+     * @constructor
+     */
     function Crossroads(){
         this._routes = [];
         this.bypassed = new signals.Signal();

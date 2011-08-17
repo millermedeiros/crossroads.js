@@ -1,7 +1,7 @@
 # Crossroads.js Changelog #
 
 
-## NEXT ##
+## v0.5.0 (2011/08/17) ##
 
 ### API Changes ###
 
@@ -27,6 +27,7 @@
 
  - changed behavior of trailing slash at the end of string pattern so it doesn't affect route anymore (issue #12).
  - added NPM package.
+
 
 
 ## v0.3 (2011/05/03) ##
