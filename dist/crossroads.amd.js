@@ -3,7 +3,7 @@
  * Released under the MIT license <http://www.opensource.org/licenses/mit-license.php>
  * @author Miller Medeiros
  * @version 0.4.0+
- * @build 40 (06/28/2011 05:24 PM)
+ * @build 41 (08/16/2011 10:24 PM)
  */
 define(['signals'], function(signals){
         
@@ -228,7 +228,7 @@ define(['signals'], function(signals){
         
         var ESCAPE_CHARS_REGEXP = /[\\.+*?\^$\[\](){}\/'#]/g, //match chars that should be escaped on string regexp
             UNNECESSARY_SLASHES_REGEXP = /\/$/g, //trailing slash
-            OPTIONAL_SLASHES_REGEXP = /([:}])\/?(:)/g, //slash between `::` or `}:`. $1 = before, $2 = after
+            OPTIONAL_SLASHES_REGEXP = /([:}]|\w(?=\/))\/?(:)/g, //slash between `::` or `}:` or `\w:`. $1 = before, $2 = after
 
             REQUIRED_PARAMS_REGEXP = /\{([^}]+)\}/g, //match everything between `{ }`
             OPTIONAL_PARAMS_REGEXP = /:([^:]+):/g, //match everything between `: :`

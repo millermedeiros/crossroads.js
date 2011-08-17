@@ -338,6 +338,56 @@ YUI().use('node', 'console', 'test', function (Y){
             var s = crossroads.addRoute('/{foo}:bar:ipsum'); //weird use!
             Y.Assert.areSame(true, s.match('/123/45/ipsum'));
         },
+
+        testMatchOptional10 : function(){
+            var s = crossroads.addRoute('/123/:bar:/:ipsum:');
+            Y.Assert.areSame(true, s.match('/123'));
+        },
+
+        testMatchOptional10_2 : function(){
+            var s = crossroads.addRoute('/123/:bar:/:ipsum:');
+            Y.Assert.areSame(true, s.match('/123/'));
+        },
+
+        testMatchOptional10_3 : function(){
+            var s = crossroads.addRoute('/123/:bar:/:ipsum:');
+            Y.Assert.areSame(true, s.match('/123/asd'));
+        },
+
+        testMatchOptional10_4 : function(){
+            var s = crossroads.addRoute('/123/:bar:/:ipsum:');
+            Y.Assert.areSame(true, s.match('/123/asd/45'));
+        },
+
+        testMatchOptional10_5 : function(){
+            var s = crossroads.addRoute('/123/:bar:/:ipsum:');
+            Y.Assert.areSame(true, s.match('/123/asd/45/'));
+        },
+
+        testMatchOptional11 : function(){
+            var s = crossroads.addRoute('/123/:bar::ipsum:');
+            Y.Assert.areSame(true, s.match('/123'));
+        },
+
+        testMatchOptional11_2 : function(){
+            var s = crossroads.addRoute('/123/:bar::ipsum:');
+            Y.Assert.areSame(true, s.match('/123/'));
+        },
+
+        testMatchOptional11_3 : function(){
+            var s = crossroads.addRoute('/123/:bar::ipsum:');
+            Y.Assert.areSame(true, s.match('/123/asd'));
+        },
+
+        testMatchOptional11_4 : function(){
+            var s = crossroads.addRoute('/123/:bar::ipsum:');
+            Y.Assert.areSame(true, s.match('/123/asd/45'));
+        },
+
+        testMatchOptional11_5 : function(){
+            var s = crossroads.addRoute('/123/:bar::ipsum:');
+            Y.Assert.areSame(true, s.match('/123/asd/45/'));
+        },
         
         testMatchArrayOptions : function(){
             var s = crossroads.addRoute('/{foo}/{bar}');
