@@ -1,7 +1,6 @@
     
     var crossroads,
         patternLexer,
-        _toString = Object.prototype.toString,
         BOOL_REGEXP = /^(true|false)$/i;
     
     // Helpers -----------
@@ -17,7 +16,7 @@
     }
     
     function isType(type, val){
-        return '[object '+ type +']' === _toString.call(val);
+        return '[object '+ type +']' === Object.prototype.toString.call(val);
     }
     
     function isRegExp(val){
@@ -40,7 +39,7 @@
                 );
     }
 
-    function typecastValues(values){
+    function typecastArrayValues(values){
         var n = values.length, 
             result = [];
         while(n--){

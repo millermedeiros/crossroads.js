@@ -52,7 +52,7 @@
             return this._routes.length;
         },
 
-        _sortedInsert : function (route){
+        _sortedInsert : function(route){
             //simplified insertion sort
             var routes = this._routes,
                 n = routes.length;
@@ -60,7 +60,7 @@
             routes.splice(n+1, 0, route);
         },
         
-        _getMatchedRoute : function (request){
+        _getMatchedRoute : function(request){
             var routes = this._routes,
                 n = routes.length,
                 route;

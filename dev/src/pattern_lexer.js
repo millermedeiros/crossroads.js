@@ -57,7 +57,7 @@
             if(vals){
                 vals.shift();
                 if(shouldTypecast){
-                    vals = typecastValues(vals);
+                    vals = typecastArrayValues(vals);
                 }
             }
             return vals;
