@@ -68,6 +68,18 @@
             o.request_ = shouldTypecast? typecastValue(request) : request;
             return o;
         },
+
+        _getParamsArray : function(request){
+            var vals = this._getParamValuesObject(request),
+                norm = this.rules? this.rules.normalize_ : null,
+                params;
+            if(isFunction(norm)){
+                params = norm(request, vals);
+            } else {
+                params = patternLexer.getParamValues(request, this._matchRegexp, this._router.shouldTypecast);
+            }
+            return params;
+        },
                 
         dispose : function(){
             this._router.removeRoute(this);
