@@ -147,7 +147,8 @@ crossroads.routed.add(console.log); //log all routes
 hasher.changed.add(crossroads.parse, crossroads); //parse hash changes
 hasher.init(); //start listening for history change
 
-hasher.setHash('lorem/ipsum'); //update URL fragment generating new history record
+//update URL fragment generating new history record
+hasher.setHash('lorem/ipsum');
 </pre>
 
 				</div>
@@ -428,7 +429,7 @@ crossroads.parse('/news/123'); //will trigger both handlers of `route1`
 
 					<h3 class="h3-1 code" id="route-rules">Route.rules<em>:Object</em></h3>
 					<p>
-						Object used to configure parameters/segments validation rules. <strong>This Object only validate parameters if Route pattern is a String.</strong>
+						Object used to configure parameters/segments validation rules.
 					</p>
 					<p>
 						Validation rules can be an Array, a RegExp or a Function:
