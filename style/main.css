@@ -48,7 +48,7 @@ sub{bottom:-0.25em}
 /* ========================= GENERAL TAGS ======================== */
 
 html{font-family:'Helvetica Neue', Helvetica, Arial, sans-serif; overflow-y:scroll}
-body{background-color:#e7fdf8; color:#333; font-size:14px; line-height:1.5em}
+body{background-color:#e7fdf8; color:#333; font-size:16px; line-height:1.6em}
 
 h1, h2, h3, h4, h5, h6{font-weight:normal; line-height:1em}
 h1, .h1{font-size:4em; margin:1em 0 0.75px}
