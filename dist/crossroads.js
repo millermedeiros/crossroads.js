@@ -3,13 +3,12 @@
  * Released under the MIT license <http://www.opensource.org/licenses/mit-license.php>
  * @author Miller Medeiros
  * @version 0.4.0+
- * @build 41 (08/16/2011 10:24 PM)
+ * @build 43 (08/17/2011 12:45 AM)
  */
 (function(global){
         
     var crossroads,
         patternLexer,
-        _toString = Object.prototype.toString,
         BOOL_REGEXP = /^(true|false)$/i;
     
     // Helpers -----------
@@ -25,7 +24,7 @@
     }
     
     function isType(type, val){
-        return '[object '+ type +']' === _toString.call(val);
+        return '[object '+ type +']' === Object.prototype.toString.call(val);
     }
     
     function isRegExp(val){
@@ -48,7 +47,7 @@
                 );
     }
 
-    function typecastValues(values){
+    function typecastArrayValues(values){
         var n = values.length, 
             result = [];
         while(n--){
@@ -111,7 +110,7 @@
             return this._routes.length;
         },
 
-        _sortedInsert : function (route){
+        _sortedInsert : function(route){
             //simplified insertion sort
             var routes = this._routes,
                 n = routes.length;
@@ -119,7 +118,7 @@
             routes.splice(n+1, 0, route);
         },
         
-        _getMatchedRoute : function (request){
+        _getMatchedRoute : function(request){
             var routes = this._routes,
                 n = routes.length,
                 route;
@@ -163,18 +162,18 @@
         
         _validateParams : function(request){
             var rules = this.rules, 
+                values = this._getParamValuesObject(request),
                 prop;
             for(prop in rules){
-                if(rules.hasOwnProperty(prop) && ! this._isValidParam(request, prop)){ //filter prototype
+                if(rules.hasOwnProperty(prop) && ! this._isValidParam(request, prop, values)){ //filter prototype
                     return false;
                 }
             }
             return true;
         },
         
-        _isValidParam : function(request, prop){
+        _isValidParam : function(request, prop, values){
             var validationRule = this.rules[prop],
-                values = this._getParamValuesObject(request),
                 val = values[prop],
                 isValid;
             
@@ -193,12 +192,14 @@
         
         _getParamValuesObject : function(request){
             var shouldTypecast = this._router.shouldTypecast,
-                ids = this._paramsIds,
                 values = patternLexer.getParamValues(request, this._matchRegexp, shouldTypecast),
                 o = {}, 
-                n = ids? ids.length : 0;
+                n = values.length;
             while(n--){
-                o[ids[n]] = values[n];
+                o[n] = values[n]; //for RegExp pattern and also alias to normal paths
+                if(this._paramsIds){
+                    o[this._paramsIds[n]] = values[n];
+                }
             }
             o.request_ = shouldTypecast? typecastValue(request) : request;
             return o;
@@ -279,7 +280,7 @@
             if(vals){
                 vals.shift();
                 if(shouldTypecast){
-                    vals = typecastValues(vals);
+                    vals = typecastArrayValues(vals);
                 }
             }
             return vals;

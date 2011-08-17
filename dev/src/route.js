@@ -23,18 +23,18 @@
         
         _validateParams : function(request){
             var rules = this.rules, 
+                values = this._getParamValuesObject(request),
                 prop;
             for(prop in rules){
-                if(rules.hasOwnProperty(prop) && ! this._isValidParam(request, prop)){ //filter prototype
+                if(rules.hasOwnProperty(prop) && ! this._isValidParam(request, prop, values)){ //filter prototype
                     return false;
                 }
             }
             return true;
         },
         
-        _isValidParam : function(request, prop){
+        _isValidParam : function(request, prop, values){
             var validationRule = this.rules[prop],
-                values = this._getParamValuesObject(request),
                 val = values[prop],
                 isValid;
             
@@ -53,12 +53,14 @@
         
         _getParamValuesObject : function(request){
             var shouldTypecast = this._router.shouldTypecast,
-                ids = this._paramsIds,
                 values = patternLexer.getParamValues(request, this._matchRegexp, shouldTypecast),
                 o = {}, 
-                n = ids? ids.length : 0;
+                n = values.length;
             while(n--){
-                o[ids[n]] = values[n];
+                o[n] = values[n]; //for RegExp pattern and also alias to normal paths
+                if(this._paramsIds){
+                    o[this._paramsIds[n]] = values[n];
+                }
             }
             o.request_ = shouldTypecast? typecastValue(request) : request;
             return o;
