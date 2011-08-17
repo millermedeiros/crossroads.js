@@ -69,8 +69,23 @@
 
 		<echo message="${dist.min.name} built." />
 	</target>
+
+    <target name="jshint">
+        <apply dir="${dist.dir}" executable="java" parallel="false" failonerror="true">
+            <fileset dir="${dist.dir}">
+                <include name="${dist.name}"/>
+            </fileset>
+            <arg value="-jar" />
+            <arg path="${rhino.jar}" />
+            <arg path="${jshint.js}" />
+            <srcfile/>
+            <arg value="${jshint.opts}" />
+        </apply>
+        <echo>JSHint Successful</echo>
+    </target>
+    
 	
-	<target name="compile" depends="build, minify">
+	<target name="compile" depends="build, minify, jshint">
 		<echo message="Build Complete." />
 	</target>
 	

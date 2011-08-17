@@ -1,9 +1,9 @@
 {
   "predef": [],
 
-  "browser" : true,
+  "browser" : false,
   "devel" : false,
-  "jquery" : true,
+  "jquery" : false,
   "mootools" : false,
   "node" : false,
   "prototypejs" : false,
@@ -16,7 +16,7 @@
   "curly" : false,
   "debug" : false,
   "eqeqeq" : true,
-  "eqnull" : false,
+  "eqnull" : true,
   "es5" : true,
   "evil" : false,
   "expr" : true,
