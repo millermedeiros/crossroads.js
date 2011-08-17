@@ -384,21 +384,21 @@ crossroads.bypassed.add(otherRouter.parse, otherRouter);
 
 					<h3 class="h3-1 code" id="crossroads-should_typecast">crossroads.shouldTypecast<em>:Boolean</em></h3>
                     <p>
-                        Set if crossroads should typecast route paths. Default value is <code>false</code>.
+                        Set if crossroads should typecast route paths. Default value is <code>true</code>.
                     </p>
                     <p>
-                        Note that you need to set this property for each Router returned by the <a href="#crossroads-create">crossroads.create()</a> since all Routers have <code>false</code> as the default value.
+                        Note that you need to set this property for each Router returned by the <a href="#crossroads-create">crossroads.create()</a> since all Routers have <code>true</code> as the default value.
                     </p>
 <h4 class="h4-1">Example</h4>
 <pre class="brush: js; gutter:false; toolbar:false">
-crossroads.shouldTypecast = true; //default = false
+crossroads.shouldTypecast = true; //default = true
 crossroads.addRoute('/news/{id}', function(id){
     console.log(id); // 12 (remove trailing zeroes since it's typecasted)
 });
 crossroads.parse('/news/00012');
 </pre>
 <pre class="brush: js; gutter:false; toolbar:false">
-crossroads.shouldTypecast = false; //default = false
+crossroads.shouldTypecast = false; //default = true
 crossroads.addRoute('/news/{id}', function(id){
     console.log(id); // "00012" (keep trailing zeroes)
 });
@@ -409,7 +409,7 @@ crossroads.parse('/news/00012');
 					<h3 class="h3-1 code" id="route-matched">Route.matched<em>:Signal</em></h3>
 					<p>Signal dispatched every time a request matches the route pattern.</p>
 					<p>
-                        Signal handlers will receive all parameters captured by the Route pattern, it is important to note that values will be "typecasted" if <code>Router.shouldTypecast = true</code>,
+                        Signal handlers will receive all parameters captured by the Route pattern, it is important to note that values will be "typecasted" if <a href="#crossroads-should_typecast">Router.shouldTypecast = true</a>,
 						so if the request was <code>"/foo/123"</code> and pattern <code>"{section}/{sub}"</code>, <code>"foo"</code> (String) will be the first parameter and <code>123</code> (Number) 
 						will be the second parameter of the handler.
 					</p>
