@@ -1,8 +1,6 @@
     
     var crossroads,
-        Route,
         patternLexer,
-        _toString = Object.prototype.toString,
         BOOL_REGEXP = /^(true|false)$/i;
     
     // Helpers -----------
@@ -18,7 +16,7 @@
     }
     
     function isType(type, val){
-        return '[object '+ type +']' === _toString.call(val);
+        return '[object '+ type +']' === Object.prototype.toString.call(val);
     }
     
     function isRegExp(val){
@@ -39,4 +37,13 @@
                         (val === '' || isNaN(val))? val : parseFloat(val) //parseFloat(null || '') returns NaN, isNaN('') returns false
                     )
                 );
+    }
+
+    function typecastArrayValues(values){
+        var n = values.length, 
+            result = [];
+        while(n--){
+            result[n] = typecastValue(values[n]); 
+        }
+        return result;
     }

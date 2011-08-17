@@ -2,85 +2,82 @@
     // Crossroads --------
     //====================
     
-    crossroads = (function(){
+    /**
+     * @constructor
+     */
+    function Crossroads(){
+        this._routes = [];
+        this.bypassed = new signals.Signal();
+        this.routed = new signals.Signal();
+    }
+
+    Crossroads.prototype = {
         
-        var _routes = [],
-            _bypassed = new signals.Signal(),
-            _routed = new signals.Signal();
-        
-        function addRoute(pattern, callback, priority){
-            var route = new Route(pattern, callback, priority);
-            sortedInsert(route);
+        create : function(){
+            return new Crossroads();
+        },
+
+        shouldTypecast : true,
+
+        addRoute : function(pattern, callback, priority){
+            var route = new Route(pattern, callback, priority, this);
+            this._sortedInsert(route);
             return route;
-        }
+        },
         
-        function sortedInsert(route){
-            //simplified insertion sort
-            var n = getNumRoutes();
-            do { --n; } while (_routes[n] && route._priority <= _routes[n]._priority);
-            _routes.splice(n+1, 0, route);
-        }
-        
-        function getNumRoutes(){
-            return _routes.length;
-        }
-        
-        function removeRoute(route){
-            var i = getRouteIndex(route);
-            if(i >= 0) _routes.splice(i, 1);
+        removeRoute : function(route){
+            var i = arrayIndexOf(this._routes, route);
+            if(i >= 0) this._routes.splice(i, 1);
             route._destroy();
-        }
+        },
         
-        function getRouteIndex(route){
-            return arrayIndexOf(_routes, route);
-        }
-        
-        function removeAllRoutes(){
-            var n = getNumRoutes();
+        removeAllRoutes : function(){
+            var n = this.getNumRoutes();
             while(n--){
-                _routes[n]._destroy();
+                this._routes[n]._destroy();
             }
-            _routes.length = 0;
-        }
+            this._routes.length = 0;
+        },
         
-        function parse(request){
+        parse : function(request){
             request = request || '';
-            var route = getMatchedRoute(request),
-                params = route? getParamValues(request, route) : null;
+            var route = this._getMatchedRoute(request),
+                params = route? patternLexer.getParamValues(request, route._matchRegexp, this.shouldTypecast) : null;
             if(route){
                 params? route.matched.dispatch.apply(route.matched, params) : route.matched.dispatch();
-                _routed.dispatch(request, route, params);
+                this.routed.dispatch(request, route, params);
             }else{
-                _bypassed.dispatch(request);
+                this.bypassed.dispatch(request);
             }
-        }
+        },
         
-        function getMatchedRoute(request){
-            var i = getNumRoutes(), route;
-            while(route = _routes[--i]){ //should be decrement loop since higher priorities are added at the end of array  
+        getNumRoutes : function(){
+            return this._routes.length;
+        },
+
+        _sortedInsert : function(route){
+            //simplified insertion sort
+            var routes = this._routes,
+                n = routes.length;
+            do { --n; } while (routes[n] && route._priority <= routes[n]._priority);
+            routes.splice(n+1, 0, route);
+        },
+        
+        _getMatchedRoute : function(request){
+            var routes = this._routes,
+                n = routes.length,
+                route;
+            while(route = routes[--n]){ //should be decrement loop since higher priorities are added at the end of array  
                 if(route.match(request)) return route;
             }
             return null;
+        },
+
+        toString : function(){
+            return '[crossroads numRoutes:'+ this.getNumRoutes() +']';
         }
-        
-        function getParamValues(request, route){
-            return patternLexer.getParamValues(request, route._matchRegexp);
-        }
-        
-        //API
-        return {
-            _routes : _routes,
-            addRoute : addRoute,
-            removeRoute : removeRoute,
-            removeAllRoutes : removeAllRoutes,
-            parse : parse,
-            bypassed : _bypassed,
-            routed : _routed,
-            getNumRoutes : getNumRoutes,
-            toString : function(){
-                return '[crossroads numRoutes:'+ getNumRoutes() +']';
-            }
-        };
-        
-    }());
+    };
+    
+    //"static" instance
+    crossroads = new Crossroads();
     

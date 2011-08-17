@@ -1,16 +1,20 @@
         
     // Route --------------
     //=====================
-     
-    Route = function (pattern, callback, priority){
+    
+    /**
+     * @constructor
+     */
+    function Route(pattern, callback, priority, router){
         var isRegexPattern = isRegExp(pattern);
+        this._router = router;
         this._pattern = pattern;
         this._paramsIds = isRegexPattern? null : patternLexer.getParamIds(this._pattern);
         this._matchRegexp = isRegexPattern? pattern : patternLexer.compilePattern(pattern);
         this.matched = new signals.Signal();
         if(callback) this.matched.add(callback);
         this._priority = priority || 0;
-    };
+    }
     
     Route.prototype = {
         
@@ -22,18 +26,18 @@
         
         _validateParams : function(request){
             var rules = this.rules, 
+                values = this._getParamValuesObject(request),
                 prop;
             for(prop in rules){
-                if(rules.hasOwnProperty(prop) && ! this._isValidParam(request, prop)){ //filter prototype
+                if(rules.hasOwnProperty(prop) && ! this._isValidParam(request, prop, values)){ //filter prototype
                     return false;
                 }
             }
             return true;
         },
         
-        _isValidParam : function(request, prop){
+        _isValidParam : function(request, prop, values){
             var validationRule = this.rules[prop],
-                values = this._getParamValuesObject(request),
                 val = values[prop],
                 isValid;
             
@@ -41,7 +45,7 @@
                 isValid = validationRule.test(val);
             }
             else if (isArray(validationRule)) {
-                isValid = arrayIndexOf(validationRule, val) !== -1;
+                isValid = arrayIndexOf(validationRule, val || '') !== -1; //adding empty string since optional rule can be empty
             }
             else if (isFunction(validationRule)) {
                 isValid = validationRule(val, request, values);
@@ -51,19 +55,22 @@
         },
         
         _getParamValuesObject : function(request){
-            var ids = this._paramsIds,
-                values = patternLexer.getParamValues(request, this._matchRegexp),
+            var shouldTypecast = this._router.shouldTypecast,
+                values = patternLexer.getParamValues(request, this._matchRegexp, shouldTypecast),
                 o = {}, 
-                n = ids? ids.length : 0;
+                n = values.length;
             while(n--){
-                o[ids[n]] = values[n];
+                o[n] = values[n]; //for RegExp pattern and also alias to normal paths
+                if(this._paramsIds){
+                    o[this._paramsIds[n]] = values[n];
+                }
             }
-            o.request_ = typecastValue(request);
+            o.request_ = shouldTypecast? typecastValue(request) : request;
             return o;
         },
                 
         dispose : function(){
-            crossroads.removeRoute(this);
+            this._router.removeRoute(this);
         },
         
         _destroy : function(){
