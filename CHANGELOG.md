@@ -9,6 +9,7 @@
    segments values. (issue #18)
  - added support to optional segments (issue #17)
  - added support to multiple instances (issue #19)
+ - added numbered rules for RegExp pattern and alias to segments (issue #16)
 
 ### Other ###
 

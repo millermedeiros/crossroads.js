@@ -463,10 +463,10 @@ YUI().use('node', 'console', 'test', function (Y){
                     return (val === 'lorem-ipsum' || val === 123);
                 },
                 bar : function(val, request, params){
-                    return (request === '/lorem-ipsum/dolor/sit-amet' || request === '/123/45/67');
+                    return (request !== '/lorem-ipsum');
                 },
                 ipsum : function(val, request, params){
-                    return (params.foo === 'lorem-ipsum' && params.bar === 'dolor' && params.ipsum === 'sit-amet') || (params.foo === 123 && params.bar === 45 && params.ipsum === 67);
+                    return (params.bar === 'dolor' && params.ipsum === 'sit-amet') || (params.bar === 45 && params.ipsum === 67);
                 }
             };
             
@@ -475,6 +475,55 @@ YUI().use('node', 'console', 'test', function (Y){
             Y.Assert.areSame(false, s.match('lorem-ipsum'));
             Y.Assert.areSame(false, s.match('/123'));
             Y.Assert.areSame(false, s.match('123'));
+            Y.Assert.areSame(false, s.match('/123/44/55'));
+            Y.Assert.areSame(true, s.match('/123/45/67'));
+        },
+
+        testMatchFunctionOptions_PathAlias : function(){
+            var s = crossroads.addRoute('/{foo}/{bar}/{ipsum}');
+            
+            s.rules = {
+                0 : function(val, request, params){
+                    return (val === 'lorem-ipsum' || val === 123);
+                },
+                1 : function(val, request, params){
+                    return (request !== '/lorem-ipsum');
+                },
+                2 : function(val, request, params){
+                    return (params[1] === 'dolor' && params[2] === 'sit-amet') || (params[1] === 45 && params[2] === 67);
+                }
+            };
+            
+            Y.Assert.areSame(false, s.match('/lorem-ipsum'));
+            Y.Assert.areSame(true, s.match('/lorem-ipsum/dolor/sit-amet'));
+            Y.Assert.areSame(false, s.match('lorem-ipsum'));
+            Y.Assert.areSame(false, s.match('/123'));
+            Y.Assert.areSame(false, s.match('123'));
+            Y.Assert.areSame(false, s.match('/123/44/55'));
+            Y.Assert.areSame(true, s.match('/123/45/67'));
+        },
+
+        testMatchFunctionOptions_RegExpPattern : function(){
+            var s = crossroads.addRoute(/([\-\w]+)\/([\-\w]+)\/([\-\w]+)/);
+            
+            s.rules = {
+                0 : function(val, request, params){
+                    return (val === 'lorem-ipsum' || val === 123);
+                },
+                1 : function(val, request, params){
+                    return (request !== '/lorem-ipsum');
+                },
+                2 : function(val, request, params){
+                    return (params[1] === 'dolor' && params[2] === 'sit-amet') || (params[1] === 45 && params[2] === 67);
+                }
+            };
+            
+            Y.Assert.areSame(false, s.match('/lorem-ipsum'));
+            Y.Assert.areSame(true, s.match('/lorem-ipsum/dolor/sit-amet'));
+            Y.Assert.areSame(false, s.match('lorem-ipsum'));
+            Y.Assert.areSame(false, s.match('/123'));
+            Y.Assert.areSame(false, s.match('123'));
+            Y.Assert.areSame(false, s.match('/123/44/55'));
             Y.Assert.areSame(true, s.match('/123/45/67'));
         },
 
