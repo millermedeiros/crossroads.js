@@ -611,7 +611,7 @@ YUI().use('node', 'console', 'test', function (Y){
 
         },
 
-        testMatchMagicRule : function(){
+        testMatchMagicRequestRule : function(){
             var s = crossroads.addRoute('/{foo}/{bar}/{ipsum}');
             
             s.rules = {
@@ -634,7 +634,7 @@ YUI().use('node', 'console', 'test', function (Y){
             Y.Assert.areSame(false, s.match('/123/45/555'), 'check if magic rule blocked normal validation');
         },
         
-        testMatchMagicRule2 : function(){
+        testMatchMagicRequestRule2 : function(){
             var s = crossroads.addRoute(/^([a-z0-9]+)$/);
             
             s.rules = {
@@ -650,7 +650,7 @@ YUI().use('node', 'console', 'test', function (Y){
             Y.Assert.areSame(false, s.match('555'), 'check if magic rule blocked normal validation');
         },
 
-        testMatchMagicRule3 : function(){
+        testMatchMagicRequestRule3 : function(){
             var s = crossroads.addRoute(/^([a-z0-9]+)$/);
             
             s.rules = {
@@ -664,7 +664,7 @@ YUI().use('node', 'console', 'test', function (Y){
             Y.Assert.areSame(false, s.match('555'), 'check if magic rule blocked normal validation');
         },
 
-        testMatchMagicRule4 : function(){
+        testMatchMagicRequestRule4 : function(){
             var s = crossroads.addRoute(/^([a-z0-9]+)$/);
             
             s.rules = {
@@ -678,7 +678,7 @@ YUI().use('node', 'console', 'test', function (Y){
             Y.Assert.areSame(false, s.match('555'), 'check if magic rule blocked normal validation');
         },
 
-        testMatchMagicRuleOptional : function(){
+        testMatchMagicRequestRuleOptional : function(){
             var s = crossroads.addRoute(':foo:');
             
             s.rules = {
@@ -1051,6 +1051,65 @@ YUI().use('node', 'console', 'test', function (Y){
             cr.parse('/lorem_ipsum');
             
             Y.Assert.areSame('lorem_ipsum', t1);
+        },
+
+        testRouteNormalize : function(){
+            var t1, t2, t3, t4, t5, t6, t7, t8;
+
+            //based on: https://github.com/millermedeiros/crossroads.js/issues/21
+            
+            var myRoute = crossroads.addRoute('{a}/{b}/:c:/:d:');
+            myRoute.rules = {
+                a : ['news', 'article'],
+                b : /[\-0-9a-zA-Z]+/,
+                request_ : /\/[0-9]+\/|$/,
+                normalize_ : function(request, vals){
+                    var id;
+                    var idRegex = /^[0-9]+$/;
+                    if(vals.a === 'article'){
+                        id = vals.c;
+                    } else {
+                    if( idRegex.test(vals.b) ){
+                        id = vals.b;
+                    } else if ( idRegex.test(vals.c) ) {
+                        id = vals.c;
+                    }
+                    }
+                    return ['news', id]; //return params
+                }
+            };
+            myRoute.matched.addOnce(function(a, b){
+                t1 = a;
+                t2 = b;
+            });
+            crossroads.parse('news/111/lorem-ipsum');
+
+            myRoute.matched.addOnce(function(a, b){
+                t3 = a;
+                t4 = b;
+            });
+            crossroads.parse('news/foo/222/lorem-ipsum');
+
+            myRoute.matched.addOnce(function(a, b){
+                t5 = a;
+                t6 = b;
+            });
+            crossroads.parse('news/333');
+
+            myRoute.matched.addOnce(function(a, b){
+                t7 = a;
+                t8 = b;
+            });
+            crossroads.parse('article/news/444');
+            
+            Y.Assert.areSame('news', t1);
+            Y.Assert.areSame(111, t2);
+            Y.Assert.areSame('news', t3);
+            Y.Assert.areSame(222, t4);
+            Y.Assert.areSame('news', t5);
+            Y.Assert.areSame(333, t6);
+            Y.Assert.areSame('news', t7);
+            Y.Assert.areSame(444, t8);
         },
 
         //------------------------------ Priority --------------------------------------------//

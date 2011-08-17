@@ -42,7 +42,7 @@
         parse : function(request){
             request = request || '';
             var route = this._getMatchedRoute(request),
-                params = route? patternLexer.getParamValues(request, route._matchRegexp, this.shouldTypecast) : null;
+                params = route? route._getParamsArray(request) : null;
             if(route){
                 params? route.matched.dispatch.apply(route.matched, params) : route.matched.dispatch();
                 this.routed.dispatch(request, route, params);

@@ -1,15 +1,22 @@
 # Crossroads.js Changelog #
 
+## Next ##
+
+## API Changes ##
+
+ - added magic rule to normalize route params before dispatch `rules.normalize_`. (issue #21)
+
+
 
 ## v0.5.0 (2011/08/17) ##
 
 ### API Changes ###
 
+ - added numbered rules for RegExp pattern and alias to segments (issue #16)
+ - added support to optional segments (issue #17)
  - added property `crossroads.shouldTypecast` to enable/disable typecasting
    segments values. (issue #18)
- - added support to optional segments (issue #17)
  - added support to multiple instances (issue #19)
- - added numbered rules for RegExp pattern and alias to segments (issue #16)
 
 ### Other ###
 

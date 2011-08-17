@@ -2,7 +2,7 @@
  * Crossroads.js <http://millermedeiros.github.com/crossroads.js>
  * Released under the MIT license
  * Author: Miller Medeiros
- * Version 0.5.0 - Build: 58 (2011/08/17 02:00 AM)
+ * Version 0.5.0+ - Build: 60 (2011/08/17 12:09 PM)
  */
 
 define(['signals'], function(signals){
@@ -100,7 +100,7 @@ define(['signals'], function(signals){
         parse : function(request){
             request = request || '';
             var route = this._getMatchedRoute(request),
-                params = route? patternLexer.getParamValues(request, route._matchRegexp, this.shouldTypecast) : null;
+                params = route? route._getParamsArray(request) : null;
             if(route){
                 params? route.matched.dispatch.apply(route.matched, params) : route.matched.dispatch();
                 this.routed.dispatch(request, route, params);
@@ -209,6 +209,18 @@ define(['signals'], function(signals){
             }
             o.request_ = shouldTypecast? typecastValue(request) : request;
             return o;
+        },
+
+        _getParamsArray : function(request){
+            var vals = this._getParamValuesObject(request),
+                norm = this.rules? this.rules.normalize_ : null,
+                params;
+            if(isFunction(norm)){
+                params = norm(request, vals);
+            } else {
+                params = patternLexer.getParamValues(request, this._matchRegexp, this._router.shouldTypecast);
+            }
+            return params;
         },
                 
         dispose : function(){
