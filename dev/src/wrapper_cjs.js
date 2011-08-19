@@ -4,4 +4,4 @@
     //::CROSSROADS_JS:://
     //::ROUTE_JS:://
     //::LEXER_JS:://
-    exports = crossroads;
+    module.exports = crossroads;
