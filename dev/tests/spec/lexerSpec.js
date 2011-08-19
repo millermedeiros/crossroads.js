@@ -1,3 +1,8 @@
+//for node
+var crossroads = crossroads || require('crossroads');
+//end node
+
+
 describe('patternLexer', function(){
 
     describe('getParamIds()', function(){

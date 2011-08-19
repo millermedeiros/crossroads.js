@@ -1,7 +1,12 @@
 /*jshint onevar:false */
 
+//for node
+var crossroads = crossroads || require('crossroads');
+//end node
 
-describe('Add', function(){
+
+describe('crossroads.addRoute()', function(){
+ 
 
     beforeEach(function(){
         crossroads.removeAllRoutes();
@@ -19,7 +24,7 @@ describe('Add', function(){
 
     });
 
-    it('should add listener to matched', function(){
+    it('should add listener to matched if provided', function(){
 
         var s = crossroads.addRoute('/{foo}', function(){
             expect().toBe('shouldnt be called');
@@ -45,7 +50,7 @@ describe('Add', function(){
 
     });
 
-    it('should increment', function(){
+    it('should increment num routes', function(){
 
         var s1 = crossroads.addRoute(/^foo\/([a-z]+)$/, function(){
             expect().toBe('shouldnt be called');

@@ -81,3 +81,28 @@ This will delete all JS files inside the `dist` folder, merge/update/compress so
 **IMPORTANT:** `dist` folder always contain the latest version, regular users should **not** need to run build task.
 
 
+
+## Running unit tests ##
+
+### On the browser ###
+
+Open `dev/tests/spec_runner-dist.html` on your browser. 
+
+`spec_runner-dist` tests `dist/crossroads.js` and `spec_runner-dev` tests files inside
+`dev/src` - they all run the same specs.
+
+
+### On Node.js ###
+
+Install [npm](http://npmjs.org) and run:
+
+```
+npm install jasmine-node -g
+npm link
+jasmine-node dev/test/spec
+```
+
+Note that node.js can only run the distribution file, so any change to the 
+`dev/src` files will require a new `ant compile`. `npm link` takes care of 
+installing dependencies and [updating](https://github.com/isaacs/npm/blob/master/doc/link.md) 
+crossroads at each change to the `crossroads.cjs.js` file.

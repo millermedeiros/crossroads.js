@@ -1,5 +1,10 @@
 /*jshint onevar:false */
 
+//for node
+var crossroads = crossroads || require('crossroads');
+//end node
+
+
 describe('Match', function(){
 
     afterEach(function(){
