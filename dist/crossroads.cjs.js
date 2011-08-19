@@ -2,7 +2,7 @@
  * Crossroads.js <http://millermedeiros.github.com/crossroads.js>
  * Released under the MIT license
  * Author: Miller Medeiros
- * Version 0.5.0+ - Build: 60 (2011/08/17 12:09 PM)
+ * Version 0.5.0+ - Build: 61 (2011/08/18 09:13 PM)
  */
 
     var signals = require('signals');
@@ -248,6 +248,7 @@
         var ESCAPE_CHARS_REGEXP = /[\\.+*?\^$\[\](){}\/'#]/g, //match chars that should be escaped on string regexp
             UNNECESSARY_SLASHES_REGEXP = /\/$/g, //trailing slash
             OPTIONAL_SLASHES_REGEXP = /([:}]|\w(?=\/))\/?(:)/g, //slash between `::` or `}:` or `\w:`. $1 = before, $2 = after
+            REQUIRED_SLASHES_REGEXP = /([:}])\/?(\{)/g,
 
             REQUIRED_PARAMS_REGEXP = /\{([^}]+)\}/g, //match everything between `{ }`
             OPTIONAL_PARAMS_REGEXP = /:([^:]+):/g, //match everything between `: :`
@@ -257,9 +258,11 @@
             SAVE_REQUIRED_PARAMS = '___CR_REQ___', 
             SAVE_OPTIONAL_PARAMS = '___CR_OPT___',
             SAVE_OPTIONAL_SLASHES = '___CR_OPT_SLASH___',
+            SAVE_REQUIRED_SLASHES = '___CR_REQ_SLASH___',
             SAVED_REQUIRED_REGEXP = new RegExp(SAVE_REQUIRED_PARAMS, 'g'),
             SAVED_OPTIONAL_REGEXP = new RegExp(SAVE_OPTIONAL_PARAMS, 'g'),
-            SAVED_OPTIONAL_SLASHES_REGEXP = new RegExp(SAVE_OPTIONAL_SLASHES, 'g');
+            SAVED_OPTIONAL_SLASHES_REGEXP = new RegExp(SAVE_OPTIONAL_SLASHES, 'g'),
+            SAVED_REQUIRED_SLASHES_REGEXP = new RegExp(SAVE_REQUIRED_SLASHES, 'g');
         
 
         function getParamIds(pattern){
@@ -283,12 +286,14 @@
 
         function tokenize(pattern){
             pattern = pattern.replace(OPTIONAL_SLASHES_REGEXP, '$1'+ SAVE_OPTIONAL_SLASHES +'$2');
+            pattern = pattern.replace(REQUIRED_SLASHES_REGEXP, '$1'+ SAVE_REQUIRED_SLASHES +'$2');
             pattern = pattern.replace(OPTIONAL_PARAMS_REGEXP, SAVE_OPTIONAL_PARAMS);
             return pattern.replace(REQUIRED_PARAMS_REGEXP, SAVE_REQUIRED_PARAMS);
         }
         
         function untokenize(pattern){
             pattern = pattern.replace(SAVED_OPTIONAL_SLASHES_REGEXP, '\\/?');
+            pattern = pattern.replace(SAVED_REQUIRED_SLASHES_REGEXP, '\\/');
             pattern = pattern.replace(SAVED_OPTIONAL_REGEXP, '([^\\/]+)?\/?');
             return pattern.replace(SAVED_REQUIRED_REGEXP, '([^\\/]+)');
         }
