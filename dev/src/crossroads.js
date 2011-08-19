@@ -80,4 +80,5 @@
     
     //"static" instance
     crossroads = new Crossroads();
+    crossroads.VERSION = '::VERSION_NUMBER::';
     

@@ -5,10 +5,12 @@
 ## API Changes ##
 
  - added magic rule to normalize route params before dispatch `rules.normalize_`. (#21)
+ - added crossroads.VERSION
 
 ### Fixes ###
 
  - fix optional "/" between required params. (#25)
+ - fix CommonJS wrapper, wasn't exporting crossroads properly 
 
 
 
