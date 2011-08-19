@@ -219,6 +219,19 @@ YUI().use('node', 'console', 'test', function (Y){
             Y.Assert.areSame(false, s.match('123/45'));
         },
 
+        testMatchReqParamNoSlash : function(){
+            var s = crossroads.addRoute('/{foo}{bar}');
+            
+            Y.Assert.areSame(false, s.match('/lorem-ipsum'));
+            Y.Assert.areSame(false, s.match('/lorem-ipsum/'));
+            Y.Assert.areSame(true, s.match('/lorem-ipsum/dolor'));
+            Y.Assert.areSame(false, s.match('lorem-ipsum'));
+            Y.Assert.areSame(false, s.match('/123'));
+            Y.Assert.areSame(false, s.match('/123/'));
+            Y.Assert.areSame(false, s.match('123'));
+            Y.Assert.areSame(false, s.match('123/45'));
+        },
+
         testMatchOptional1 : function(){
             var s = crossroads.addRoute(':bar:');
             Y.Assert.areSame(true, s.match('lorem-ipsum')); 
