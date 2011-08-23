@@ -2,7 +2,7 @@
  * Crossroads.js <http://millermedeiros.github.com/crossroads.js>
  * Released under the MIT license
  * Author: Miller Medeiros
- * Version 0.5.0+ - Build: 64 (2011/08/19 02:28 PM)
+ * Version 0.5.0+ - Build: 65 (2011/08/23 05:22 PM)
  */
 
 define(['signals'], function(signals){
@@ -153,6 +153,7 @@ define(['signals'], function(signals){
         this._router = router;
         this._pattern = pattern;
         this._paramsIds = isRegexPattern? null : patternLexer.getParamIds(this._pattern);
+        this._optionalParamsIds = isRegexPattern? null : patternLexer.getOptionalParamsIds(this._pattern);
         this._matchRegexp = isRegexPattern? pattern : patternLexer.compilePattern(pattern);
         this.matched = new signals.Signal();
         if(callback) this.matched.add(callback);
@@ -184,7 +185,10 @@ define(['signals'], function(signals){
                 val = values[prop],
                 isValid;
             
-            if (isRegExp(validationRule)) {
+            if ( val == null && this._optionalParamsIds && arrayIndexOf(this._optionalParamsIds, prop) !== -1) {
+                isValid = true;
+            }   
+            else if (isRegExp(validationRule)) {
                 isValid = validationRule.test(val);
             }
             else if (isArray(validationRule)) {
@@ -273,6 +277,14 @@ define(['signals'], function(signals){
             }
             return ids;
         }
+        
+        function getOptionalParamsIds(pattern){
+            var ids = [], match;
+            while(match = OPTIONAL_PARAMS_REGEXP.exec(pattern)){
+                ids.push(match[1]);
+            }
+            return ids;
+        }
     
         function compilePattern(pattern){
             pattern = pattern || '';
@@ -313,6 +325,7 @@ define(['signals'], function(signals){
         //API
         return {
             getParamIds : getParamIds,
+            getOptionalParamsIds : getOptionalParamsIds,
             getParamValues : getParamValues,
             compilePattern : compilePattern
         };

@@ -11,6 +11,7 @@
 
  - fix optional "/" between required params. (#25)
  - fix CommonJS wrapper, wasn't exporting crossroads properly 
+ - only execute optional params rules if value != null. (#26)
 
 
 

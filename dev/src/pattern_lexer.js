@@ -31,6 +31,14 @@
             }
             return ids;
         }
+        
+        function getOptionalParamsIds(pattern){
+            var ids = [], match;
+            while(match = OPTIONAL_PARAMS_REGEXP.exec(pattern)){
+                ids.push(match[1]);
+            }
+            return ids;
+        }
     
         function compilePattern(pattern){
             pattern = pattern || '';
@@ -71,6 +79,7 @@
         //API
         return {
             getParamIds : getParamIds,
+            getOptionalParamsIds : getOptionalParamsIds,
             getParamValues : getParamValues,
             compilePattern : compilePattern
         };
