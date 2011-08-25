@@ -203,8 +203,7 @@ hasher.setHash('lorem/ipsum');
                             </dd>
                             <dd>
 								The pattern <code>"{foo}/{bar}"</code> will match <code>"lorem/ipsum-dolor"</code> but won't match <code>"lorem/ipsum-dolor/sit"</code>. 
-                                The patterns <code>"{foo}{bar}"</code> and <code>"{foo}/{bar}"</code> match exactly the same requests, a single trailing slash at
-                                the end of the request is ignored, so <code>{foo}/</code> matches same requests as <code>{foo}</code>. - If you need to 
+                            					A single trailing slash at the end of the request is ignored, so <code>{foo}/</code> matches same requests as <code>{foo}</code>. - If you need to 
 								match segments that may contain "/" use a regular expression instead of a string pattern.
                             </dd>
                             <dd>
