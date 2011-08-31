@@ -10,6 +10,7 @@
         this._router = router;
         this._pattern = pattern;
         this._paramsIds = isRegexPattern? null : patternLexer.getParamIds(this._pattern);
+        this._optionalParamsIds = isRegexPattern? null : patternLexer.getOptionalParamsIds(this._pattern);
         this._matchRegexp = isRegexPattern? pattern : patternLexer.compilePattern(pattern);
         this.matched = new signals.Signal();
         if(callback) this.matched.add(callback);
@@ -41,7 +42,10 @@
                 val = values[prop],
                 isValid;
             
-            if (isRegExp(validationRule)) {
+            if ( val == null && this._optionalParamsIds && arrayIndexOf(this._optionalParamsIds, prop) !== -1) {
+                isValid = true;
+            }   
+            else if (isRegExp(validationRule)) {
                 isValid = validationRule.test(val);
             }
             else if (isArray(validationRule)) {

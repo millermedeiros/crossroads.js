@@ -11,7 +11,12 @@
 
  - fix optional "/" between required params. (#25)
  - fix CommonJS wrapper, wasn't exporting crossroads properly 
+ - only execute optional params rules if value != null. (#26)
 
+### Other ###
+
+ - Migrated unit tests from YUI to Jasmine to allow testing on nodejs and also 
+   because it runs locally and gives better error messages. (#5)
 
 
 ## v0.5.0 (2011/08/17) ##
