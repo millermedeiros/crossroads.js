@@ -17,7 +17,7 @@
             return new Crossroads();
         },
 
-        shouldTypecast : true,
+        shouldTypecast : false,
 
         addRoute : function(pattern, callback, priority){
             var route = new Route(pattern, callback, priority, this);

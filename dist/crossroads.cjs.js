@@ -2,7 +2,7 @@
  * Crossroads.js <http://millermedeiros.github.com/crossroads.js>
  * Released under the MIT license
  * Author: Miller Medeiros
- * Version 0.5.0+ - Build: 65 (2011/08/23 05:22 PM)
+ * Version 0.5.0+ - Build: 66 (2011/08/31 08:14 PM)
  */
 
     var signals = require('signals');
@@ -75,7 +75,7 @@
             return new Crossroads();
         },
 
-        shouldTypecast : true,
+        shouldTypecast : false,
 
         addRoute : function(pattern, callback, priority){
             var route = new Route(pattern, callback, priority, this);

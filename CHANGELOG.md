@@ -6,6 +6,7 @@
 
  - added magic rule to normalize route params before dispatch `rules.normalize_`. (#21)
  - added crossroads.VERSION
+ - changed `crossroads.shouldTypecast` default value to `false` (issue #23)
 
 ### Fixes ###
 

@@ -163,9 +163,9 @@ describe('crossroads.parse()', function(){
             crossroads.parse('foo/lorem/123/true/false');
 
             expect( t1 ).toBe( 'lorem' );
-            expect( t2 ).toBe( 123 );
-            expect( t3 ).toBe( true );
-            expect( t4 ).toBe( false );
+            expect( t2 ).toBe( '123' );
+            expect( t3 ).toBe( 'true' );
+            expect( t4 ).toBe( 'false' );
         });
 
         it('should only pass matched params', function(){
@@ -182,7 +182,7 @@ describe('crossroads.parse()', function(){
             crossroads.parse('foo/lorem/123');
 
             expect( t1 ).toBe( 'lorem' );
-            expect( t2 ).toBe( 123 );
+            expect( t2 ).toBe( '123' );
             expect( t3 ).toBeUndefined();
             expect( t4 ).toBeUndefined();
         });
@@ -205,7 +205,7 @@ describe('crossroads.parse()', function(){
             crossroads.parse('/123/456');
             crossroads.parse('/maecennas/ullamcor');
 
-            expect( t1 ).toBe( 456 );
+            expect( t1 ).toBe( '456' );
             expect( t2 ).toBeUndefined();
         });
 
@@ -221,7 +221,7 @@ describe('crossroads.parse()', function(){
             crossroads.parse('//456');
 
             expect( t1 ).toBe( '' );
-            expect( t2 ).toBe( 456 );
+            expect( t2 ).toBe( '456' );
         });
     });
 
@@ -333,13 +333,13 @@ describe('crossroads.parse()', function(){
             crossroads.parse('article/news/444');
 
             expect( t1 ).toBe( 'news' );
-            expect( t2 ).toBe( 111 );
+            expect( t2 ).toBe( '111' );
             expect( t3 ).toBe( 'news' );
-            expect( t4 ).toBe( 222 );
+            expect( t4 ).toBe( '222' );
             expect( t5 ).toBe( 'news' );
-            expect( t6 ).toBe( 333 );
+            expect( t6 ).toBe( '333' );
             expect( t7 ).toBe( 'news' );
-            expect( t8 ).toBe( 444 );
+            expect( t8 ).toBe( '444' );
 
         });
 
@@ -416,7 +416,7 @@ describe('crossroads.parse()', function(){
                 t4 = bar;
             });
             b.rules = {
-                foo : [123, 456, 567, 2],
+                foo : ['123', '456', '567', '2'],
                 bar : /ullamcor/
             };
 
@@ -426,8 +426,8 @@ describe('crossroads.parse()', function(){
             crossroads.parse('lorem-555');
 
             expect( t1 ).toBe( 'lorem' );
-            expect( t2 ).toBe( 123 );
-            expect( t3 ).toBe( 123 );
+            expect( t2 ).toBe( '123' );
+            expect( t3 ).toBe( '123' );
             expect( t4 ).toBe( 'ullamcor' );
         });
 

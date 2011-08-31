@@ -22,16 +22,16 @@ describe('Match', function(){
 
     it('should ignore trailing slash on pattern', function(){
         var r1 = crossroads.addRoute('/lorem-ipsum/');
-            
+
         expect( r1.match('/lorem-ipsum') ).toBe( true );
         expect( r1.match('/lorem-ipsum/') ).toBe( true );
         expect( r1.match('/lorem-ipsum/dolor') ).toBe( false );
     });
 
     it('should match params', function(){
-        
+
         var s = crossroads.addRoute('/{foo}');
-            
+
         expect( s.match('/lorem-ipsum') ).toBe( true );
         expect( s.match('/lorem-ipsum/') ).toBe( true );
         expect( s.match('/lorem-ipsum/dolor') ).toBe( false );
@@ -209,23 +209,23 @@ describe('Match', function(){
             expect( a.match('/123asd/45/') ).toBe( true );
             expect( a.match('/123asd/45/qwe') ).toBe( false );
         });
-    
+
     });
 
 
     describe('rules', function(){
-        
+
         describe('basic rules', function(){
 
             it('should allow array options', function(){
 
                 var s = crossroads.addRoute('/{foo}/{bar}');
-                
+
                 s.rules = {
-                    foo : ['lorem-ipsum', 123],
-                    bar : ['dolor', 45]
+                    foo : ['lorem-ipsum', '123'],
+                    bar : ['dolor', '45']
                 };
-                
+
                 expect( s.match('/lorem-ipsum') ).toBe( false );
                 expect( s.match('/lorem-ipsum/dolor') ).toBe( true );
                 expect( s.match('lorem-ipsum') ).toBe( false );
@@ -237,39 +237,35 @@ describe('Match', function(){
             });
 
             it('should allow RegExp options', function(){
-                
                 var s = crossroads.addRoute('/{foo}/{bar}');
-                
+
                 s.rules = {
                     foo : /(^[a-z0-9\-]+$)/,
                     bar : /(.+)/
                 };
-                
-                
+
                 expect( s.match('/lorem-ipsum') ).toBe( false );
                 expect( s.match('/lorem-ipsum/dolor') ).toBe( true );
                 expect( s.match('lorem-ipsum') ).toBe( false );
                 expect( s.match('/123') ).toBe( false );
                 expect( s.match('123') ).toBe( false );
                 expect( s.match('/123/45') ).toBe( true );
-            
             });
 
             it('should allow function rule', function(){
                 var s = crossroads.addRoute('/{foo}/{bar}/{ipsum}');
-                
                 s.rules = {
                     foo : function(val, request, params){
-                        return (val === 'lorem-ipsum' || val === 123);
+                        return (val === 'lorem-ipsum' || val === '123');
                     },
                     bar : function(val, request, params){
                         return (request !== '/lorem-ipsum');
                     },
                     ipsum : function(val, request, params){
-                        return (params.bar === 'dolor' && params.ipsum === 'sit-amet') || (params.bar === 45 && params.ipsum === 67);
+                        return (params.bar === 'dolor' && params.ipsum === 'sit-amet') || (params.bar === '45' && params.ipsum === '67');
                     }
                 };
-                
+
                 expect( s.match('/lorem-ipsum') ).toBe( false );
                 expect( s.match('/lorem-ipsum/dolor/sit-amet') ).toBe( true );
                 expect( s.match('lorem-ipsum') ).toBe( false );
@@ -280,28 +276,25 @@ describe('Match', function(){
             });
 
             it('should work with mixed rules', function(){
-                
                 var s = crossroads.addRoute('/{foo}/{bar}/{ipsum}');
-            
                 s.rules = {
                     foo : function(val, request, params){
-                        return (val === 'lorem-ipsum' || val === 123);
+                        return (val === 'lorem-ipsum' || val === '123');
                     },
-                    bar : ['dolor', 45],
+                    bar : ['dolor', '45'],
                     ipsum : /(sit-amet|67)/
                 };
-                
+
                 expect( s.match('/lorem-ipsum') ).toBe( false );
                 expect( s.match('/lorem-ipsum/dolor/sit-amet') ).toBe( true );
                 expect( s.match('lorem-ipsum') ).toBe( false );
                 expect( s.match('/123') ).toBe( false );
                 expect( s.match('123') ).toBe( false );
                 expect( s.match('/123/45/67') ).toBe( true );
-
             });
 
             it('should only check rules of optional segments if param exists', function(){
-                
+
                 var a = crossroads.addRoute('/123/:foo:/:bar:');
                 a.rules = {
                     foo : /^\w+$/,
@@ -357,7 +350,7 @@ describe('Match', function(){
                 var s = crossroads.addRoute('/{foo}/{bar}/{ipsum}');
             
                 s.rules = {
-                    0 : ['lorem-ipsum', 123],
+                    0 : ['lorem-ipsum', '123'],
                     1 : function(val, request, params){
                         return (request !== '/lorem-ipsum');
                     },
@@ -379,7 +372,7 @@ describe('Match', function(){
                 var s = crossroads.addRoute(/([\-\w]+)\/([\-\w]+)\/([\-\w]+)/);
             
                 s.rules = {
-                    0 : ['lorem-ipsum', 123],
+                    0 : ['lorem-ipsum', '123'],
                     1 : function(val, request, params){
                         return (request !== '/lorem-ipsum');
                     },
@@ -405,7 +398,7 @@ describe('Match', function(){
                 var s = crossroads.addRoute(/^([a-z0-9]+)$/);
                 s.rules = {
                     request_ : function(request){ //this gets executed after all other validations
-                        return request !== 555;
+                        return request !== '555';
                     }
                 };
                 expect( s.match('lorem') ).toBe( true );
@@ -419,9 +412,9 @@ describe('Match', function(){
                 var s = crossroads.addRoute('/{foo}/{bar}/{ipsum}');
                 s.rules = {
                     foo : function(val, request, params){
-                        return (val === 'lorem-ipsum' || val === 123);
+                        return (val === 'lorem-ipsum' || val === '123');
                     },
-                    bar : ['dolor', 45],
+                    bar : ['dolor', '45'],
                     ipsum : /(sit-amet|67|555)/,
                     request_ : function(request){ //this gets executed after all other validations
                         return request !== '/123/45/555';
@@ -439,7 +432,7 @@ describe('Match', function(){
             it('can be an array', function(){
                 var s = crossroads.addRoute(/^([a-z0-9]+)$/);
                 s.rules = {
-                    request_ : ['lorem', 123]
+                    request_ : ['lorem', '123']
                 };
                 expect( s.match('lorem') ).toBe( true );
                 expect( s.match('lorem/dolor/sit-amet') ).toBe( false );
