@@ -357,15 +357,11 @@ describe('Match', function(){
                 var s = crossroads.addRoute('/{foo}/{bar}/{ipsum}');
             
                 s.rules = {
-                    0 : function(val, request, params){
-                        return (val === 'lorem-ipsum' || val === 123);
-                    },
+                    0 : ['lorem-ipsum', 123],
                     1 : function(val, request, params){
                         return (request !== '/lorem-ipsum');
                     },
-                    2 : function(val, request, params){
-                        return (params[1] === 'dolor' && params[2] === 'sit-amet') || (params[1] === 45 && params[2] === 67);
-                    }
+                    2 : /^(sit-amet|67)$/
                 };
                 
                 expect( s.match('/lorem-ipsum') ).toBe( false );
@@ -383,15 +379,11 @@ describe('Match', function(){
                 var s = crossroads.addRoute(/([\-\w]+)\/([\-\w]+)\/([\-\w]+)/);
             
                 s.rules = {
-                    0 : function(val, request, params){
-                        return (val === 'lorem-ipsum' || val === 123);
-                    },
+                    0 : ['lorem-ipsum', 123],
                     1 : function(val, request, params){
                         return (request !== '/lorem-ipsum');
                     },
-                    2 : function(val, request, params){
-                        return (params[1] === 'dolor' && params[2] === 'sit-amet') || (params[1] === 45 && params[2] === 67);
-                    }
+                    2 : /^(sit-amet|67)$/
                 };
                 
                 expect( s.match('/lorem-ipsum') ).toBe( false );
@@ -406,84 +398,81 @@ describe('Match', function(){
 
         });
 
-        describe('special rules', function(){
         
-            describe('request_', function(){
-                
-                it('should validate whole request', function(){
-                    var s = crossroads.addRoute(/^([a-z0-9]+)$/);
-                    s.rules = {
-                        request_ : function(request){ //this gets executed after all other validations
-                            return request !== 555;
-                        }
-                    };
-                    expect( s.match('lorem') ).toBe( true );
-                    expect( s.match('lorem/dolor/sit-amet') ).toBe( false );
-                    expect( s.match('lorem-ipsum') ).toBe( false );
-                    expect( s.match('123') ).toBe( true );
-                    expect( s.match('555') ).toBe( false );
-                });
+        describe('request_', function(){
 
-                it('should execute after other rules', function(){
-                    var s = crossroads.addRoute('/{foo}/{bar}/{ipsum}');
-                    s.rules = {
-                        foo : function(val, request, params){
-                            return (val === 'lorem-ipsum' || val === 123);
-                        },
-                        bar : ['dolor', 45],
-                        ipsum : /(sit-amet|67|555)/,
-                        request_ : function(request){ //this gets executed after all other validations
-                            return request !== '/123/45/555';
-                        }
-                    };
-                    expect( s.match('/lorem-ipsum') ).toBe( false );
-                    expect( s.match('/lorem-ipsum/dolor/sit-amet') ).toBe( true );
-                    expect( s.match('lorem-ipsum') ).toBe( false );
-                    expect( s.match('/123') ).toBe( false );
-                    expect( s.match('123') ).toBe( false );
-                    expect( s.match('/123/45/67') ).toBe( true );
-                    expect( s.match('/123/45/555') ).toBe( false );
-                });
-            
-                it('can be an array', function(){
-                    var s = crossroads.addRoute(/^([a-z0-9]+)$/);
-                    s.rules = {
-                        request_ : ['lorem', 123]
-                    };
-                    expect( s.match('lorem') ).toBe( true );
-                    expect( s.match('lorem/dolor/sit-amet') ).toBe( false );
-                    expect( s.match('lorem-ipsum') ).toBe( false );
-                    expect( s.match('123') ).toBe( true );
-                    expect( s.match('555') ).toBe( false );
-                });
-
-                it('can be a RegExp', function(){
-                    var s = crossroads.addRoute(/^([a-z0-9]+)$/);
-                    s.rules = {
-                        request_ : /^(lorem|123)$/
-                    };
-                    expect( s.match('lorem') ).toBe( true );
-                    expect( s.match('lorem/dolor/sit-amet') ).toBe( false );
-                    expect( s.match('lorem-ipsum') ).toBe( false );
-                    expect( s.match('123') ).toBe( true );
-                    expect( s.match('555') ).toBe( false );
-                });
-
-                it('should work with optional params', function(){
-                    var s = crossroads.addRoute(':foo:');
-                    s.rules = {
-                        request_ : /^(lorem|123|)$/ //empty also matches!
-                    };
-                    expect( s.match('lorem') ).toBe( true );
-                    expect( s.match('lorem/dolor/sit-amet') ).toBe( false );
-                    expect( s.match('lorem-ipsum') ).toBe( false );
-                    expect( s.match('123') ).toBe( true );
-                    expect( s.match('555') ).toBe( false );
-                    expect( s.match('') ).toBe( true );
-                });
-
+            it('should validate whole request', function(){
+                var s = crossroads.addRoute(/^([a-z0-9]+)$/);
+                s.rules = {
+                    request_ : function(request){ //this gets executed after all other validations
+                        return request !== 555;
+                    }
+                };
+                expect( s.match('lorem') ).toBe( true );
+                expect( s.match('lorem/dolor/sit-amet') ).toBe( false );
+                expect( s.match('lorem-ipsum') ).toBe( false );
+                expect( s.match('123') ).toBe( true );
+                expect( s.match('555') ).toBe( false );
             });
-        
+
+            it('should execute after other rules', function(){
+                var s = crossroads.addRoute('/{foo}/{bar}/{ipsum}');
+                s.rules = {
+                    foo : function(val, request, params){
+                        return (val === 'lorem-ipsum' || val === 123);
+                    },
+                    bar : ['dolor', 45],
+                    ipsum : /(sit-amet|67|555)/,
+                    request_ : function(request){ //this gets executed after all other validations
+                        return request !== '/123/45/555';
+                    }
+                };
+                expect( s.match('/lorem-ipsum') ).toBe( false );
+                expect( s.match('/lorem-ipsum/dolor/sit-amet') ).toBe( true );
+                expect( s.match('lorem-ipsum') ).toBe( false );
+                expect( s.match('/123') ).toBe( false );
+                expect( s.match('123') ).toBe( false );
+                expect( s.match('/123/45/67') ).toBe( true );
+                expect( s.match('/123/45/555') ).toBe( false );
+            });
+
+            it('can be an array', function(){
+                var s = crossroads.addRoute(/^([a-z0-9]+)$/);
+                s.rules = {
+                    request_ : ['lorem', 123]
+                };
+                expect( s.match('lorem') ).toBe( true );
+                expect( s.match('lorem/dolor/sit-amet') ).toBe( false );
+                expect( s.match('lorem-ipsum') ).toBe( false );
+                expect( s.match('123') ).toBe( true );
+                expect( s.match('555') ).toBe( false );
+            });
+
+            it('can be a RegExp', function(){
+                var s = crossroads.addRoute(/^([a-z0-9]+)$/);
+                s.rules = {
+                    request_ : /^(lorem|123)$/
+                };
+                expect( s.match('lorem') ).toBe( true );
+                expect( s.match('lorem/dolor/sit-amet') ).toBe( false );
+                expect( s.match('lorem-ipsum') ).toBe( false );
+                expect( s.match('123') ).toBe( true );
+                expect( s.match('555') ).toBe( false );
+            });
+
+            it('should work with optional params', function(){
+                var s = crossroads.addRoute(':foo:');
+                s.rules = {
+                    request_ : /^(lorem|123|)$/ //empty also matches!
+                };
+                expect( s.match('lorem') ).toBe( true );
+                expect( s.match('lorem/dolor/sit-amet') ).toBe( false );
+                expect( s.match('lorem-ipsum') ).toBe( false );
+                expect( s.match('123') ).toBe( true );
+                expect( s.match('555') ).toBe( false );
+                expect( s.match('') ).toBe( true );
+            });
+
         });
 
     });

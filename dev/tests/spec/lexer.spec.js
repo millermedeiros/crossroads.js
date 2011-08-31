@@ -5,8 +5,9 @@ var crossroads = crossroads || require('crossroads');
 
 describe('patternLexer', function(){
 
+
     describe('getParamIds()', function(){
-    
+
         it('should return an Array with the ids', function(){
             var ids = crossroads.patternLexer.getParamIds('/lorem/{ipsum}/{dolor}');
             expect( ids[0] ).toEqual( 'ipsum' );
@@ -15,8 +16,10 @@ describe('patternLexer', function(){
 
     });
 
+
+
     describe('compilePattern()', function(){
-        
+
         it('should create RegExp from string which should match pattern', function(){
             var pattern = '/lorem/{ipsum}/{dolor}',
                 regex = crossroads.patternLexer.compilePattern(pattern);
@@ -37,8 +40,9 @@ describe('patternLexer', function(){
 
     });
 
+
     describe('getParamValues()', function(){
-    
+
         it('should return pattern params', function(){
             var pattern = '/lorem/{ipsum}/{dolor}',
                 regex = crossroads.patternLexer.compilePattern(pattern),
@@ -49,5 +53,6 @@ describe('patternLexer', function(){
         });
 
     });
+
 
 });

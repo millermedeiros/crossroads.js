@@ -99,7 +99,7 @@ Install [npm](http://npmjs.org) and run:
 ```
 npm install jasmine-node -g
 npm link
-jasmine-node dev/test/spec
+jasmine-node dev/tests/spec
 ```
 
 Note that node.js can only run the distribution file, so any change to the 

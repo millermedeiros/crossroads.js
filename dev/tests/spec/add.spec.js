@@ -6,9 +6,9 @@ var crossroads = crossroads || require('crossroads');
 
 
 describe('crossroads.addRoute()', function(){
- 
 
-    beforeEach(function(){
+
+    afterEach(function(){
         crossroads.removeAllRoutes();
     });
 
