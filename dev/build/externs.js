@@ -9,3 +9,5 @@ signals.Signal.prototype = {
     getNumListeners : function(){},
     dispose : function(){}
 };
+//CommonJS and AMD
+var exports, require, define, module;

@@ -18,6 +18,9 @@
 
  - Migrated unit tests from YUI to Jasmine to allow testing on nodejs and also 
    because it runs locally and gives better error messages. (#5)
+ - Changed wrapper to generate a single distribution file that runs on all
+   environments. (#27)
+
 
 
 ## v0.5.0 (2011/08/17) ##

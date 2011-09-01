@@ -1,7 +1,7 @@
-        
+
     // Route --------------
     //=====================
-    
+
     /**
      * @constructor
      */
@@ -16,15 +16,15 @@
         if(callback) this.matched.add(callback);
         this._priority = priority || 0;
     }
-    
+
     Route.prototype = {
-        
+
         rules : void(0),
-        
+
         match : function(request){
             return this._matchRegexp.test(request) && this._validateParams(request); //validate params even if regexp because of `request_` rule.
         },
-        
+
         _validateParams : function(request){
             var rules = this.rules, 
                 values = this._getParamValuesObject(request),
@@ -36,15 +36,15 @@
             }
             return true;
         },
-        
+
         _isValidParam : function(request, prop, values){
             var validationRule = this.rules[prop],
                 val = values[prop],
                 isValid;
-            
+
             if ( val == null && this._optionalParamsIds && arrayIndexOf(this._optionalParamsIds, prop) !== -1) {
                 isValid = true;
-            }   
+            }
             else if (isRegExp(validationRule)) {
                 isValid = validationRule.test(val);
             }
@@ -54,10 +54,10 @@
             else if (isFunction(validationRule)) {
                 isValid = validationRule(val, request, values);
             }
-            
+
             return isValid || false; //fail silently if validationRule is from an unsupported type
         },
-        
+
         _getParamValuesObject : function(request){
             var shouldTypecast = this._router.shouldTypecast,
                 values = patternLexer.getParamValues(request, this._matchRegexp, shouldTypecast),
@@ -84,19 +84,19 @@
             }
             return params;
         },
-                
+
         dispose : function(){
             this._router.removeRoute(this);
         },
-        
+
         _destroy : function(){
             this.matched.dispose();
             this.matched = this._pattern = this._matchRegexp = null;
         },
-        
+
         toString : function(){
             return '[Route pattern:"'+ this._pattern +'", numListeners:'+ this.matched.getNumListeners() +']';
         }
-        
+
     };
-    
+
