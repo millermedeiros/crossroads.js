@@ -1,0 +1,10 @@
+.tmp*
+.project
+.settings/
+design/
+node_modules/
+
+.DS_Store?
+ehthumbs.db
+Icon?
+Thumbs.db
