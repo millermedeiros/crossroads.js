@@ -2,7 +2,7 @@
  * Crossroads.js <http://millermedeiros.github.com/crossroads.js>
  * Released under the MIT license
  * Author: Miller Medeiros
- * Version: 0.5.0+ - Build: 73 (2011/08/31 09:37 PM)
+ * Version: 0.6.0 - Build: 76 (2011/08/31 10:18 PM)
  */
 
 (function(def){
@@ -140,7 +140,7 @@ def(['signals'], function(signals){
 
     //"static" instance
     crossroads = new Crossroads();
-    crossroads.VERSION = '0.5.0+';
+    crossroads.VERSION = '0.6.0';
 
 
 

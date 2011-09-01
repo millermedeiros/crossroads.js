@@ -1,23 +1,25 @@
 # Crossroads.js Changelog #
 
-## Next ##
+
+## v0.6.0 (2011/08/31) ##
 
 ## API Changes ##
 
+ - changed `crossroads.shouldTypecast` default value to `false` (issue #23)
  - added magic rule to normalize route params before dispatch `rules.normalize_`. (#21)
  - added crossroads.VERSION
- - changed `crossroads.shouldTypecast` default value to `false` (issue #23)
 
 ### Fixes ###
 
  - fix optional "/" between required params. (#25)
- - fix CommonJS wrapper, wasn't exporting crossroads properly 
- - only execute optional params rules if value != null. (#26)
+ - only test optional params if value != null. (#26)
+ - fix CommonJS wrapper, wasn't exporting crossroads properly (#27)
 
 ### Other ###
 
  - Migrated unit tests from YUI to Jasmine to allow testing on nodejs and also 
-   because it runs locally and gives better error messages. (#5)
+   because it runs locally and gives better error messages. Increased a lot the
+   number of tests that helped to spot a few edge cases. (#5)
  - Changed wrapper to generate a single distribution file that runs on all
    environments. (#27)
 
