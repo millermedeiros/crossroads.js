@@ -1,7 +1,7 @@
-        
+
     // Crossroads --------
     //====================
-    
+
     /**
      * @constructor
      */
@@ -12,25 +12,25 @@
     }
 
     Crossroads.prototype = {
-        
+
         create : function(){
             return new Crossroads();
         },
 
-        shouldTypecast : true,
+        shouldTypecast : false,
 
         addRoute : function(pattern, callback, priority){
             var route = new Route(pattern, callback, priority, this);
             this._sortedInsert(route);
             return route;
         },
-        
+
         removeRoute : function(route){
             var i = arrayIndexOf(this._routes, route);
             if(i >= 0) this._routes.splice(i, 1);
             route._destroy();
         },
-        
+
         removeAllRoutes : function(){
             var n = this.getNumRoutes();
             while(n--){
@@ -38,11 +38,11 @@
             }
             this._routes.length = 0;
         },
-        
+
         parse : function(request){
             request = request || '';
             var route = this._getMatchedRoute(request),
-                params = route? patternLexer.getParamValues(request, route._matchRegexp, this.shouldTypecast) : null;
+                params = route? route._getParamsArray(request) : null;
             if(route){
                 params? route.matched.dispatch.apply(route.matched, params) : route.matched.dispatch();
                 this.routed.dispatch(request, route, params);
@@ -50,7 +50,7 @@
                 this.bypassed.dispatch(request);
             }
         },
-        
+
         getNumRoutes : function(){
             return this._routes.length;
         },
@@ -62,7 +62,7 @@
             do { --n; } while (routes[n] && route._priority <= routes[n]._priority);
             routes.splice(n+1, 0, route);
         },
-        
+
         _getMatchedRoute : function(request){
             var routes = this._routes,
                 n = routes.length,
@@ -77,7 +77,8 @@
             return '[crossroads numRoutes:'+ this.getNumRoutes() +']';
         }
     };
-    
+
     //"static" instance
     crossroads = new Crossroads();
-    
+    crossroads.VERSION = '::VERSION_NUMBER::';
+

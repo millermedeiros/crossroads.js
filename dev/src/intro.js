@@ -1,11 +1,11 @@
-    
+
     var crossroads,
         patternLexer,
         BOOL_REGEXP = /^(true|false)$/i;
-    
+
     // Helpers -----------
     //====================
-    
+
     function arrayIndexOf(arr, val){
         var n = arr.length;
         //Array.indexOf doesn't work on IE 6-7
@@ -14,19 +14,19 @@
         }
         return -1;
     }
-    
+
     function isType(type, val){
         return '[object '+ type +']' === Object.prototype.toString.call(val);
     }
-    
+
     function isRegExp(val){
         return isType('RegExp', val);
     }
-    
+
     function isArray(val){
         return isType('Array', val);
     }
-    
+
     function isFunction(val){
         return isType('Function', val);
     }
