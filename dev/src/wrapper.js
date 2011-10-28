@@ -1,28 +1,19 @@
 //::LICENSE:://
-(function(def){
-def(['signals'], function(signals){
+(function (define) {
+    define('crossroads', function (require) {
+        var signals = require('signals');
 //::INTRO_JS:://
 //::CROSSROADS_JS:://
 //::ROUTE_JS:://
 //::LEXER_JS:://
-    return crossroads;
-});
-}(
-    // wrapper to run code everywhere
-    // based on http://bit.ly/c7U4h5
-    typeof require === 'undefined'?
-        //Browser (regular script tag)
-        function(deps, factory){
-            this.crossroads = factory(signals);
-        } :
-        ((typeof exports === 'undefined')?
-            //AMD
-            function(deps, factory){
-                define('crossroads', deps, factory);
-            } :
-            //CommonJS
-            function(deps, factory){
-                module.exports = factory.apply(this, deps.map(require));
-            }
-        )
-));
+        return crossroads;
+    });
+}(typeof define === 'function' && define.amd ? define : function (id, factory) {
+    if (typeof module !== 'undefined' && module.exports) { //Node
+        module.exports = factory(require);
+    } else {
+        window[id] = factory(function (value) {
+            return window[value];
+        });
+    }
+}));
