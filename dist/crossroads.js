@@ -2,11 +2,12 @@
  * Crossroads.js <http://millermedeiros.github.com/crossroads.js>
  * Released under the MIT license
  * Author: Miller Medeiros
- * Version: 0.6.0 - Build: 77 (2011/08/31 11:12 PM)
+ * Version: 0.6.0+ - Build: 83 (2011/10/28 07:20 PM)
  */
 
-(function(def){
-def(['signals'], function(signals){
+(function (define) {
+define('crossroads', function (require) {
+    var signals = require('signals');
 
     var crossroads,
         patternLexer,
@@ -126,7 +127,7 @@ def(['signals'], function(signals){
             var routes = this._routes,
                 n = routes.length,
                 route;
-            while(route = routes[--n]){ //should be decrement loop since higher priorities are added at the end of array  
+            while(route = routes[--n]){ //should be decrement loop since higher priorities are added at the end of array
                 if(route.match(request)) return route;
             }
             return null;
@@ -139,7 +140,7 @@ def(['signals'], function(signals){
 
     //"static" instance
     crossroads = new Crossroads();
-    crossroads.VERSION = '0.6.0';
+    crossroads.VERSION = '0.6.0+';
 
 
 
@@ -170,7 +171,7 @@ def(['signals'], function(signals){
         },
 
         _validateParams : function(request){
-            var rules = this.rules, 
+            var rules = this.rules,
                 values = this._getParamValuesObject(request),
                 prop;
             for(prop in rules){
@@ -186,7 +187,7 @@ def(['signals'], function(signals){
                 val = values[prop],
                 isValid;
 
-            if ( val == null && this._optionalParamsIds && arrayIndexOf(this._optionalParamsIds, prop) !== -1) {
+            if (val == null && this._optionalParamsIds && arrayIndexOf(this._optionalParamsIds, prop) !== -1) {
                 isValid = true;
             }
             else if (isRegExp(validationRule)) {
@@ -205,7 +206,7 @@ def(['signals'], function(signals){
         _getParamValuesObject : function(request){
             var shouldTypecast = this._router.shouldTypecast,
                 values = patternLexer.getParamValues(request, this._matchRegexp, shouldTypecast),
-                o = {}, 
+                o = {},
                 n = values.length;
             while(n--){
                 o[n] = values[n]; //for RegExp pattern and also alias to normal paths
@@ -218,11 +219,10 @@ def(['signals'], function(signals){
         },
 
         _getParamsArray : function(request){
-            var vals = this._getParamValuesObject(request),
-                norm = this.rules? this.rules.normalize_ : null,
+            var norm = this.rules? this.rules.normalize_ : null,
                 params;
-            if(isFunction(norm)){
-                params = norm(request, vals);
+            if(norm && isFunction(norm)){
+                params = norm(request, this._getParamValuesObject(request));
             } else {
                 params = patternLexer.getParamValues(request, this._matchRegexp, this._router.shouldTypecast);
             }
@@ -336,22 +336,12 @@ def(['signals'], function(signals){
 
     return crossroads;
 });
-}(
-    // wrapper to run code everywhere
-    // based on http://bit.ly/c7U4h5
-    typeof require === 'undefined'?
-        //Browser (regular script tag)
-        function(deps, factory){
-            this.crossroads = factory(signals);
-        } :
-        ((typeof exports === 'undefined')?
-            //AMD
-            function(deps, factory){
-                define('crossroads', deps, factory);
-            } :
-            //CommonJS
-            function(deps, factory){
-                module.exports = factory.apply(this, deps.map(require));
-            }
-        )
-));
+}(typeof define === 'function' && define.amd ? define : function (id, factory) {
+    if (typeof module !== 'undefined' && module.exports) { //Node
+        module.exports = factory(require);
+    } else {
+        window[id] = factory(function (value) {
+            return window[value];
+        });
+    }
+}));
