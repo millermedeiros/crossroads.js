@@ -26,7 +26,7 @@
         },
 
         _validateParams : function(request){
-            var rules = this.rules, 
+            var rules = this.rules,
                 values = this._getParamValuesObject(request),
                 prop;
             for(prop in rules){
@@ -42,7 +42,7 @@
                 val = values[prop],
                 isValid;
 
-            if ( val == null && this._optionalParamsIds && arrayIndexOf(this._optionalParamsIds, prop) !== -1) {
+            if (val == null && this._optionalParamsIds && arrayIndexOf(this._optionalParamsIds, prop) !== -1) {
                 isValid = true;
             }
             else if (isRegExp(validationRule)) {
@@ -61,7 +61,7 @@
         _getParamValuesObject : function(request){
             var shouldTypecast = this._router.shouldTypecast,
                 values = patternLexer.getParamValues(request, this._matchRegexp, shouldTypecast),
-                o = {}, 
+                o = {},
                 n = values.length;
             while(n--){
                 o[n] = values[n]; //for RegExp pattern and also alias to normal paths
@@ -74,11 +74,10 @@
         },
 
         _getParamsArray : function(request){
-            var vals = this._getParamValuesObject(request),
-                norm = this.rules? this.rules.normalize_ : null,
+            var norm = this.rules? this.rules.normalize_ : null,
                 params;
-            if(isFunction(norm)){
-                params = norm(request, vals);
+            if(norm && isFunction(norm)){
+                params = norm(request, this._getParamValuesObject(request));
             } else {
                 params = patternLexer.getParamValues(request, this._matchRegexp, this._router.shouldTypecast);
             }

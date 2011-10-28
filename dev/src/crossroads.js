@@ -67,7 +67,7 @@
             var routes = this._routes,
                 n = routes.length,
                 route;
-            while(route = routes[--n]){ //should be decrement loop since higher priorities are added at the end of array  
+            while(route = routes[--n]){ //should be decrement loop since higher priorities are added at the end of array
                 if(route.match(request)) return route;
             }
             return null;
