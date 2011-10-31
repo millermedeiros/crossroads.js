@@ -1,6 +1,14 @@
 # Crossroads.js Changelog #
 
 
+## NEXT ##
+
+## API Changes ##
+
+ - added `crossroads.normalizeFn` (issue #31)
+
+
+
 ## v0.6.0 (2011/08/31) ##
 
 ## API Changes ##
