@@ -233,22 +233,26 @@ describe('crossroads.parse()', function(){
             var prevTypecast = crossroads.shouldTypecast;
             crossroads.shouldTypecast = true;
 
-            var t1, t2, t3, t4;
+            var t1, t2, t3, t4, t5, t6;
 
-            var a = crossroads.addRoute('{lorem}/{ipsum}/{dolor}/{sit}');
-            a.matched.add(function(a, b, c, d){
+            var a = crossroads.addRoute('{a}/{b}/{c}/{d}/{e}/{f}');
+            a.matched.add(function(a, b, c, d, e, f){
                 t1 = a;
                 t2 = b;
                 t3 = c;
                 t4 = d;
+                t5 = e;
+                t6 = f;
             });
 
-            crossroads.parse('lorem/123/true/false');
+            crossroads.parse('lorem/123/true/false/null/undefined');
 
             expect( t1 ).toBe( 'lorem' );
             expect( t2 ).toBe( 123 );
             expect( t3 ).toBe( true );
             expect( t4 ).toBe( false );
+            expect( t5 ).toBe( null );
+            expect( t6 ).toBe( undefined );
 
             crossroads.shouldTypecast = prevTypecast; //restore
         });
