@@ -1,7 +1,8 @@
 
     var crossroads,
         patternLexer,
-        BOOL_REGEXP = /^(true|false)$/i;
+        BOOL_REGEXP = /^(true|false)$/i,
+        UNDEF;
 
     // Helpers -----------
     //====================
@@ -32,18 +33,30 @@
     }
 
     function typecastValue(val){
-        return (val === null)? val : (
-                    BOOL_REGEXP.test(val)? (val.toLowerCase() === 'true') : (
-                        (val === '' || isNaN(val))? val : parseFloat(val) //parseFloat(null || '') returns NaN, isNaN('') returns false
-                    )
-                );
+        var r;
+        if ( val === null || val === 'null' ) {
+            r = null;
+        } else if ( val === 'true' ) {
+            r = true;
+        } else if ( val === 'false' ) {
+            r = false;
+        } else if ( val === UNDEF || val === 'undefined' ) {
+            r = UNDEF;
+        } else if ( val === '' || isNaN(val) ) {
+            //isNaN('') returns false
+            r = val;
+        } else {
+            //parseFloat(null || '') returns NaN
+            r = parseFloat(val);
+        }
+        return r;
     }
 
     function typecastArrayValues(values){
-        var n = values.length, 
+        var n = values.length,
             result = [];
         while(n--){
-            result[n] = typecastValue(values[n]); 
+            result[n] = typecastValue(values[n]);
         }
         return result;
     }

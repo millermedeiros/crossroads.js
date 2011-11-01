@@ -1,6 +1,12 @@
 # Crossroads.js Changelog #
 
 
+## NEXT
+
+ - improve parameter typecasting. (issue #32)
+
+
+
 ## v0.6.0 (2011/08/31) ##
 
 ## API Changes ##
