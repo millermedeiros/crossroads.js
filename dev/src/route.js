@@ -21,6 +21,8 @@
 
     Route.prototype = {
 
+        greedy : false,
+
         rules : void(0),
 
         match : function (request) {
