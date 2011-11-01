@@ -72,6 +72,7 @@
                 }
             }
             o.request_ = shouldTypecast? typecastValue(request) : request;
+            o.vals_ = values;
             return o;
         },
 

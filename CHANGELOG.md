@@ -6,6 +6,8 @@
 ### API Changes ###
 
  - added `crossroads.normalizeFn` (issue #31)
+ - added `vals_` Array to values object passed to `normalize_` and
+   `crossroads.normalizeFn` to increase flexibility. (issue #31)
 
 ### Other ###
 

@@ -412,6 +412,31 @@ describe('crossroads.parse()', function(){
 
         });
 
+
+        it('should receive all values as an array on the special property `vals_`', function () {
+
+            var t1, t2;
+
+            crossroads.normalizeFn = function(request, vals){
+                //convert params into an array..
+                return [vals.vals_];
+            };
+
+            crossroads.addRoute('/{a}/{b}', function(params){
+                t1 = params;
+            });
+            crossroads.addRoute('/{a}', function(params){
+                t2 = params;
+            });
+
+            crossroads.parse('/foo/bar');
+            crossroads.parse('/foo');
+
+            expect( t1.join(';') ).toEqual( ['foo', 'bar'].join(';') );
+            expect( t2.join(';') ).toEqual( ['foo'].join(';') );
+
+        });
+
     });
 
 
