@@ -2,7 +2,7 @@
  * Crossroads.js <http://millermedeiros.github.com/crossroads.js>
  * Released under the MIT license
  * Author: Miller Medeiros
- * Version: 0.6.0+ - Build: 84 (2011/11/01 03:17 PM)
+ * Version: 0.6.0+ - Build: 85 (2011/11/01 04:36 PM)
  */
 
 (function (define) {
@@ -125,12 +125,20 @@ define('crossroads', function (require) {
         parse : function (request) {
             request = request || '';
 
-            var route = this._getMatchedRoute(request),
-                params = route? route._getParamsArray(request) : null;
+            var routes = this._getMatchedRoutes(request),
+                i = 0,
+                n = routes.length,
+                cur;
 
-            if (route) {
-                route.matched.dispatch.apply(route.matched, params);
-                this.routed.dispatch(request, route, params);
+            if (n) {
+                //shold be incremental loop, execute routes in order
+                while (i < n) {
+                    cur = routes[i];
+                    cur.route.matched.dispatch.apply(cur.route.matched, cur.params);
+                    cur.isFirst = !i;
+                    this.routed.dispatch(request, cur);
+                    i += 1;
+                }
             } else {
                 this.bypassed.dispatch(request);
             }
@@ -148,17 +156,21 @@ define('crossroads', function (require) {
             routes.splice(n+1, 0, route);
         },
 
-        _getMatchedRoute : function (request) {
-            var routes = this._routes,
+        _getMatchedRoutes : function (request) {
+            var res = [],
+                routes = this._routes,
                 n = routes.length,
                 route;
             //should be decrement loop since higher priorities are added at the end of array
             while (route = routes[--n]) {
-                if (route.match(request)) {
-                    return route;
+                if ((!res.length || route.greedy) && route.match(request)) {
+                    res.push({
+                        route : route,
+                        params : route._getParamsArray(request)
+                    });
                 }
             }
-            return null;
+            return res;
         },
 
         toString : function () {
@@ -193,6 +205,8 @@ define('crossroads', function (require) {
     }
 
     Route.prototype = {
+
+        greedy : false,
 
         rules : void(0),
 
