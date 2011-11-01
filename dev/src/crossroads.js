@@ -52,10 +52,12 @@
                 cur;
 
             if (n) {
+                //shold be incremental loop, execute routes in order
                 while (i < n) {
                     cur = routes[i];
                     cur.route.matched.dispatch.apply(cur.route.matched, cur.params);
-                    this.routed.dispatch(request, cur.route, cur.params, !i);
+                    cur.isFirst = !i;
+                    this.routed.dispatch(request, cur);
                     i += 1;
                 }
             } else {

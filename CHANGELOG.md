@@ -8,6 +8,9 @@
  - added `crossroads.normalizeFn` (issue #31)
  - added `vals_` Array to values object passed to `normalize_` and
    `crossroads.normalizeFn` to increase flexibility. (issue #31)
+ - added `Route.greedy` support. (issue #20)
+ - changed parameters dispatched by `crossroads.routed` signal, passes request
+   as first param and a data object as second param. (issue #20)
 
 ### Other ###
 

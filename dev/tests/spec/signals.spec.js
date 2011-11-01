@@ -54,16 +54,16 @@ describe('crossroads Signals', function(){
             count2++;
         });
 
-        crossroads.routed.add(function(request, route, params, isFirst){
+        crossroads.routed.add(function(request, data){
             requests.push(request);
             count++;
 
             expect( request ).toBe( '/foo_bar' );
-            expect( route ).toBe( a );
-            expect( params[0] ).toEqual( 'foo' );
-            expect( params[1] ).toEqual( 'bar' );
+            expect( data.route ).toBe( a );
+            expect( data.params[0] ).toEqual( 'foo' );
+            expect( data.params[1] ).toEqual( 'bar' );
             routed = true;
-            first = isFirst;
+            first = data.isFirst;
         });
 
         crossroads.parse('/lorem/ipsum');
@@ -84,9 +84,9 @@ describe('crossroads Signals', function(){
         var count = 0,
             firsts = [];
 
-        crossroads.routed.add(function(req, route, params, isFirst){
+        crossroads.routed.add(function(req, data){
             count += 1;
-            firsts.push(isFirst);
+            firsts.push(data.isFirst);
         });
 
         //anti-pattern!
