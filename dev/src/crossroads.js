@@ -13,6 +13,8 @@
 
     Crossroads.prototype = {
 
+        normalizeFn : null,
+
         create : function(){
             return new Crossroads();
         },

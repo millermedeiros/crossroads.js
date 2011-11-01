@@ -1,7 +1,13 @@
 # Crossroads.js Changelog #
 
 
-## NEXT
+## NEXT ##
+
+### API Changes ###
+
+ - added `crossroads.normalizeFn` (issue #31)
+
+### Other ###
 
  - improve parameter typecasting. (issue #32)
 

@@ -350,6 +350,71 @@ describe('crossroads.parse()', function(){
     });
 
 
+    describe('crossroads.normalizeFn', function () {
+
+        var prevNorm;
+
+        beforeEach(function(){
+            prevNorm = crossroads.normalizeFn;
+        });
+
+        afterEach(function() {
+            crossroads.normalizeFn = prevNorm;
+        });
+
+
+        it('should work as a default normalize_', function () {
+
+            var t1, t2, t3, t4, t5, t6, t7, t8;
+
+
+            crossroads.normalizeFn = function(request, vals){
+                var id;
+                var idRegex = /^[0-9]+$/;
+                if(vals.a === 'article'){
+                    id = vals.c;
+                } else {
+                if( idRegex.test(vals.b) ){
+                    id = vals.b;
+                } else if ( idRegex.test(vals.c) ) {
+                    id = vals.c;
+                }
+                }
+                return ['news', id]; //return params
+            };
+
+            var route1 = crossroads.addRoute('news/{b}/:c:/:d:');
+            route1.matched.addOnce(function(a, b){
+                t1 = a;
+                t2 = b;
+            });
+            crossroads.parse('news/111/lorem-ipsum');
+
+            var route2 = crossroads.addRoute('{a}/{b}/:c:/:d:');
+            route2.rules = {
+                a : ['news', 'article'],
+                b : /[\-0-9a-zA-Z]+/,
+                request_ : /\/[0-9]+\/|$/,
+                normalize_ : function (req, vals) {
+                    return ['foo', vals.b];
+                }
+            };
+            route2.matched.addOnce(function(a, b){
+                t3 = a;
+                t4 = b;
+            });
+            crossroads.parse('article/333');
+
+            expect( t1 ).toBe( 'news' );
+            expect( t2 ).toBe( '111' );
+            expect( t3 ).toBe( 'foo' );
+            expect( t4 ).toBe( '333' );
+
+        });
+
+    });
+
+
     describe('priority', function(){
 
         it('should enforce match order', function(){

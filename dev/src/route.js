@@ -76,6 +76,7 @@
         _getParamsArray : function(request){
             var norm = this.rules? this.rules.normalize_ : null,
                 params;
+            norm = norm || this._router.normalizeFn; // default normalize
             if(norm && isFunction(norm)){
                 params = norm(request, this._getParamValuesObject(request));
             } else {
