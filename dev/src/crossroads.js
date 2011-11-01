@@ -46,12 +46,18 @@
         parse : function (request) {
             request = request || '';
 
-            var route = this._getMatchedRoute(request),
-                params = route? route._getParamsArray(request) : null;
+            var routes = this._getMatchedRoutes(request),
+                i = 0,
+                n = routes.length,
+                cur;
 
-            if (route) {
-                route.matched.dispatch.apply(route.matched, params);
-                this.routed.dispatch(request, route, params);
+            if (n) {
+                while (i < n) {
+                    cur = routes[i];
+                    cur.route.matched.dispatch.apply(cur.route.matched, cur.params);
+                    this.routed.dispatch(request, cur.route, cur.params, !i);
+                    i += 1;
+                }
             } else {
                 this.bypassed.dispatch(request);
             }
@@ -69,17 +75,21 @@
             routes.splice(n+1, 0, route);
         },
 
-        _getMatchedRoute : function (request) {
-            var routes = this._routes,
+        _getMatchedRoutes : function (request) {
+            var res = [],
+                routes = this._routes,
                 n = routes.length,
                 route;
             //should be decrement loop since higher priorities are added at the end of array
             while (route = routes[--n]) {
-                if (route.match(request)) {
-                    return route;
+                if ((!res.length || route.greedy) && route.match(request)) {
+                    res.push({
+                        route : route,
+                        params : route._getParamsArray(request)
+                    });
                 }
             }
-            return null;
+            return res;
         },
 
         toString : function () {
