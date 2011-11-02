@@ -1,7 +1,7 @@
 # Crossroads.js Changelog #
 
 
-## NEXT ##
+## v0.7.0 (2011/11/02) ##
 
 ### API Changes ###
 
@@ -15,6 +15,8 @@
 ### Other ###
 
  - improve parameter typecasting. (issue #32)
+ - refactoring for better code compression and also simplified some logic to
+   increase code readability.
 
 
 
