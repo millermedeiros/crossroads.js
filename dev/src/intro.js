@@ -1,49 +1,68 @@
 
     var crossroads,
         patternLexer,
-        BOOL_REGEXP = /^(true|false)$/i;
+        BOOL_REGEXP = /^(true|false)$/i,
+        UNDEF;
 
     // Helpers -----------
     //====================
 
-    function arrayIndexOf(arr, val){
-        var n = arr.length;
-        //Array.indexOf doesn't work on IE 6-7
-        while(n--){
-            if(arr[n] === val) return n;
+    function arrayIndexOf(arr, val) {
+        if (arr.indexOf) {
+            return arr.indexOf(val);
+        } else {
+            //Array.indexOf doesn't work on IE 6-7
+            var n = arr.length;
+            while (n--) {
+                if (arr[n] === val) {
+                    return n;
+                }
+            }
+            return -1;
         }
-        return -1;
     }
 
-    function isType(type, val){
-        return '[object '+ type +']' === Object.prototype.toString.call(val);
+    function isKind(val, kind) {
+        return '[object '+ kind +']' === Object.prototype.toString.call(val);
     }
 
-    function isRegExp(val){
-        return isType('RegExp', val);
+    function isRegExp(val) {
+        return isKind(val, 'RegExp');
     }
 
-    function isArray(val){
-        return isType('Array', val);
+    function isArray(val) {
+        return isKind(val, 'Array');
     }
 
-    function isFunction(val){
-        return isType('Function', val);
+    function isFunction(val) {
+        return isKind(val, 'Function');
     }
 
-    function typecastValue(val){
-        return (val === null)? val : (
-                    BOOL_REGEXP.test(val)? (val.toLowerCase() === 'true') : (
-                        (val === '' || isNaN(val))? val : parseFloat(val) //parseFloat(null || '') returns NaN, isNaN('') returns false
-                    )
-                );
+    function typecastValue(val) {
+        var r;
+        if (val === null || val === 'null') {
+            r = null;
+        } else if (val === 'true') {
+            r = true;
+        } else if (val === 'false') {
+            r = false;
+        } else if (val === UNDEF || val === 'undefined') {
+            r = UNDEF;
+        } else if (val === '' || isNaN(val)) {
+            //isNaN('') returns false
+            r = val;
+        } else {
+            //parseFloat(null || '') returns NaN
+            r = parseFloat(val);
+        }
+        return r;
     }
 
-    function typecastArrayValues(values){
-        var n = values.length, 
+    function typecastArrayValues(values) {
+        var n = values.length,
             result = [];
-        while(n--){
-            result[n] = typecastValue(values[n]); 
+        while (n--) {
+            result[n] = typecastValue(values[n]);
         }
         return result;
     }

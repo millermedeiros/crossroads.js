@@ -1,6 +1,25 @@
 # Crossroads.js Changelog #
 
 
+## v0.7.0 (2011/11/02) ##
+
+### API Changes ###
+
+ - added `crossroads.normalizeFn` (issue #31)
+ - added `vals_` Array to values object passed to `normalize_` and
+   `crossroads.normalizeFn` to increase flexibility. (issue #31)
+ - added `Route.greedy` support. (issue #20)
+ - changed parameters dispatched by `crossroads.routed` signal, passes request
+   as first param and a data object as second param. (issue #20)
+
+### Other ###
+
+ - improve parameter typecasting. (issue #32)
+ - refactoring for better code compression and also simplified some logic to
+   increase code readability.
+
+
+
 ## v0.6.0 (2011/08/31) ##
 
 ## API Changes ##

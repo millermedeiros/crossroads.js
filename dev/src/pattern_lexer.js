@@ -2,45 +2,47 @@
     // Pattern Lexer ------
     //=====================
 
-    patternLexer = crossroads.patternLexer = (function(){
+    patternLexer = crossroads.patternLexer = (function () {
+
 
         var ESCAPE_CHARS_REGEXP = /[\\.+*?\^$\[\](){}\/'#]/g, //match chars that should be escaped on string regexp
             UNNECESSARY_SLASHES_REGEXP = /\/$/g, //trailing slash
             OPTIONAL_SLASHES_REGEXP = /([:}]|\w(?=\/))\/?(:)/g, //slash between `::` or `}:` or `\w:`. $1 = before, $2 = after
-            REQUIRED_SLASHES_REGEXP = /([:}])\/?(\{)/g,
+            REQUIRED_SLASHES_REGEXP = /([:}])\/?(\{)/g, //used to insert slash between `:{` and `}{`
 
             REQUIRED_PARAMS_REGEXP = /\{([^}]+)\}/g, //match everything between `{ }`
             OPTIONAL_PARAMS_REGEXP = /:([^:]+):/g, //match everything between `: :`
             PARAMS_REGEXP = /(?:\{|:)([^}:]+)(?:\}|:)/g, //capture everything between `{ }` or `: :`
 
-            //used to save params during compile (avoid escaping things that shouldn't be escaped)
-            SAVE_REQUIRED_PARAMS = '___CR_REQ___', 
-            SAVE_OPTIONAL_PARAMS = '___CR_OPT___',
-            SAVE_OPTIONAL_SLASHES = '___CR_OPT_SLASH___',
-            SAVE_REQUIRED_SLASHES = '___CR_REQ_SLASH___',
+            //used to save params during compile (avoid escaping things that
+            //shouldn't be escaped).
+            SAVE_REQUIRED_PARAMS = '__CR_RP__',
+            SAVE_OPTIONAL_PARAMS = '__CR_OP__',
+            SAVE_REQUIRED_SLASHES = '__CR_RS__',
+            SAVE_OPTIONAL_SLASHES = '__CR_OS__',
             SAVED_REQUIRED_REGEXP = new RegExp(SAVE_REQUIRED_PARAMS, 'g'),
             SAVED_OPTIONAL_REGEXP = new RegExp(SAVE_OPTIONAL_PARAMS, 'g'),
             SAVED_OPTIONAL_SLASHES_REGEXP = new RegExp(SAVE_OPTIONAL_SLASHES, 'g'),
             SAVED_REQUIRED_SLASHES_REGEXP = new RegExp(SAVE_REQUIRED_SLASHES, 'g');
 
 
-        function getParamIds(pattern){
-            var ids = [], match;
-            while(match = PARAMS_REGEXP.exec(pattern)){
-                ids.push(match[1]);
+        function captureVals(regex, pattern) {
+            var vals = [], match;
+            while (match = regex.exec(pattern)) {
+                vals.push(match[1]);
             }
-            return ids;
+            return vals;
         }
 
-        function getOptionalParamsIds(pattern){
-            var ids = [], match;
-            while(match = OPTIONAL_PARAMS_REGEXP.exec(pattern)){
-                ids.push(match[1]);
-            }
-            return ids;
+        function getParamIds(pattern) {
+            return captureVals(PARAMS_REGEXP, pattern);
         }
 
-        function compilePattern(pattern){
+        function getOptionalParamsIds(pattern) {
+            return captureVals(OPTIONAL_PARAMS_REGEXP, pattern);
+        }
+
+        function compilePattern(pattern) {
             pattern = pattern || '';
             if(pattern){
                 pattern = pattern.replace(UNNECESSARY_SLASHES_REGEXP, '');
@@ -51,25 +53,26 @@
             return new RegExp('^'+ pattern + '/?$'); //trailing slash is optional
         }
 
-        function tokenize(pattern){
+        function tokenize(pattern) {
+            //save chars that shouldn't be escaped
             pattern = pattern.replace(OPTIONAL_SLASHES_REGEXP, '$1'+ SAVE_OPTIONAL_SLASHES +'$2');
             pattern = pattern.replace(REQUIRED_SLASHES_REGEXP, '$1'+ SAVE_REQUIRED_SLASHES +'$2');
             pattern = pattern.replace(OPTIONAL_PARAMS_REGEXP, SAVE_OPTIONAL_PARAMS);
             return pattern.replace(REQUIRED_PARAMS_REGEXP, SAVE_REQUIRED_PARAMS);
         }
 
-        function untokenize(pattern){
+        function untokenize(pattern) {
             pattern = pattern.replace(SAVED_OPTIONAL_SLASHES_REGEXP, '\\/?');
             pattern = pattern.replace(SAVED_REQUIRED_SLASHES_REGEXP, '\\/');
             pattern = pattern.replace(SAVED_OPTIONAL_REGEXP, '([^\\/]+)?\/?');
             return pattern.replace(SAVED_REQUIRED_REGEXP, '([^\\/]+)');
         }
 
-        function getParamValues(request, regexp, shouldTypecast){
+        function getParamValues(request, regexp, shouldTypecast) {
             var vals = regexp.exec(request);
-            if(vals){
+            if (vals) {
                 vals.shift();
-                if(shouldTypecast){
+                if (shouldTypecast) {
                     vals = typecastArrayValues(vals);
                 }
             }

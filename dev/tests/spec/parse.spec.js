@@ -233,22 +233,26 @@ describe('crossroads.parse()', function(){
             var prevTypecast = crossroads.shouldTypecast;
             crossroads.shouldTypecast = true;
 
-            var t1, t2, t3, t4;
+            var t1, t2, t3, t4, t5, t6;
 
-            var a = crossroads.addRoute('{lorem}/{ipsum}/{dolor}/{sit}');
-            a.matched.add(function(a, b, c, d){
+            var a = crossroads.addRoute('{a}/{b}/{c}/{d}/{e}/{f}');
+            a.matched.add(function(a, b, c, d, e, f){
                 t1 = a;
                 t2 = b;
                 t3 = c;
                 t4 = d;
+                t5 = e;
+                t6 = f;
             });
 
-            crossroads.parse('lorem/123/true/false');
+            crossroads.parse('lorem/123/true/false/null/undefined');
 
             expect( t1 ).toBe( 'lorem' );
             expect( t2 ).toBe( 123 );
             expect( t3 ).toBe( true );
             expect( t4 ).toBe( false );
+            expect( t5 ).toBe( null );
+            expect( t6 ).toBe( undefined );
 
             crossroads.shouldTypecast = prevTypecast; //restore
         });
@@ -340,6 +344,96 @@ describe('crossroads.parse()', function(){
             expect( t6 ).toBe( '333' );
             expect( t7 ).toBe( 'news' );
             expect( t8 ).toBe( '444' );
+
+        });
+
+    });
+
+
+    describe('crossroads.normalizeFn', function () {
+
+        var prevNorm;
+
+        beforeEach(function(){
+            prevNorm = crossroads.normalizeFn;
+        });
+
+        afterEach(function() {
+            crossroads.normalizeFn = prevNorm;
+        });
+
+
+        it('should work as a default normalize_', function () {
+
+            var t1, t2, t3, t4, t5, t6, t7, t8;
+
+
+            crossroads.normalizeFn = function(request, vals){
+                var id;
+                var idRegex = /^[0-9]+$/;
+                if(vals.a === 'article'){
+                    id = vals.c;
+                } else {
+                if( idRegex.test(vals.b) ){
+                    id = vals.b;
+                } else if ( idRegex.test(vals.c) ) {
+                    id = vals.c;
+                }
+                }
+                return ['news', id]; //return params
+            };
+
+            var route1 = crossroads.addRoute('news/{b}/:c:/:d:');
+            route1.matched.addOnce(function(a, b){
+                t1 = a;
+                t2 = b;
+            });
+            crossroads.parse('news/111/lorem-ipsum');
+
+            var route2 = crossroads.addRoute('{a}/{b}/:c:/:d:');
+            route2.rules = {
+                a : ['news', 'article'],
+                b : /[\-0-9a-zA-Z]+/,
+                request_ : /\/[0-9]+\/|$/,
+                normalize_ : function (req, vals) {
+                    return ['foo', vals.b];
+                }
+            };
+            route2.matched.addOnce(function(a, b){
+                t3 = a;
+                t4 = b;
+            });
+            crossroads.parse('article/333');
+
+            expect( t1 ).toBe( 'news' );
+            expect( t2 ).toBe( '111' );
+            expect( t3 ).toBe( 'foo' );
+            expect( t4 ).toBe( '333' );
+
+        });
+
+
+        it('should receive all values as an array on the special property `vals_`', function () {
+
+            var t1, t2;
+
+            crossroads.normalizeFn = function(request, vals){
+                //convert params into an array..
+                return [vals.vals_];
+            };
+
+            crossroads.addRoute('/{a}/{b}', function(params){
+                t1 = params;
+            });
+            crossroads.addRoute('/{a}', function(params){
+                t2 = params;
+            });
+
+            crossroads.parse('/foo/bar');
+            crossroads.parse('/foo');
+
+            expect( t1.join(';') ).toEqual( ['foo', 'bar'].join(';') );
+            expect( t2.join(';') ).toEqual( ['foo'].join(';') );
 
         });
 
@@ -463,6 +557,52 @@ describe('crossroads.parse()', function(){
             expect( t2 ).toBeUndefined();
             expect( t3 ).toBeUndefined();
             expect( t4 ).toBeUndefined();
+        });
+
+    });
+
+
+    describe('greedy routes', function () {
+
+        it('should match multiple greedy routes', function () {
+
+            var t1, t2, t3, t4, t5, t6, t7, t8;
+
+            var r1 = crossroads.addRoute('/{a}/{b}/', function(a,b){
+                t1 = a;
+                t2 = b;
+            });
+            r1.greedy = false;
+
+            var r2 = crossroads.addRoute('/bar/{b}/', function(a,b){
+                t3 = a;
+                t4 = b;
+            });
+            r2.greedy = true;
+
+            var r3 = crossroads.addRoute('/foo/{b}/', function(a,b){
+                t5 = a;
+                t6 = b;
+            });
+            r3.greedy = true;
+
+            var r4 = crossroads.addRoute('/{a}/:b:/', function(a,b){
+                t7 = a;
+                t8 = b;
+            });
+            r4.greedy = true;
+
+            crossroads.parse('/foo/lorem');
+
+            expect( t1 ).toEqual( 'foo' );
+            expect( t2 ).toEqual( 'lorem' );
+            expect( t3 ).toBeUndefined();
+            expect( t4 ).toBeUndefined();
+            expect( t5 ).toEqual( 'lorem' );
+            expect( t6 ).toBeUndefined();
+            expect( t7 ).toEqual( 'foo' );
+            expect( t8 ).toEqual( 'lorem' );
+
         });
 
     });

@@ -10,4 +10,5 @@ signals.Signal.prototype = {
     dispose : function(){}
 };
 //CommonJS and AMD
-var exports, require, define, module;
+var exports, require, define = function(){}, module;
+define.amd = true;

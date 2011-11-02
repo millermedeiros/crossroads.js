@@ -295,12 +295,13 @@ describe('Match', function(){
 
             it('should only check rules of optional segments if param exists', function(){
 
-                var a = crossroads.addRoute('/123/:foo:/:bar:');
+                var a = crossroads.addRoute('/123/:a:/:b:/:c:');
                 a.rules = {
-                    foo : /^\w+$/,
-                    bar : function(val){
+                    a : /^\w+$/,
+                    b : function(val){
                         return val === 'ipsum';
-                    }
+                    },
+                    c : ['lorem', 'bar']
                 };
 
                 expect( a.match('/123') ).toBe( true );
@@ -308,10 +309,12 @@ describe('Match', function(){
                 expect( a.match('/123/asd') ).toBe( true );
                 expect( a.match('/123/asd/') ).toBe( true );
                 expect( a.match('/123/asd/ipsum/') ).toBe( true );
+                expect( a.match('/123/asd/ipsum/bar') ).toBe( true );
 
                 expect( a.match('/123/asd/45') ).toBe( false );
                 expect( a.match('/123/asd/45/qwe') ).toBe( false );
                 expect( a.match('/123/as#%d&/ipsum') ).toBe( false );
+                expect( a.match('/123/asd/ipsum/nope') ).toBe( false );
 
             });
 
