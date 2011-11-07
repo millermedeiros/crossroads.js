@@ -2,7 +2,7 @@
  * Crossroads.js <http://millermedeiros.github.com/crossroads.js>
  * Released under the MIT license
  * Author: Miller Medeiros
- * Version: 0.7.0 - Build: 86 (2011/11/02 02:48 AM)
+ * Version: 0.7.0 - Build: 87 (2011/11/07 03:34 PM)
  */
 
 (function (define) {
@@ -11,7 +11,6 @@ define('crossroads', function (require) {
 
     var crossroads,
         patternLexer,
-        BOOL_REGEXP = /^(true|false)$/i,
         UNDEF;
 
     // Helpers -----------
@@ -48,6 +47,7 @@ define('crossroads', function (require) {
         return isKind(val, 'Function');
     }
 
+    //borrowed from AMD-utils
     function typecastValue(val) {
         var r;
         if (val === null || val === 'null') {
