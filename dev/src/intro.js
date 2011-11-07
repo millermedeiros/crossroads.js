@@ -1,7 +1,6 @@
 
     var crossroads,
         patternLexer,
-        BOOL_REGEXP = /^(true|false)$/i,
         UNDEF;
 
     // Helpers -----------
@@ -38,6 +37,7 @@
         return isKind(val, 'Function');
     }
 
+    //borrowed from AMD-utils
     function typecastValue(val) {
         var r;
         if (val === null || val === 'null') {
