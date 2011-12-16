@@ -2,7 +2,7 @@
  * Crossroads.js <http://millermedeiros.github.com/crossroads.js>
  * Released under the MIT license
  * Author: Miller Medeiros
- * Version: 0.7.0+ - Build: 89 (2011/12/16 01:10 AM)
+ * Version: 0.7.0+ - Build: 90 (2011/12/16 01:18 AM)
  */
 
 (function (define) {
@@ -94,6 +94,22 @@ define('crossroads', function (require) {
     Crossroads.prototype = {
 
         normalizeFn : null,
+
+        normalizeAsArray : function(){
+            this.normalizeFn = function (req, vals) {
+                return [vals.vals_];
+            };
+        },
+
+        normalizeAsObject : function () {
+            this.normalizeFn = function (req, vals) {
+                return [vals];
+            };
+        },
+
+        normalizeAsArguments : function () {
+            this.normalizeFn = null;
+        },
 
         create : function () {
             return new Crossroads();

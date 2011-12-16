@@ -5,6 +5,8 @@
 ### API Changes
 
  - added `Route.switched` (#37)
+ - added `crossroads.normalizeAsArray`, `crossroads.normalizeAsObject` and
+   `crossroads.normalizeAsArguments` (#31)
 
 
 ## v0.7.0 (2011/11/02) ##

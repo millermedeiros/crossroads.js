@@ -437,6 +437,74 @@ describe('crossroads.parse()', function(){
 
         });
 
+        describe('normalizeAsArray', function () {
+
+            it('should pass array', function () {
+                var arg;
+
+                crossroads.normalizeAsArray();
+                crossroads.addRoute('/{a}/{b}', function (a) {
+                    arg = a;
+                });
+                crossroads.parse('/foo/bar');
+
+                expect( {}.toString.call(arg) ).toEqual( '[object Array]' );
+                expect( arg[0] ).toEqual( 'foo' );
+                expect( arg[1] ).toEqual( 'bar' );
+            });
+
+        });
+
+        describe('normalizeAsObject', function () {
+
+            it('should pass object', function () {
+                var arg;
+
+                crossroads.normalizeAsObject();
+                crossroads.addRoute('/{a}/{b}', function (a) {
+                    arg = a;
+                });
+                crossroads.parse('/foo/bar');
+
+                expect( arg.a ).toEqual( 'foo' );
+                expect( arg.b ).toEqual( 'bar' );
+            });
+
+        });
+
+        describe('normalizeAsArguments', function () {
+
+            it('should pass multiple args', function () {
+                var arg1, arg2;
+
+                crossroads.normalizeAsArguments();
+                crossroads.addRoute('/{a}/{b}', function (a, b) {
+                    arg1 = a;
+                    arg2 = b;
+                });
+                crossroads.parse('/foo/bar');
+
+                expect( arg1 ).toEqual( 'foo' );
+                expect( arg2 ).toEqual( 'bar' );
+            });
+
+            it('should override prev normalize', function () {
+                var arg1, arg2;
+
+                crossroads.normalizeAsArray();
+                crossroads.normalizeAsArguments();
+                crossroads.addRoute('/{a}/{b}', function (a, b) {
+                    arg1 = a;
+                    arg2 = b;
+                });
+                crossroads.parse('/foo/bar');
+
+                expect( arg1 ).toEqual( 'foo' );
+                expect( arg2 ).toEqual( 'bar' );
+            });
+
+        });
+
     });
 
 
