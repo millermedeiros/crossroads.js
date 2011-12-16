@@ -2,7 +2,7 @@
  * Crossroads.js <http://millermedeiros.github.com/crossroads.js>
  * Released under the MIT license
  * Author: Miller Medeiros
- * Version: 0.7.0 - Build: 87 (2011/11/07 03:34 PM)
+ * Version: 0.7.0+ - Build: 89 (2011/12/16 01:10 AM)
  */
 
 (function (define) {
@@ -86,6 +86,7 @@ define('crossroads', function (require) {
      */
     function Crossroads() {
         this._routes = [];
+        this._prevRoutes = [];
         this.bypassed = new signals.Signal();
         this.routed = new signals.Signal();
     }
@@ -131,6 +132,8 @@ define('crossroads', function (require) {
                 cur;
 
             if (n) {
+                this._notifyPrevRoutes(request);
+                this._prevRoutes = routes;
                 //shold be incremental loop, execute routes in order
                 while (i < n) {
                     cur = routes[i];
@@ -141,6 +144,14 @@ define('crossroads', function (require) {
                 }
             } else {
                 this.bypassed.dispatch(request);
+            }
+        },
+
+        _notifyPrevRoutes : function(request) {
+            var i = 0, cur;
+            while (cur = this._prevRoutes[i++]) {
+                //check if switched exist since route may be disposed
+                if(cur.route.switched) cur.route.switched.dispatch(request);
             }
         },
 
@@ -180,7 +191,7 @@ define('crossroads', function (require) {
 
     //"static" instance
     crossroads = new Crossroads();
-    crossroads.VERSION = '0.7.0';
+    crossroads.VERSION = '0.7.0+';
 
 
 
@@ -198,6 +209,7 @@ define('crossroads', function (require) {
         this._optionalParamsIds = isRegexPattern? null : patternLexer.getOptionalParamsIds(this._pattern);
         this._matchRegexp = isRegexPattern? pattern : patternLexer.compilePattern(pattern);
         this.matched = new signals.Signal();
+        this.switched = new signals.Signal();
         if (callback) {
             this.matched.add(callback);
         }
@@ -281,7 +293,8 @@ define('crossroads', function (require) {
 
         _destroy : function () {
             this.matched.dispose();
-            this.matched = this._pattern = this._matchRegexp = null;
+            this.switched.dispose();
+            this.matched = this.switched = this._pattern = this._matchRegexp = null;
         },
 
         toString : function () {

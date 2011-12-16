@@ -13,6 +13,7 @@
         this._optionalParamsIds = isRegexPattern? null : patternLexer.getOptionalParamsIds(this._pattern);
         this._matchRegexp = isRegexPattern? pattern : patternLexer.compilePattern(pattern);
         this.matched = new signals.Signal();
+        this.switched = new signals.Signal();
         if (callback) {
             this.matched.add(callback);
         }
@@ -96,7 +97,8 @@
 
         _destroy : function () {
             this.matched.dispose();
-            this.matched = this._pattern = this._matchRegexp = null;
+            this.switched.dispose();
+            this.matched = this.switched = this._pattern = this._matchRegexp = null;
         },
 
         toString : function () {

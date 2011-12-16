@@ -7,6 +7,7 @@
      */
     function Crossroads() {
         this._routes = [];
+        this._prevRoutes = [];
         this.bypassed = new signals.Signal();
         this.routed = new signals.Signal();
     }
@@ -52,6 +53,8 @@
                 cur;
 
             if (n) {
+                this._notifyPrevRoutes(request);
+                this._prevRoutes = routes;
                 //shold be incremental loop, execute routes in order
                 while (i < n) {
                     cur = routes[i];
@@ -62,6 +65,14 @@
                 }
             } else {
                 this.bypassed.dispatch(request);
+            }
+        },
+
+        _notifyPrevRoutes : function(request) {
+            var i = 0, cur;
+            while (cur = this._prevRoutes[i++]) {
+                //check if switched exist since route may be disposed
+                if(cur.route.switched) cur.route.switched.dispatch(request);
             }
         },
 

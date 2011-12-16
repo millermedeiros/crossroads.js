@@ -1,20 +1,26 @@
 # Crossroads.js Changelog #
 
+## Next
+
+### API Changes
+
+ - added `Route.switched` (#37)
+
 
 ## v0.7.0 (2011/11/02) ##
 
 ### API Changes ###
 
- - added `crossroads.normalizeFn` (issue #31)
+ - added `crossroads.normalizeFn` (#31)
  - added `vals_` Array to values object passed to `normalize_` and
-   `crossroads.normalizeFn` to increase flexibility. (issue #31)
- - added `Route.greedy` support. (issue #20)
+   `crossroads.normalizeFn` to increase flexibility. (#31)
+ - added `Route.greedy` support. (#20)
  - changed parameters dispatched by `crossroads.routed` signal, passes request
-   as first param and a data object as second param. (issue #20)
+   as first param and a data object as second param. (#20)
 
 ### Other ###
 
- - improve parameter typecasting. (issue #32)
+ - improve parameter typecasting. (#32)
  - refactoring for better code compression and also simplified some logic to
    increase code readability.
 
@@ -24,7 +30,7 @@
 
 ## API Changes ##
 
- - changed `crossroads.shouldTypecast` default value to `false` (issue #23)
+ - changed `crossroads.shouldTypecast` default value to `false` (#23)
  - added magic rule to normalize route params before dispatch `rules.normalize_`. (#21)
  - added crossroads.VERSION
 
@@ -36,7 +42,7 @@
 
 ### Other ###
 
- - Migrated unit tests from YUI to Jasmine to allow testing on nodejs and also 
+ - Migrated unit tests from YUI to Jasmine to allow testing on nodejs and also
    because it runs locally and gives better error messages. Increased a lot the
    number of tests that helped to spot a few edge cases. (#5)
  - Changed wrapper to generate a single distribution file that runs on all
@@ -90,8 +96,8 @@
 ## v0.2 (2011/04/14) ##
 
 ### API Changes ###
- 
- - added priority param to `addRoute`. (#2) 
+
+ - added priority param to `addRoute`. (#2)
 
 ### Other ###
 
