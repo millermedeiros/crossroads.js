@@ -1,8 +1,8 @@
 /** @license
- * Crossroads.js <http://millermedeiros.github.com/crossroads.js>
- * Released under the MIT license
+ * crossroads <http://millermedeiros.github.com/crossroads.js/>
+ * License: MIT
  * Author: Miller Medeiros
- * Version: 0.7.0+ - Build: 90 (2011/12/16 01:18 AM)
+ * Version: 0.7.0 (2012/1/3 4:59)
  */
 
 (function (define) {
@@ -207,7 +207,7 @@ define('crossroads', function (require) {
 
     //"static" instance
     crossroads = new Crossroads();
-    crossroads.VERSION = '0.7.0+';
+    crossroads.VERSION = '0.7.0';
 
 
 

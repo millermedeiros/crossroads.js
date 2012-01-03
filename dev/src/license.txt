@@ -1,6 +1,6 @@
 /** @license
- * Crossroads.js <http://millermedeiros.github.com/crossroads.js>
- * Released under the MIT license
- * Author: Miller Medeiros
- * Version: ::VERSION_NUMBER:: - Build: ::BUILD_NUMBER:: (::BUILD_DATE::)
+ * ::NAME:: <::HOMEPAGE::>
+ * License: ::LICENSE::
+ * Author: ::AUTHOR::
+ * Version: ::VERSION_NUMBER:: (::BUILD_DATE::)
  */

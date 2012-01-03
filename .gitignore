@@ -2,7 +2,7 @@
 .project
 .settings/
 design/
-node_modules/
+node_modules/signals/
 
 .DS_Store?
 ehthumbs.db

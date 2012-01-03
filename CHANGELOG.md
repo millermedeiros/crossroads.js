@@ -8,6 +8,11 @@
  - added `crossroads.normalizeAsArray`, `crossroads.normalizeAsObject` and
    `crossroads.normalizeAsArguments` (#31)
 
+### Other
+
+ - change build to Node.js
+ - change minifier to UglifyJS.
+
 
 ## v0.7.0 (2011/11/02) ##
 
