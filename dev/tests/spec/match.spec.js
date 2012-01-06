@@ -45,10 +45,10 @@ describe('Match', function(){
 
     it('should match optional params', function(){
         var s = crossroads.addRoute(':bar:');
-        expect( s.match('lorem-ipsum') ).toBe( true ); 
-        expect( s.match('') ).toBe( true ); 
+        expect( s.match('lorem-ipsum') ).toBe( true );
+        expect( s.match('') ).toBe( true );
         expect( s.match('lorem-ipsum/dolor') ).toBe( false );
-        expect( s.match('/lorem-ipsum/') ).toBe( false ); 
+        expect( s.match('/lorem-ipsum/') ).toBe( false );
 
     });
 
@@ -58,7 +58,7 @@ describe('Match', function(){
         expect( s.match('/lorem-ipsum/') ).toBe( true );
         expect( s.match('/lorem-ipsum/dolor') ).toBe( true );
         expect( s.match('123/45') ).toBe( false );
-    }); 
+    });
 
     it('should work even with optional params on the middle of pattern', function(){
         var a = crossroads.addRoute('/{foo}/:bar:/{ipsum}'); //bad use!
@@ -90,7 +90,7 @@ describe('Match', function(){
 
 
     describe('slash between params are optional', function(){
-    
+
         describe('between required params', function(){
             it('after other param', function(){
                 var a = crossroads.addRoute('{bar}{ipsum}');
@@ -156,7 +156,7 @@ describe('Match', function(){
                 expect( a.match('/123/asd/45') ).toBe( true );
                 expect( a.match('/123/asd/45/') ).toBe( true );
                 expect( a.match('/123/asd/45/qwe') ).toBe( false );
-            }); 
+            });
 
             it('optional params after \\w/', function(){
                 var a = crossroads.addRoute('/123/:bar::ipsum:');
@@ -169,13 +169,13 @@ describe('Match', function(){
                 expect( a.match('/123/asd/45/qwe') ).toBe( false );
             });
 
-        }); 
+        });
 
     });
 
 
     describe('slash is required between word and param', function(){
-        
+
         it('required param after \\w', function(){
             var a = crossroads.addRoute('/123{bar}{ipsum}');
             expect( a.match('/123') ).toBe( false );
@@ -322,7 +322,7 @@ describe('Match', function(){
             it('should work with shouldTypecast=false', function(){
                 var prevTypecast = crossroads.shouldTypecast;
                 var s = crossroads.addRoute('/{foo}/{bar}/{ipsum}');
-            
+
                 crossroads.shouldTypecast = false;
 
                 s.rules = {
@@ -332,7 +332,7 @@ describe('Match', function(){
                     bar : ['dolor', '45'], //only string validates
                     ipsum : /(sit-amet|67)/
                 };
-                
+
                 expect( s.match('/lorem-ipsum') ).toBe( false );
                 expect( s.match('/lorem-ipsum/dolor/sit-amet') ).toBe( true );
                 expect( s.match('lorem-ipsum') ).toBe( false );
@@ -347,11 +347,11 @@ describe('Match', function(){
 
 
         describe('path alias', function(){
-        
+
             it('should work with string pattern', function(){
-            
+
                 var s = crossroads.addRoute('/{foo}/{bar}/{ipsum}');
-            
+
                 s.rules = {
                     0 : ['lorem-ipsum', '123'],
                     1 : function(val, request, params){
@@ -359,7 +359,7 @@ describe('Match', function(){
                     },
                     2 : /^(sit-amet|67)$/
                 };
-                
+
                 expect( s.match('/lorem-ipsum') ).toBe( false );
                 expect( s.match('/lorem-ipsum/dolor/sit-amet') ).toBe( true );
                 expect( s.match('lorem-ipsum') ).toBe( false );
@@ -371,9 +371,9 @@ describe('Match', function(){
             });
 
             it('should work with RegExp pattern', function(){
-            
+
                 var s = crossroads.addRoute(/([\-\w]+)\/([\-\w]+)\/([\-\w]+)/);
-            
+
                 s.rules = {
                     0 : ['lorem-ipsum', '123'],
                     1 : function(val, request, params){
@@ -381,7 +381,7 @@ describe('Match', function(){
                     },
                     2 : /^(sit-amet|67)$/
                 };
-                
+
                 expect( s.match('/lorem-ipsum') ).toBe( false );
                 expect( s.match('/lorem-ipsum/dolor/sit-amet') ).toBe( true );
                 expect( s.match('lorem-ipsum') ).toBe( false );
@@ -389,12 +389,12 @@ describe('Match', function(){
                 expect( s.match('123') ).toBe( false );
                 expect( s.match('/123/44/55') ).toBe( false );
                 expect( s.match('/123/45/67') ).toBe( true );
-            
+
             });
 
         });
 
-        
+
         describe('request_', function(){
 
             it('should validate whole request', function(){
@@ -467,6 +467,37 @@ describe('Match', function(){
                 expect( s.match('123') ).toBe( true );
                 expect( s.match('555') ).toBe( false );
                 expect( s.match('') ).toBe( true );
+            });
+
+        });
+
+
+
+        describe('normalize_', function(){
+
+            it('should ignore normalize_ since it isn\'t a validation rule', function () {
+
+                var calledNormalize = false;
+                var s = crossroads.addRoute('/{foo}/{bar}/{ipsum}');
+                s.rules = {
+                     foo : function(val, request, params){
+                         return (val === 'lorem-ipsum' || val === '123');
+                     },
+                     bar : ['dolor', '45'],
+                     ipsum : /(sit-amet|67)/,
+                     normalize_ : function(){
+                         calledNormalize = true;
+                         return [true];
+                     }
+                 };
+
+                 expect( calledNormalize ).toBe( false );
+                 expect( s.match('/lorem-ipsum') ).toBe( false );
+                 expect( s.match('/lorem-ipsum/dolor/sit-amet') ).toBe( true );
+                 expect( s.match('lorem-ipsum') ).toBe( false );
+                 expect( s.match('/123') ).toBe( false );
+                 expect( s.match('123') ).toBe( false );
+                 expect( s.match('/123/45/67') ).toBe( true );
             });
 
         });

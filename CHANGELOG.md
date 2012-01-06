@@ -1,5 +1,12 @@
 # Crossroads.js Changelog #
 
+## v0.7.1 (2012/01/06) ##
+
+### Fixes ###
+
+ - avoid calling `rules.normalize_` during validation step (#39)
+
+
 
 ## v0.7.0 (2011/11/02) ##
 
