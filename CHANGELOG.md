@@ -1,17 +1,26 @@
 # Crossroads.js Changelog #
 
-## Next
+## Next ##
 
-### API Changes
+### API Changes ###
 
  - added `Route.switched` (#37)
  - added `crossroads.normalizeAsArray`, `crossroads.normalizeAsObject` and
    `crossroads.normalizeAsArguments` (#31)
 
-### Other
+### Other ###
 
  - change build to Node.js
  - change minifier to UglifyJS.
+
+
+
+## v0.7.1 (2012/01/06) ##
+
+### Fixes ###
+
+ - avoid calling `rules.normalize_` during validation step (#39)
+
 
 
 ## v0.7.0 (2011/11/02) ##

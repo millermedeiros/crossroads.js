@@ -35,7 +35,8 @@
                 values = this._getParamsObject(request),
                 key;
             for (key in rules) {
-                if(rules.hasOwnProperty(key) && ! this._isValidParam(request, key, values)){
+                // normalize_ isn't a validation rule... (#39)
+                if(key !== 'normalize_' && rules.hasOwnProperty(key) && ! this._isValidParam(request, key, values)){
                     return false;
                 }
             }

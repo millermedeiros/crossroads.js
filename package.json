@@ -3,7 +3,7 @@
     "description" : "Routes System",
     "keywords" : ["routes", "event", "observer", "routing"],
     "homepage" : "http://millermedeiros.github.com/crossroads.js/",
-    "version" : "0.7.0",
+    "version" : "0.7.1",
     "author" : {
         "name" : "Miller Medeiros",
         "url" : "http://blog.millermedeiros.com/"

@@ -2,7 +2,7 @@
  * crossroads <http://millermedeiros.github.com/crossroads.js/>
  * License: MIT
  * Author: Miller Medeiros
- * Version: 0.7.0 (2012/1/3 4:59)
+ * Version: 0.7.1 (2012/1/6 19:29)
  */
 
 (function (define) {
@@ -207,7 +207,7 @@ define('crossroads', function (require) {
 
     //"static" instance
     crossroads = new Crossroads();
-    crossroads.VERSION = '0.7.0';
+    crossroads.VERSION = '0.7.1';
 
 
 
@@ -247,7 +247,8 @@ define('crossroads', function (require) {
                 values = this._getParamsObject(request),
                 key;
             for (key in rules) {
-                if(rules.hasOwnProperty(key) && ! this._isValidParam(request, key, values)){
+                // normalize_ isn't a validation rule... (#39)
+                if(key !== 'normalize_' && rules.hasOwnProperty(key) && ! this._isValidParam(request, key, values)){
                     return false;
                 }
             }
