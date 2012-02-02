@@ -2,12 +2,11 @@
  * crossroads <http://millermedeiros.github.com/crossroads.js/>
  * License: MIT
  * Author: Miller Medeiros
- * Version: 0.7.1 (2012/1/6 19:29)
+ * Version: 0.7.1 (2012/2/2 11:33)
  */
 
 (function (define) {
-define('crossroads', function (require) {
-    var signals = require('signals');
+define(['signals'], function (signals) {
 
     var crossroads,
         patternLexer,
@@ -415,12 +414,11 @@ define('crossroads', function (require) {
 
     return crossroads;
 });
-}(typeof define === 'function' && define.amd ? define : function (id, factory) {
+}(typeof define === 'function' && define.amd ? define : function (deps, factory) {
     if (typeof module !== 'undefined' && module.exports) { //Node
-        module.exports = factory(require);
+        module.exports = factory(require(deps[0]));
     } else {
-        window[id] = factory(function (value) {
-            return window[value];
-        });
+        /*jshint sub:true */
+        window['crossroads'] = factory(window[deps[0]]);
     }
 }));
