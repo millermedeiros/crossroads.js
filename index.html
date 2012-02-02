@@ -607,7 +607,7 @@ route1.match("/blog/2011-05-04/2"); //true. all segments validate
 </pre>
 <h4 class="h4-1">Example RegExp pattern</h4>
 <pre class="brush: js; gutter:false; toolbar:false">
-var route1 = crossroads.addRoute(/([\-\w]+)\/([\-\w]+)\/([\-\w]+));
+var route1 = crossroads.addRoute(/([\-\w]+)\/([\-\w]+)\/([\-\w]+)/);
 
 //note that `rules` keys represent capturing group index
 route1.rules = {
