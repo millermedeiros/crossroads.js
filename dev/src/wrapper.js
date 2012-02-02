@@ -1,19 +1,17 @@
 //::LICENSE:://
 (function (define) {
-define('crossroads', ['signals'], function (signals) {
+define(['signals'], function (signals) {
 //::INTRO_JS:://
 //::CROSSROADS_JS:://
 //::ROUTE_JS:://
 //::LEXER_JS:://
     return crossroads;
 });
-}(typeof define === 'function' && define.amd ? define : function (id, deps, factory) {
+}(typeof define === 'function' && define.amd ? define : function (deps, factory) {
     if (typeof module !== 'undefined' && module.exports) { //Node
-        var signals = require(deps[0]);
-        module.exports = factory(signals);
+        module.exports = factory(require(deps[0]));
     } else {
-        window[id] = factory((function (value) {
-            return window[value];
-        }(deps[0])));
+        /*jshint sub:true */
+        window['crossroads'] = factory(window[deps[0]]);
     }
 }));
