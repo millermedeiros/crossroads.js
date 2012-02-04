@@ -437,12 +437,12 @@ describe('crossroads.parse()', function(){
 
         });
 
-        describe('normalizeAsArray', function () {
+        describe('NORM_AS_ARRAY', function () {
 
             it('should pass array', function () {
                 var arg;
 
-                crossroads.normalizeAsArray();
+                crossroads.normalizeFn = crossroads.NORM_AS_ARRAY;
                 crossroads.addRoute('/{a}/{b}', function (a) {
                     arg = a;
                 });
@@ -455,12 +455,12 @@ describe('crossroads.parse()', function(){
 
         });
 
-        describe('normalizeAsObject', function () {
+        describe('NORM_AS_OBJECT', function () {
 
             it('should pass object', function () {
                 var arg;
 
-                crossroads.normalizeAsObject();
+                crossroads.normalizeFn = crossroads.NORM_AS_OBJECT;
                 crossroads.addRoute('/{a}/{b}', function (a) {
                     arg = a;
                 });
@@ -472,27 +472,12 @@ describe('crossroads.parse()', function(){
 
         });
 
-        describe('normalizeAsArguments', function () {
+        describe('normalizeFn = null', function () {
 
             it('should pass multiple args', function () {
                 var arg1, arg2;
 
-                crossroads.normalizeAsArguments();
-                crossroads.addRoute('/{a}/{b}', function (a, b) {
-                    arg1 = a;
-                    arg2 = b;
-                });
-                crossroads.parse('/foo/bar');
-
-                expect( arg1 ).toEqual( 'foo' );
-                expect( arg2 ).toEqual( 'bar' );
-            });
-
-            it('should override prev normalize', function () {
-                var arg1, arg2;
-
-                crossroads.normalizeAsArray();
-                crossroads.normalizeAsArguments();
+                crossroads.normalizeFn = null;
                 crossroads.addRoute('/{a}/{b}', function (a, b) {
                     arg1 = a;
                     arg2 = b;

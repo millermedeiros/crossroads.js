@@ -16,22 +16,6 @@
 
         normalizeFn : null,
 
-        normalizeAsArray : function(){
-            this.normalizeFn = function (req, vals) {
-                return [vals.vals_];
-            };
-        },
-
-        normalizeAsObject : function () {
-            this.normalizeFn = function (req, vals) {
-                return [vals];
-            };
-        },
-
-        normalizeAsArguments : function () {
-            this.normalizeFn = null;
-        },
-
         create : function () {
             return new Crossroads();
         },
@@ -130,3 +114,10 @@
     crossroads = new Crossroads();
     crossroads.VERSION = '::VERSION_NUMBER::';
 
+    crossroads.NORM_AS_ARRAY = function (req, vals) {
+        return [vals.vals_];
+    };
+
+    crossroads.NORM_AS_OBJECT = function (req, vals) {
+        return [vals];
+    };

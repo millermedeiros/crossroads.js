@@ -5,8 +5,7 @@
 ### API Changes ###
 
  - added `Route.switched` (#37)
- - added `crossroads.normalizeAsArray`, `crossroads.normalizeAsObject` and
-   `crossroads.normalizeAsArguments` (#31)
+ - added `crossroads.NORM_AS_ARRAY`, `crossroads.NORM_AS_OBJECT` (#31)
 
 ### Other ###
 

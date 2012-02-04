@@ -2,7 +2,7 @@
  * crossroads <http://millermedeiros.github.com/crossroads.js/>
  * License: MIT
  * Author: Miller Medeiros
- * Version: 0.7.1 (2012/2/2 11:33)
+ * Version: 0.7.1 (2012/2/4 4:11)
  */
 
 (function (define) {
@@ -93,22 +93,6 @@ define(['signals'], function (signals) {
     Crossroads.prototype = {
 
         normalizeFn : null,
-
-        normalizeAsArray : function(){
-            this.normalizeFn = function (req, vals) {
-                return [vals.vals_];
-            };
-        },
-
-        normalizeAsObject : function () {
-            this.normalizeFn = function (req, vals) {
-                return [vals];
-            };
-        },
-
-        normalizeAsArguments : function () {
-            this.normalizeFn = null;
-        },
 
         create : function () {
             return new Crossroads();
@@ -208,6 +192,13 @@ define(['signals'], function (signals) {
     crossroads = new Crossroads();
     crossroads.VERSION = '0.7.1';
 
+    crossroads.NORM_AS_ARRAY = function (req, vals) {
+        return [vals.vals_];
+    };
+
+    crossroads.NORM_AS_OBJECT = function (req, vals) {
+        return [vals];
+    };
 
 
     // Route --------------
