@@ -2,7 +2,7 @@
  * crossroads <http://millermedeiros.github.com/crossroads.js/>
  * License: MIT
  * Author: Miller Medeiros
- * Version: 0.7.1 (2012/2/4 4:11)
+ * Version: 0.8.0-alpha (2012/3/3 17:1)
  */
 
 (function (define) {
@@ -122,8 +122,9 @@ define(['signals'], function (signals) {
             this._routes.length = 0;
         },
 
-        parse : function (request) {
+        parse : function (request, defaultArgs) {
             request = request || '';
+            defaultArgs = defaultArgs || [];
 
             var routes = this._getMatchedRoutes(request),
                 i = 0,
@@ -136,13 +137,13 @@ define(['signals'], function (signals) {
                 //shold be incremental loop, execute routes in order
                 while (i < n) {
                     cur = routes[i];
-                    cur.route.matched.dispatch.apply(cur.route.matched, cur.params);
+                    cur.route.matched.dispatch.apply(cur.route.matched, defaultArgs.concat(cur.params));
                     cur.isFirst = !i;
-                    this.routed.dispatch(request, cur);
+                    this.routed.dispatch.apply(this.routed, defaultArgs.concat([request, cur]));
                     i += 1;
                 }
             } else {
-                this.bypassed.dispatch(request);
+                this.bypassed.dispatch.apply(this.bypassed, defaultArgs.concat([request]));
             }
         },
 
@@ -190,7 +191,7 @@ define(['signals'], function (signals) {
 
     //"static" instance
     crossroads = new Crossroads();
-    crossroads.VERSION = '0.7.1';
+    crossroads.VERSION = '0.8.0-alpha';
 
     crossroads.NORM_AS_ARRAY = function (req, vals) {
         return [vals.vals_];

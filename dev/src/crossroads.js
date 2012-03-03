@@ -44,8 +44,9 @@
             this._routes.length = 0;
         },
 
-        parse : function (request) {
+        parse : function (request, defaultArgs) {
             request = request || '';
+            defaultArgs = defaultArgs || [];
 
             var routes = this._getMatchedRoutes(request),
                 i = 0,
@@ -58,13 +59,13 @@
                 //shold be incremental loop, execute routes in order
                 while (i < n) {
                     cur = routes[i];
-                    cur.route.matched.dispatch.apply(cur.route.matched, cur.params);
+                    cur.route.matched.dispatch.apply(cur.route.matched, defaultArgs.concat(cur.params));
                     cur.isFirst = !i;
-                    this.routed.dispatch(request, cur);
+                    this.routed.dispatch.apply(this.routed, defaultArgs.concat([request, cur]));
                     i += 1;
                 }
             } else {
-                this.bypassed.dispatch(request);
+                this.bypassed.dispatch.apply(this.bypassed, defaultArgs.concat([request]));
             }
         },
 

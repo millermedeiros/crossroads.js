@@ -6,6 +6,7 @@
 
  - added `Route.switched` (#37)
  - added `crossroads.NORM_AS_ARRAY`, `crossroads.NORM_AS_OBJECT` (#31)
+ - added option to pass default arguments to `crossroads.parse()` (#44)
 
 ### Other ###
 

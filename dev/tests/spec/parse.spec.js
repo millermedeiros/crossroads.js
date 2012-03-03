@@ -10,6 +10,8 @@ describe('crossroads.parse()', function(){
 
     afterEach(function(){
         crossroads.removeAllRoutes();
+        crossroads.routed.removeAll();
+        crossroads.bypassed.removeAll();
     });
 
 
@@ -659,5 +661,45 @@ describe('crossroads.parse()', function(){
         });
 
     });
+
+    describe('default arguments', function () {
+
+        it('should pass default arguments to all signals', function () {
+
+            var t1, t2, t3, t4, t5, t6, t7, t8;
+
+            crossroads.addRoute('foo', function(a, b){
+                t1 = a;
+                t2 = b;
+            });
+
+            crossroads.bypassed.add(function(a, b, c){
+                t3 = a;
+                t4 = b;
+                t5 = c;
+            });
+
+            crossroads.routed.add(function(a, b, c){
+                t6 = a;
+                t7 = b;
+                t8 = c;
+            });
+
+            crossroads.parse('foo', [123, 'dolor']);
+            crossroads.parse('bar', ['ipsum', 123]);
+
+            expect( t1 ).toEqual( 123 );
+            expect( t2 ).toEqual( 'dolor' );
+            expect( t3 ).toEqual( 'ipsum' );
+            expect( t4 ).toEqual( 123 );
+            expect( t5 ).toEqual( 'bar' );
+            expect( t6 ).toEqual( 123 );
+            expect( t7 ).toEqual( 'dolor' );
+            expect( t8 ).toEqual( 'foo' );
+
+        });
+
+    });
+
 
 });
