@@ -2,14 +2,13 @@
  * crossroads <http://millermedeiros.github.com/crossroads.js/>
  * License: MIT
  * Author: Miller Medeiros
- * Version: 0.8.0-alpha (2012/3/3 17:1)
+ * Version: 0.8.0 (2012/3/5 14:26)
  */
 
 (function (define) {
 define(['signals'], function (signals) {
 
     var crossroads,
-        patternLexer,
         UNDEF;
 
     // Helpers -----------
@@ -191,7 +190,7 @@ define(['signals'], function (signals) {
 
     //"static" instance
     crossroads = new Crossroads();
-    crossroads.VERSION = '0.8.0-alpha';
+    crossroads.VERSION = '0.8.0';
 
     crossroads.NORM_AS_ARRAY = function (req, vals) {
         return [vals.vals_];
@@ -209,7 +208,8 @@ define(['signals'], function (signals) {
      * @constructor
      */
     function Route(pattern, callback, priority, router) {
-        var isRegexPattern = isRegExp(pattern);
+        var isRegexPattern = isRegExp(pattern),
+            patternLexer = crossroads.patternLexer;
         this._router = router;
         this._pattern = pattern;
         this._paramsIds = isRegexPattern? null : patternLexer.getParamIds(this._pattern);
@@ -269,7 +269,7 @@ define(['signals'], function (signals) {
 
         _getParamsObject : function (request) {
             var shouldTypecast = this._router.shouldTypecast,
-                values = patternLexer.getParamValues(request, this._matchRegexp, shouldTypecast),
+                values = crossroads.patternLexer.getParamValues(request, this._matchRegexp, shouldTypecast),
                 o = {},
                 n = values.length;
             while (n--) {
@@ -290,7 +290,7 @@ define(['signals'], function (signals) {
             if (norm && isFunction(norm)) {
                 params = norm(request, this._getParamsObject(request));
             } else {
-                params = patternLexer.getParamValues(request, this._matchRegexp, this._router.shouldTypecast);
+                params = crossroads.patternLexer.getParamValues(request, this._matchRegexp, this._router.shouldTypecast);
             }
             return params;
         },
@@ -316,7 +316,7 @@ define(['signals'], function (signals) {
     // Pattern Lexer ------
     //=====================
 
-    patternLexer = crossroads.patternLexer = (function () {
+    crossroads.patternLexer = (function () {
 
 
         var ESCAPE_CHARS_REGEXP = /[\\.+*?\^$\[\](){}\/'#]/g, //match chars that should be escaped on string regexp
@@ -327,15 +327,21 @@ define(['signals'], function (signals) {
             REQUIRED_PARAMS_REGEXP = /\{([^}]+)\}/g, //match everything between `{ }`
             OPTIONAL_PARAMS_REGEXP = /:([^:]+):/g, //match everything between `: :`
             PARAMS_REGEXP = /(?:\{|:)([^}:]+)(?:\}|:)/g, //capture everything between `{ }` or `: :`
+            REQUIRED_REST = /\{([^}]+)\*\}/g,
+            OPTIONAL_REST = /:([^:]+)\*:/g,
 
             //used to save params during compile (avoid escaping things that
             //shouldn't be escaped).
             SAVE_REQUIRED_PARAMS = '__CR_RP__',
             SAVE_OPTIONAL_PARAMS = '__CR_OP__',
+            SAVE_REQUIRED_REST = '__CR_RR__',
+            SAVE_OPTIONAL_REST = '__CR_OR__',
             SAVE_REQUIRED_SLASHES = '__CR_RS__',
             SAVE_OPTIONAL_SLASHES = '__CR_OS__',
             SAVED_REQUIRED_REGEXP = new RegExp(SAVE_REQUIRED_PARAMS, 'g'),
             SAVED_OPTIONAL_REGEXP = new RegExp(SAVE_OPTIONAL_PARAMS, 'g'),
+            SAVED_REQUIRED_REST_REGEXP = new RegExp(SAVE_REQUIRED_REST, 'g'),
+            SAVED_OPTIONAL_REST_REGEXP = new RegExp(SAVE_OPTIONAL_REST, 'g'),
             SAVED_OPTIONAL_SLASHES_REGEXP = new RegExp(SAVE_OPTIONAL_SLASHES, 'g'),
             SAVED_REQUIRED_SLASHES_REGEXP = new RegExp(SAVE_REQUIRED_SLASHES, 'g');
 
@@ -371,6 +377,8 @@ define(['signals'], function (signals) {
             //save chars that shouldn't be escaped
             pattern = pattern.replace(OPTIONAL_SLASHES_REGEXP, '$1'+ SAVE_OPTIONAL_SLASHES +'$2');
             pattern = pattern.replace(REQUIRED_SLASHES_REGEXP, '$1'+ SAVE_REQUIRED_SLASHES +'$2');
+            pattern = pattern.replace(OPTIONAL_REST, SAVE_OPTIONAL_REST);
+            pattern = pattern.replace(REQUIRED_REST, SAVE_REQUIRED_REST);
             pattern = pattern.replace(OPTIONAL_PARAMS_REGEXP, SAVE_OPTIONAL_PARAMS);
             return pattern.replace(REQUIRED_PARAMS_REGEXP, SAVE_REQUIRED_PARAMS);
         }
@@ -378,6 +386,8 @@ define(['signals'], function (signals) {
         function untokenize(pattern) {
             pattern = pattern.replace(SAVED_OPTIONAL_SLASHES_REGEXP, '\\/?');
             pattern = pattern.replace(SAVED_REQUIRED_SLASHES_REGEXP, '\\/');
+            pattern = pattern.replace(SAVED_OPTIONAL_REST_REGEXP, '(.*)?'); // optional group to avoid passing empty string as captured
+            pattern = pattern.replace(SAVED_REQUIRED_REST_REGEXP, '(.+)');
             pattern = pattern.replace(SAVED_OPTIONAL_REGEXP, '([^\\/]+)?\/?');
             return pattern.replace(SAVED_REQUIRED_REGEXP, '([^\\/]+)');
         }

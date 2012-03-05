@@ -78,7 +78,7 @@ describe('Match', function(){
         expect( d.match('/123/45/ipsum') ).toBe( true );
     });
 
-    it('should support multiple consecutive optional paras', function(){
+    it('should support multiple consecutive optional params', function(){
         var s = crossroads.addRoute('/123/:bar:/:ipsum:');
         expect( s.match('/123') ).toBe( true );
         expect( s.match('/123/') ).toBe( true );
@@ -88,6 +88,30 @@ describe('Match', function(){
         expect( s.match('/123/asd/45/qwe') ).toBe( false );
     });
 
+    describe('rest params', function () {
+        it('should support rest params', function () {
+            var s = crossroads.addRoute('/123/{bar}/:ipsum*:');
+            expect( s.match('/123') ).toBe( false );
+            expect( s.match('/123/') ).toBe( false );
+            expect( s.match('/123/asd') ).toBe( true );
+            expect( s.match('/123/asd/45') ).toBe( true );
+            expect( s.match('/123/asd/45/') ).toBe( true );
+            expect( s.match('/123/asd/45/qwe') ).toBe( true );
+            expect( s.match('/456/asd/45/qwe') ).toBe( false );
+        });
+
+        it('should work even in the middle of pattern', function () {
+            var s = crossroads.addRoute('/foo/:bar*:/edit');
+            expect( s.match('/foo') ).toBe( false );
+            expect( s.match('/foo/') ).toBe( false );
+            expect( s.match('/foo/edit') ).toBe( true );
+            expect( s.match('/foo/asd') ).toBe( false );
+            expect( s.match('/foo/asd/edit') ).toBe( true );
+            expect( s.match('/foo/asd/edit/') ).toBe( true );
+            expect( s.match('/foo/asd/123/edit') ).toBe( true );
+            expect( s.match('/foo/asd/edit/qwe') ).toBe( false );
+        });
+    });
 
     describe('slash between params are optional', function(){
 

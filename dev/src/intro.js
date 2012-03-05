@@ -1,6 +1,5 @@
 
     var crossroads,
-        patternLexer,
         UNDEF;
 
     // Helpers -----------

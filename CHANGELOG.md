@@ -1,12 +1,13 @@
 # Crossroads.js Changelog #
 
-## Next ##
+## v0.8.0 (2012/03/05) ##
 
 ### API Changes ###
 
  - added `Route.switched` (#37)
  - added `crossroads.NORM_AS_ARRAY`, `crossroads.NORM_AS_OBJECT` (#31)
  - added option to pass default arguments to `crossroads.parse()` (#44)
+ - added rest segments support (#43)
 
 ### Other ###
 

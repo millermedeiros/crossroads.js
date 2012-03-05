@@ -702,4 +702,96 @@ describe('crossroads.parse()', function(){
     });
 
 
+    describe('rest params', function () {
+
+        it('should pass rest as a single argument', function () {
+            var t1, t2, t3, t4, t5, t6, t7, t8, t9;
+
+            var r = crossroads.addRoute('{a}/{b}/:c*:');
+            r.rules = {
+                a : ['news', 'article'],
+                b : /[\-0-9a-zA-Z]+/,
+                'c*' : ['foo/bar', 'edit', '123/456/789']
+            };
+
+            r.matched.addOnce(function(a, b, c){
+                t1 = a;
+                t2 = b;
+                t3 = c;
+            });
+            crossroads.parse('article/333');
+
+            expect( t1 ).toBe( 'article' );
+            expect( t2 ).toBe( '333' );
+            expect( t3 ).toBeUndefined();
+
+            r.matched.addOnce(function(a, b, c){
+                t4 = a;
+                t5 = b;
+                t6 = c;
+            });
+            crossroads.parse('news/456/foo/bar');
+
+            expect( t4 ).toBe( 'news' );
+            expect( t5 ).toBe( '456' );
+            expect( t6 ).toBe( 'foo/bar' );
+
+            r.matched.addOnce(function(a, b, c){
+                t7 = a;
+                t8 = b;
+                t9 = c;
+            });
+            crossroads.parse('news/456/123/aaa/bbb');
+
+            expect( t7 ).toBeUndefined();
+            expect( t8 ).toBeUndefined();
+            expect( t9 ).toBeUndefined();
+        });
+
+        it('should work in the middle of segment as well', function () {
+            var t1, t2, t3, t4, t5, t6, t7, t8, t9;
+
+            // since rest segment is greedy the last segment can't be optional
+            var r = crossroads.addRoute('{a}/{b*}/{c}');
+            r.rules = {
+                a : ['news', 'article'],
+                c : ['add', 'edit']
+            };
+
+            r.matched.addOnce(function(a, b, c){
+                t1 = a;
+                t2 = b;
+                t3 = c;
+            });
+            crossroads.parse('article/333/add');
+
+            expect( t1 ).toBe( 'article' );
+            expect( t2 ).toBe( '333' );
+            expect( t3 ).toBe( 'add' );
+
+            r.matched.addOnce(function(a, b, c){
+                t4 = a;
+                t5 = b;
+                t6 = c;
+            });
+            crossroads.parse('news/456/foo/bar/edit');
+
+            expect( t4 ).toBe( 'news' );
+            expect( t5 ).toBe( '456/foo/bar' );
+            expect( t6 ).toBe( 'edit' );
+
+            r.matched.addOnce(function(a, b, c){
+                t7 = a;
+                t8 = b;
+                t9 = c;
+            });
+            crossroads.parse('news/456/123/aaa/bbb');
+
+            expect( t7 ).toBeUndefined();
+            expect( t8 ).toBeUndefined();
+            expect( t9 ).toBeUndefined();
+        });
+
+    });
+
 });

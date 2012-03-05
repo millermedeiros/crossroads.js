@@ -1,9 +1,9 @@
 {
     "name" : "crossroads",
-    "description" : "Routes System",
-    "keywords" : ["routes", "event", "observer", "routing"],
+    "description" : "Flexible router which can be used in multiple environments",
+    "keywords" : ["routes", "event", "observer", "routing", "router"],
     "homepage" : "http://millermedeiros.github.com/crossroads.js/",
-    "version" : "0.8.0-alpha",
+    "version" : "0.8.0",
     "author" : {
         "name" : "Miller Medeiros",
         "url" : "http://blog.millermedeiros.com/"
