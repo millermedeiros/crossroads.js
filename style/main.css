@@ -51,12 +51,17 @@ html{font-family:'Helvetica Neue', Helvetica, Arial, sans-serif; overflow-y:scro
 body{background-color:#e7fdf8; color:#333; font-size:16px; line-height:1.6em}
 
 h1, h2, h3, h4, h5, h6{font-weight:normal; line-height:1em}
-h1, .h1{font-size:4em; margin:1em 0 0.75px}
-h2, .h2{font-size:2.5em; margin:1em 0 0.8px}
-h3, .h3{font-size:2em; margin:1em 0 0.75em}
-h4, .h4{font-size:1.5em; margin:1em 0 0.66em} 
-h5, .h5{font-size:1.5em; margin:1em 0 0.66em}
-h6, .h6{font-size:1em; margin:1em 0 .5em}
+h1, h2, h3{color:#c01458; word-wrap:break-word}
+h1, h2{text-transform:uppercase; font-family:'LaneNarrowRegular', 'Helvetica Neue', 'Helvetica', sans-serif; font-weight:100}
+
+h1{font-size:4em; margin:1em 0 0.75px}
+h2{font-size:2.5em; margin:1em 0 0.8px}
+h3{font-size:2em; margin:1em 0 2em; letter-spacing:-0.02em}
+h3 em{font-weight:normal; color:#898989}
+h4{font-size:1em; font-weight:bold; margin:2.5em 0 1.5em}
+h5{font-size:1.5em; margin:1em 0 0.66em}
+h6{font-size:1em; margin:1em 0 .5em}
+
 
 p{margin:1.25em 0}
 small{font-size:.833em}
@@ -152,11 +157,6 @@ ul.simpleList{list-style:disc}
 
 /* ----- PROJECT SPECIFIC ----- */
 
-.h1-2, .h2-1, .h3-1{color:#c01458; word-wrap:break-word}
-.h1-2, .h2-1{text-transform:uppercase; font-family:'LaneNarrowRegular', 'Helvetica Neue', 'Helvetica', sans-serif; font-weight:100}
-.h3-1{letter-spacing:-0.02em; margin-bottom:2em}
-.h3-1 em{font-weight:normal; color:#898989}
-.h4-1{font-size:1em; font-weight:bold; margin:2.5em 0 1.5em}
 
 .code{font-family:"Courier New", monospace;}
 ul.code{margin:1em 0}
