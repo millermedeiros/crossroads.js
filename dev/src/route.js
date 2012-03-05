@@ -6,13 +6,15 @@
      * @constructor
      */
     function Route(pattern, callback, priority, router) {
-        var isRegexPattern = isRegExp(pattern);
+        var isRegexPattern = isRegExp(pattern),
+            patternLexer = crossroads.patternLexer;
         this._router = router;
         this._pattern = pattern;
         this._paramsIds = isRegexPattern? null : patternLexer.getParamIds(this._pattern);
         this._optionalParamsIds = isRegexPattern? null : patternLexer.getOptionalParamsIds(this._pattern);
         this._matchRegexp = isRegexPattern? pattern : patternLexer.compilePattern(pattern);
         this.matched = new signals.Signal();
+        this.switched = new signals.Signal();
         if (callback) {
             this.matched.add(callback);
         }
@@ -65,7 +67,7 @@
 
         _getParamsObject : function (request) {
             var shouldTypecast = this._router.shouldTypecast,
-                values = patternLexer.getParamValues(request, this._matchRegexp, shouldTypecast),
+                values = crossroads.patternLexer.getParamValues(request, this._matchRegexp, shouldTypecast),
                 o = {},
                 n = values.length;
             while (n--) {
@@ -86,7 +88,7 @@
             if (norm && isFunction(norm)) {
                 params = norm(request, this._getParamsObject(request));
             } else {
-                params = patternLexer.getParamValues(request, this._matchRegexp, this._router.shouldTypecast);
+                params = crossroads.patternLexer.getParamValues(request, this._matchRegexp, this._router.shouldTypecast);
             }
             return params;
         },
@@ -97,7 +99,8 @@
 
         _destroy : function () {
             this.matched.dispose();
-            this.matched = this._pattern = this._matchRegexp = null;
+            this.switched.dispose();
+            this.matched = this.switched = this._pattern = this._matchRegexp = null;
         },
 
         toString : function () {

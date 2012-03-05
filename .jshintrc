@@ -8,7 +8,7 @@
     "browser"       : true,  // Standard browser globals e.g. `window`, `document`.
     "couch"         : false,
     "dojo"          : false,
-    "jquery"        : true,
+    "jquery"        : false,
     "mootools"      : false,
     "node"          : false,
     "prototypejs"   : false,

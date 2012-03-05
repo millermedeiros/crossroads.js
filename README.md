@@ -52,7 +52,6 @@ You can install Crossroads on Node.js using [NPM](http://npmjs.org/)
 ### Folder Structure ###
 
     dev       ->  development files
-    |- build        ->  files used on the build process
     |- lib          ->  3rd-party libraries
     |- src          ->  source files
     |- tests        ->  unit tests
@@ -70,9 +69,9 @@ You can install Crossroads on Node.js using [NPM](http://npmjs.org/)
 
 ## Building your own ##
 
-This project uses [Apache Ant](http://ant.apache.org/) for the build process. If for some reason you need to build a custom version install Ant and run:
+This project uses [Node.js](http://nodejs.org/) for the build process. If for some reason you need to build a custom version install Node.js and run:
 
-    ant compile
+    node build
 
 This will delete all JS files inside the `dist` folder, merge/update/compress source files and copy the output to the `dist` folder.
 
@@ -100,7 +99,8 @@ npm link
 jasmine-node dev/tests/spec
 ```
 
-Note that node.js can only run the distribution file, so any change to the 
-`dev/src` files will require a new `ant compile`. `npm link` takes care of 
-installing dependencies and [updating](https://github.com/isaacs/npm/blob/master/doc/link.md) 
-crossroads at each change to the `crossroads.cjs.js` file.
+Note that node.js can only run the distribution file, so any change to the
+`dev/src` files will require a new `node build`. `npm link` takes care of
+installing dependencies and
+[updating](https://github.com/isaacs/npm/blob/master/doc/link.md) crossroads at
+each change to the `dist/crossroads.js` file.

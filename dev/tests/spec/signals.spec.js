@@ -103,4 +103,35 @@ describe('crossroads Signals', function(){
 
     });
 
+    it('should dispatch `switched` when matching another route', function () {
+
+        var count = 0,
+            vals = [],
+            req;
+
+        var r1 = crossroads.addRoute('/{a}', function(a){
+            vals.push(a);
+            count += 1;
+        });
+
+        r1.switched.add(function(r){
+            vals.push('lorem'); //make sure happened before next matched
+            req = r;
+            count += 1;
+        });
+
+        var r2 = crossroads.addRoute('/foo/{a}', function(a){
+            vals.push(a);
+            count += 1;
+        });
+
+        crossroads.parse('/foo');
+        crossroads.parse('/foo/bar');
+
+        expect( count ).toBe( 3 );
+        expect( vals ).toEqual( ['foo', 'lorem',  'bar'] );
+        expect( req ).toEqual( '/foo/bar' );
+
+    });
+
 });

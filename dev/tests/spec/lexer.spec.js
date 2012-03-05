@@ -38,6 +38,12 @@ describe('patternLexer', function(){
             expect( regex.test(pattern) ).toEqual( true );
         });
 
+        it('should support rest params', function(){
+            var pattern = '/lo[rem](ipsum)/{ipsum*}/{dolor}:foo::bar*:/:blah:/maecennas',
+                regex = crossroads.patternLexer.compilePattern(pattern); 
+            expect( regex.test(pattern) ).toEqual( true );
+        });
+
     });
 
 

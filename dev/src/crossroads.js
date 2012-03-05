@@ -7,6 +7,7 @@
      */
     function Crossroads() {
         this._routes = [];
+        this._prevRoutes = [];
         this.bypassed = new signals.Signal();
         this.routed = new signals.Signal();
     }
@@ -43,8 +44,9 @@
             this._routes.length = 0;
         },
 
-        parse : function (request) {
+        parse : function (request, defaultArgs) {
             request = request || '';
+            defaultArgs = defaultArgs || [];
 
             var routes = this._getMatchedRoutes(request),
                 i = 0,
@@ -52,16 +54,26 @@
                 cur;
 
             if (n) {
+                this._notifyPrevRoutes(request);
+                this._prevRoutes = routes;
                 //shold be incremental loop, execute routes in order
                 while (i < n) {
                     cur = routes[i];
-                    cur.route.matched.dispatch.apply(cur.route.matched, cur.params);
+                    cur.route.matched.dispatch.apply(cur.route.matched, defaultArgs.concat(cur.params));
                     cur.isFirst = !i;
-                    this.routed.dispatch(request, cur);
+                    this.routed.dispatch.apply(this.routed, defaultArgs.concat([request, cur]));
                     i += 1;
                 }
             } else {
-                this.bypassed.dispatch(request);
+                this.bypassed.dispatch.apply(this.bypassed, defaultArgs.concat([request]));
+            }
+        },
+
+        _notifyPrevRoutes : function(request) {
+            var i = 0, cur;
+            while (cur = this._prevRoutes[i++]) {
+                //check if switched exist since route may be disposed
+                if(cur.route.switched) cur.route.switched.dispatch(request);
             }
         },
 
@@ -103,3 +115,10 @@
     crossroads = new Crossroads();
     crossroads.VERSION = '::VERSION_NUMBER::';
 
+    crossroads.NORM_AS_ARRAY = function (req, vals) {
+        return [vals.vals_];
+    };
+
+    crossroads.NORM_AS_OBJECT = function (req, vals) {
+        return [vals];
+    };

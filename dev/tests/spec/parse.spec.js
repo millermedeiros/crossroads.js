@@ -10,6 +10,8 @@ describe('crossroads.parse()', function(){
 
     afterEach(function(){
         crossroads.removeAllRoutes();
+        crossroads.routed.removeAll();
+        crossroads.bypassed.removeAll();
     });
 
 
@@ -437,6 +439,59 @@ describe('crossroads.parse()', function(){
 
         });
 
+        describe('NORM_AS_ARRAY', function () {
+
+            it('should pass array', function () {
+                var arg;
+
+                crossroads.normalizeFn = crossroads.NORM_AS_ARRAY;
+                crossroads.addRoute('/{a}/{b}', function (a) {
+                    arg = a;
+                });
+                crossroads.parse('/foo/bar');
+
+                expect( {}.toString.call(arg) ).toEqual( '[object Array]' );
+                expect( arg[0] ).toEqual( 'foo' );
+                expect( arg[1] ).toEqual( 'bar' );
+            });
+
+        });
+
+        describe('NORM_AS_OBJECT', function () {
+
+            it('should pass object', function () {
+                var arg;
+
+                crossroads.normalizeFn = crossroads.NORM_AS_OBJECT;
+                crossroads.addRoute('/{a}/{b}', function (a) {
+                    arg = a;
+                });
+                crossroads.parse('/foo/bar');
+
+                expect( arg.a ).toEqual( 'foo' );
+                expect( arg.b ).toEqual( 'bar' );
+            });
+
+        });
+
+        describe('normalizeFn = null', function () {
+
+            it('should pass multiple args', function () {
+                var arg1, arg2;
+
+                crossroads.normalizeFn = null;
+                crossroads.addRoute('/{a}/{b}', function (a, b) {
+                    arg1 = a;
+                    arg2 = b;
+                });
+                crossroads.parse('/foo/bar');
+
+                expect( arg1 ).toEqual( 'foo' );
+                expect( arg2 ).toEqual( 'bar' );
+            });
+
+        });
+
     });
 
 
@@ -603,6 +658,138 @@ describe('crossroads.parse()', function(){
             expect( t7 ).toEqual( 'foo' );
             expect( t8 ).toEqual( 'lorem' );
 
+        });
+
+    });
+
+    describe('default arguments', function () {
+
+        it('should pass default arguments to all signals', function () {
+
+            var t1, t2, t3, t4, t5, t6, t7, t8;
+
+            crossroads.addRoute('foo', function(a, b){
+                t1 = a;
+                t2 = b;
+            });
+
+            crossroads.bypassed.add(function(a, b, c){
+                t3 = a;
+                t4 = b;
+                t5 = c;
+            });
+
+            crossroads.routed.add(function(a, b, c){
+                t6 = a;
+                t7 = b;
+                t8 = c;
+            });
+
+            crossroads.parse('foo', [123, 'dolor']);
+            crossroads.parse('bar', ['ipsum', 123]);
+
+            expect( t1 ).toEqual( 123 );
+            expect( t2 ).toEqual( 'dolor' );
+            expect( t3 ).toEqual( 'ipsum' );
+            expect( t4 ).toEqual( 123 );
+            expect( t5 ).toEqual( 'bar' );
+            expect( t6 ).toEqual( 123 );
+            expect( t7 ).toEqual( 'dolor' );
+            expect( t8 ).toEqual( 'foo' );
+
+        });
+
+    });
+
+
+    describe('rest params', function () {
+
+        it('should pass rest as a single argument', function () {
+            var t1, t2, t3, t4, t5, t6, t7, t8, t9;
+
+            var r = crossroads.addRoute('{a}/{b}/:c*:');
+            r.rules = {
+                a : ['news', 'article'],
+                b : /[\-0-9a-zA-Z]+/,
+                'c*' : ['foo/bar', 'edit', '123/456/789']
+            };
+
+            r.matched.addOnce(function(a, b, c){
+                t1 = a;
+                t2 = b;
+                t3 = c;
+            });
+            crossroads.parse('article/333');
+
+            expect( t1 ).toBe( 'article' );
+            expect( t2 ).toBe( '333' );
+            expect( t3 ).toBeUndefined();
+
+            r.matched.addOnce(function(a, b, c){
+                t4 = a;
+                t5 = b;
+                t6 = c;
+            });
+            crossroads.parse('news/456/foo/bar');
+
+            expect( t4 ).toBe( 'news' );
+            expect( t5 ).toBe( '456' );
+            expect( t6 ).toBe( 'foo/bar' );
+
+            r.matched.addOnce(function(a, b, c){
+                t7 = a;
+                t8 = b;
+                t9 = c;
+            });
+            crossroads.parse('news/456/123/aaa/bbb');
+
+            expect( t7 ).toBeUndefined();
+            expect( t8 ).toBeUndefined();
+            expect( t9 ).toBeUndefined();
+        });
+
+        it('should work in the middle of segment as well', function () {
+            var t1, t2, t3, t4, t5, t6, t7, t8, t9;
+
+            // since rest segment is greedy the last segment can't be optional
+            var r = crossroads.addRoute('{a}/{b*}/{c}');
+            r.rules = {
+                a : ['news', 'article'],
+                c : ['add', 'edit']
+            };
+
+            r.matched.addOnce(function(a, b, c){
+                t1 = a;
+                t2 = b;
+                t3 = c;
+            });
+            crossroads.parse('article/333/add');
+
+            expect( t1 ).toBe( 'article' );
+            expect( t2 ).toBe( '333' );
+            expect( t3 ).toBe( 'add' );
+
+            r.matched.addOnce(function(a, b, c){
+                t4 = a;
+                t5 = b;
+                t6 = c;
+            });
+            crossroads.parse('news/456/foo/bar/edit');
+
+            expect( t4 ).toBe( 'news' );
+            expect( t5 ).toBe( '456/foo/bar' );
+            expect( t6 ).toBe( 'edit' );
+
+            r.matched.addOnce(function(a, b, c){
+                t7 = a;
+                t8 = b;
+                t9 = c;
+            });
+            crossroads.parse('news/456/123/aaa/bbb');
+
+            expect( t7 ).toBeUndefined();
+            expect( t8 ).toBeUndefined();
+            expect( t9 ).toBeUndefined();
         });
 
     });
