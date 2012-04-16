@@ -28,7 +28,7 @@ describe('crossroads.parse()', function(){
             crossroads.parse('/foo');
             crossroads.parse('foo');
 
-            expect( t1 ).toBe( 1 );
+            expect( t1 ).toBe( 2 );
         });
 
         it('should pass params and allow multiple routes', function(){

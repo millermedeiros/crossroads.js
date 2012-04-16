@@ -2,7 +2,7 @@
  * crossroads <http://millermedeiros.github.com/crossroads.js/>
  * License: MIT
  * Author: Miller Medeiros
- * Version: 0.9.0-alpha (2012/4/16 21:37)
+ * Version: 0.9.0-alpha (2012/4/16 22:34)
  */
 
 (function (define) {
@@ -324,8 +324,8 @@ define(['signals'], function (signals) {
             //match chars that should be escaped on string regexp
             ESCAPE_CHARS_REGEXP = /[\\.+*?\^$\[\](){}\/'#]/g,
 
-            //trailing slash
-            UNNECESSARY_SLASHES_REGEXP = /\/$/g,
+            //trailing slashes (begin/end of string)
+            UNNECESSARY_SLASHES_REGEXP = /^\/|\/$/g,
 
             //params - everything between `{ }` or `: :`
             PARAMS_REGEXP = /(?:\{|:)([^}:]+)(?:\}|:)/g,
@@ -376,7 +376,13 @@ define(['signals'], function (signals) {
                     id : 'OP',
                     res : '([^\\/]+)?\/?'
                 }
-            ];
+            ],
+
+            LOOSE_SLASH = 1,
+            STRICT_SLASH = 2,
+
+            _slashMode = LOOSE_SLASH;
+
 
         function precompileTokens(){
             var n = TOKENS.length,
@@ -410,15 +416,23 @@ define(['signals'], function (signals) {
         function compilePattern(pattern) {
             pattern = pattern || '';
             if(pattern){
-                pattern = pattern.replace(UNNECESSARY_SLASHES_REGEXP, '');
+                if (_slashMode === LOOSE_SLASH) {
+                    pattern = pattern.replace(UNNECESSARY_SLASHES_REGEXP, '');
+                }
                 //save tokens
                 pattern = replaceTokens(pattern, 'rgx', 'save');
                 //regexp escape
                 pattern = pattern.replace(ESCAPE_CHARS_REGEXP, '\\$&');
                 //restore tokens
                 pattern = replaceTokens(pattern, 'rRestore', 'res');
+                if (_slashMode === LOOSE_SLASH) {
+                    pattern = '/?'+ pattern +'/?';
+                }
+            } else {
+                //single slash is treated as empty
+                pattern = '/?';
             }
-            return new RegExp('^'+ pattern + '/?$'); //trailing slash is optional
+            return new RegExp('^'+ pattern + '$');
         }
 
         function replaceTokens(pattern, regexpName, replaceName) {
@@ -442,6 +456,12 @@ define(['signals'], function (signals) {
 
         //API
         return {
+            strict : function(){
+                _slashMode = STRICT_SLASH;
+            },
+            loose : function(){
+                _slashMode = LOOSE_SLASH;
+            },
             getParamIds : getParamIds,
             getOptionalParamsIds : getOptionalParamsIds,
             getParamValues : getParamValues,

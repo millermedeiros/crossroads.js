@@ -29,18 +29,16 @@ describe('Match', function(){
     });
 
     it('should match params', function(){
-
         var s = crossroads.addRoute('/{foo}');
 
         expect( s.match('/lorem-ipsum') ).toBe( true );
         expect( s.match('/lorem-ipsum/') ).toBe( true );
         expect( s.match('/lorem-ipsum/dolor') ).toBe( false );
-        expect( s.match('lorem-ipsum') ).toBe( false );
+        expect( s.match('lorem-ipsum') ).toBe( true );
         expect( s.match('/123') ).toBe( true );
         expect( s.match('/123/') ).toBe( true );
-        expect( s.match('123') ).toBe( false );
+        expect( s.match('123') ).toBe( true );
         expect( s.match('123/45') ).toBe( false );
-
     });
 
     it('should match optional params', function(){
@@ -48,8 +46,7 @@ describe('Match', function(){
         expect( s.match('lorem-ipsum') ).toBe( true );
         expect( s.match('') ).toBe( true );
         expect( s.match('lorem-ipsum/dolor') ).toBe( false );
-        expect( s.match('/lorem-ipsum/') ).toBe( false );
-
+        expect( s.match('/lorem-ipsum/') ).toBe( true );
     });
 
     it('should match normal params and optional params', function(){
@@ -57,7 +54,7 @@ describe('Match', function(){
         expect( s.match('/lorem-ipsum') ).toBe( true );
         expect( s.match('/lorem-ipsum/') ).toBe( true );
         expect( s.match('/lorem-ipsum/dolor') ).toBe( true );
-        expect( s.match('123/45') ).toBe( false );
+        expect( s.match('123/45') ).toBe( true );
     });
 
     it('should work even with optional params on the middle of pattern', function(){
@@ -232,6 +229,31 @@ describe('Match', function(){
             expect( a.match('/123asd/45') ).toBe( true );
             expect( a.match('/123asd/45/') ).toBe( true );
             expect( a.match('/123asd/45/qwe') ).toBe( false );
+        });
+
+    });
+
+
+    describe('strict slash rules', function () {
+
+        afterEach(function(){
+            crossroads.patternLexer.loose();
+        });
+
+        it('should only match if traling slashes match the original pattern', function () {
+            crossroads.patternLexer.strict();
+
+            var a = crossroads.addRoute('{foo}');
+            expect( a.match('foo') ).toBe( true );
+            expect( a.match('/foo') ).toBe( false );
+            expect( a.match('foo/') ).toBe( false );
+            expect( a.match('/foo/') ).toBe( false );
+
+            var b = crossroads.addRoute('/{foo}');
+            expect( b.match('foo') ).toBe( false );
+            expect( b.match('/foo') ).toBe( true );
+            expect( b.match('foo/') ).toBe( false );
+            expect( b.match('/foo/') ).toBe( false );
         });
 
     });
