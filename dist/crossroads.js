@@ -2,7 +2,7 @@
  * crossroads <http://millermedeiros.github.com/crossroads.js/>
  * License: MIT
  * Author: Miller Medeiros
- * Version: 0.8.0 (2012/3/5 14:26)
+ * Version: 0.9.0-alpha (2012/4/16 20:38)
  */
 
 (function (define) {
@@ -91,6 +91,8 @@ define(['signals'], function (signals) {
 
     Crossroads.prototype = {
 
+        greedy : false,
+
         normalizeFn : null,
 
         create : function () {
@@ -173,7 +175,7 @@ define(['signals'], function (signals) {
                 route;
             //should be decrement loop since higher priorities are added at the end of array
             while (route = routes[--n]) {
-                if ((!res.length || route.greedy) && route.match(request)) {
+                if ((!res.length || this.greedy || route.greedy) && route.match(request)) {
                     res.push({
                         route : route,
                         params : route._getParamsArray(request)
@@ -190,7 +192,7 @@ define(['signals'], function (signals) {
 
     //"static" instance
     crossroads = new Crossroads();
-    crossroads.VERSION = '0.8.0';
+    crossroads.VERSION = '0.9.0-alpha';
 
     crossroads.NORM_AS_ARRAY = function (req, vals) {
         return [vals.vals_];

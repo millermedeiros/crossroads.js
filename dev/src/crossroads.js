@@ -14,6 +14,8 @@
 
     Crossroads.prototype = {
 
+        greedy : false,
+
         normalizeFn : null,
 
         create : function () {
@@ -96,7 +98,7 @@
                 route;
             //should be decrement loop since higher priorities are added at the end of array
             while (route = routes[--n]) {
-                if ((!res.length || route.greedy) && route.match(request)) {
+                if ((!res.length || this.greedy || route.greedy) && route.match(request)) {
                     res.push({
                         route : route,
                         params : route._getParamsArray(request)

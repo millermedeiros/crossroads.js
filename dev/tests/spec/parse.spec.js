@@ -660,6 +660,47 @@ describe('crossroads.parse()', function(){
 
         });
 
+        it('should allow global greedy setting', function () {
+
+            var t1, t2, t3, t4, t5, t6, t7, t8;
+
+            crossroads.greedy = true;
+
+            var r1 = crossroads.addRoute('/{a}/{b}/', function(a,b){
+                t1 = a;
+                t2 = b;
+            });
+
+            var r2 = crossroads.addRoute('/bar/{b}/', function(a,b){
+                t3 = a;
+                t4 = b;
+            });
+
+            var r3 = crossroads.addRoute('/foo/{b}/', function(a,b){
+                t5 = a;
+                t6 = b;
+            });
+
+            var r4 = crossroads.addRoute('/{a}/:b:/', function(a,b){
+                t7 = a;
+                t8 = b;
+            });
+
+            crossroads.parse('/foo/lorem');
+
+            expect( t1 ).toEqual( 'foo' );
+            expect( t2 ).toEqual( 'lorem' );
+            expect( t3 ).toBeUndefined();
+            expect( t4 ).toBeUndefined();
+            expect( t5 ).toEqual( 'lorem' );
+            expect( t6 ).toBeUndefined();
+            expect( t7 ).toEqual( 'foo' );
+            expect( t8 ).toEqual( 'lorem' );
+
+            crossroads.greedy = false;
+
+        });
+
     });
 
     describe('default arguments', function () {
