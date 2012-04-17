@@ -16,6 +16,8 @@
 
         greedy : false,
 
+        greedyEnabled : true,
+
         normalizeFn : null,
 
         create : function () {
@@ -103,6 +105,9 @@
                         route : route,
                         params : route._getParamsArray(request)
                     });
+                }
+                if (!this.greedyEnabled && res.length) {
+                    break;
                 }
             }
             return res;

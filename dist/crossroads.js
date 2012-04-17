@@ -2,7 +2,7 @@
  * crossroads <http://millermedeiros.github.com/crossroads.js/>
  * License: MIT
  * Author: Miller Medeiros
- * Version: 0.9.0-alpha (2012/4/16 22:34)
+ * Version: 0.9.0-alpha (2012/4/17 13:34)
  */
 
 (function (define) {
@@ -93,6 +93,8 @@ define(['signals'], function (signals) {
 
         greedy : false,
 
+        greedyEnabled : true,
+
         normalizeFn : null,
 
         create : function () {
@@ -180,6 +182,9 @@ define(['signals'], function (signals) {
                         route : route,
                         params : route._getParamsArray(request)
                     });
+                }
+                if (!this.greedyEnabled && res.length) {
+                    break;
                 }
             }
             return res;
