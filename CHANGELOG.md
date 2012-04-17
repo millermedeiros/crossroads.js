@@ -1,5 +1,21 @@
 # Crossroads.js Changelog #
 
+
+## Next ##
+
+### API Changes ###
+
+ - added `crossroads.greedy` (#46)
+ - added `crossroads.greedyEnabled` (#46)
+ - added `crossroads.patternLexer.strict()` and
+   `crossroads.patternLexer.loose()` (#35)
+
+### Other
+
+ - change default behavior of slashes at begin/end of request (#35)
+
+
+
 ## v0.8.0 (2012/03/05) ##
 
 ### API Changes ###
