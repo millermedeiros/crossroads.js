@@ -33,7 +33,7 @@
     }
 
     function isFunction(val) {
-        return isKind(val, 'Function');
+        return typeof val === 'function';
     }
 
     //borrowed from AMD-utils

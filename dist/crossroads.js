@@ -2,7 +2,7 @@
  * crossroads <http://millermedeiros.github.com/crossroads.js/>
  * License: MIT
  * Author: Miller Medeiros
- * Version: 0.9.0-alpha (2012/4/17 13:34)
+ * Version: 0.9.0-alpha (2012/4/17 23:47)
  */
 
 (function (define) {
@@ -42,7 +42,7 @@ define(['signals'], function (signals) {
     }
 
     function isFunction(val) {
-        return isKind(val, 'Function');
+        return typeof val === 'function';
     }
 
     //borrowed from AMD-utils
@@ -300,6 +300,35 @@ define(['signals'], function (signals) {
                 params = crossroads.patternLexer.getParamValues(request, this._matchRegexp, this._router.shouldTypecast);
             }
             return params;
+        },
+
+        interpolate : function(replacements) {
+            if (typeof this._pattern !== 'string') {
+                throw new Error('Route pattern should be a string.');
+            }
+            var replaceFn = function(match, prop){
+                    if (prop in replacements) {
+                        return replacements[prop];
+                    } else if (match.indexOf('{') !== -1){
+                        throw new Error('The segment '+ match +' is required.');
+                    } else {
+                        return '';
+                    }
+                },
+                str;
+
+            //TODO: extract this logic into pattern lexer and reuse TOKENS
+            str = this._pattern
+                        .replace(/([:}]|\w(?=\/))\/?(:)/g, '$1__CR_OS__$2')
+                        .replace(/\{([^}*]+)\*?\}/g, replaceFn)
+                        .replace(/:([^:*]+)\*?:/g, replaceFn)
+                        .replace(/(?:__CR_OS__)+$/, '') // remove trailing
+                        .replace(/__CR_OS__/g, '/'); // add slash between segments
+
+            if (! this._matchRegexp.test(str) ) {
+                throw new Error('The generated string "'+ str +'" doesn\'t match the pattern "'+ this._pattern +'". Check supplied arguments.');
+            }
+            return str;
         },
 
         dispose : function () {
