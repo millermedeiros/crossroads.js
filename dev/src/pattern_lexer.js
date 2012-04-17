@@ -22,25 +22,40 @@
             TOKENS = [
                 {
                     //optional slashes
-                    //slash between `::` or `}:` or `\w:`. $1 = before, $2 = after
-                    rgx : /([:}]|\w(?=\/))\/?(:)/g,
+                    //slash between `::` or `}:` or `\w:` or `:{?` or `}{?` or `\w{?`
+                    rgx : /([:}]|\w(?=\/))\/?(:|(?:\{\?))/g,
                     save : '$1{{id}}$2',
                     id : 'OS',
                     res : '\\/?'
                 },
                 {
                     //required slashes
-                    //slash between `::` or `}:` or `\w:`. $1 = before, $2 = after
+                    //used to insert slash between `:{` and `}{`
                     rgx : /([:}])\/?(\{)/g,
                     save : '$1{{id}}$2',
                     id : 'RS',
                     res : '\\/'
                 },
                 {
+                    //required query string - everything in between `{? }`
+                    rgx : /\{\?([^}]+)\}/g,
+                    id : 'RQ',
+                    //everything from `?` till `#` or end of string
+                    res : '\\?([^#]+)'
+                },
+                {
+                    //optional query string - everything in between `:? :`
+                    rgx : /:\?([^:]+):/g,
+                    id : 'OQ',
+                    //everything from `?` till `#` or end of string
+                    res : '(?:\\?([^#]*))?'
+                },
+                {
                     //optional rest - everything in between `: *:`
                     rgx : /:([^:]+)\*:/g,
                     id : 'OR',
-                    res : '(.*)?' // optional group to avoid passing empty string as captured
+                    // optional group to avoid passing empty string as captured
+                    res : '(.*)?'
                 },
                 {
                     //rest param - everything in between `{ *}`
@@ -52,13 +67,13 @@
                     //required params - everything between `{ }`
                     rgx : /\{([^}]+)\}/g,
                     id : 'RP',
-                    res : '([^\\/]+)'
+                    res : '([^\\/\\?]+)'
                 },
                 {
                     //optional params
                     rgx : OPTIONAL_PARAMS_REGEXP,
                     id : 'OP',
-                    res : '([^\\/]+)?\/?'
+                    res : '([^\\/\\?]+)?\/?'
                 }
             ],
 
@@ -110,11 +125,11 @@
                 //restore tokens
                 pattern = replaceTokens(pattern, 'rRestore', 'res');
                 if (_slashMode === LOOSE_SLASH) {
-                    pattern = '/?'+ pattern +'/?';
+                    pattern = '\\/?'+ pattern +'\\/?';
                 }
             } else {
                 //single slash is treated as empty
-                pattern = '/?';
+                pattern = '\\/?';
             }
             return new RegExp('^'+ pattern + '$');
         }

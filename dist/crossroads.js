@@ -2,7 +2,7 @@
  * crossroads <http://millermedeiros.github.com/crossroads.js/>
  * License: MIT
  * Author: Miller Medeiros
- * Version: 0.9.0-alpha (2012/4/17 13:34)
+ * Version: 0.9.0-alpha (2012/4/17 16:42)
  */
 
 (function (define) {
@@ -73,6 +73,20 @@ define(['signals'], function (signals) {
             result[n] = typecastValue(values[n]);
         }
         return result;
+    }
+
+    //borrowed from AMD-Utils
+    function decodeQueryString(str) {
+        var queryArr = (str || '').replace('?', '').split('&'),
+            n = queryArr.length,
+            obj = {},
+            item, val;
+        while (n--) {
+            item = queryArr[n].split('=');
+            val = typecastValue(item[1]);
+            obj[item[0]] = (typeof val === 'string')? decodeURIComponent(val) : val;
+        }
+        return obj;
     }
 
 
@@ -256,15 +270,22 @@ define(['signals'], function (signals) {
         _isValidParam : function (request, prop, values) {
             var validationRule = this.rules[prop],
                 val = values[prop],
-                isValid = false;
+                isValid = false,
+                isQuery = (prop.indexOf('?') === 0);
 
             if (val == null && this._optionalParamsIds && arrayIndexOf(this._optionalParamsIds, prop) !== -1) {
                 isValid = true;
             }
             else if (isRegExp(validationRule)) {
+                if (isQuery) {
+                    val = values[prop +'_']; //use raw string
+                }
                 isValid = validationRule.test(val);
             }
             else if (isArray(validationRule)) {
+                if (isQuery) {
+                    val = values[prop +'_']; //use raw string
+                }
                 isValid = arrayIndexOf(validationRule, val) !== -1;
             }
             else if (isFunction(validationRule)) {
@@ -278,12 +299,25 @@ define(['signals'], function (signals) {
             var shouldTypecast = this._router.shouldTypecast,
                 values = crossroads.patternLexer.getParamValues(request, this._matchRegexp, shouldTypecast),
                 o = {},
-                n = values.length;
+                n = values.length,
+                param, val;
             while (n--) {
-                o[n] = values[n]; //for RegExp pattern and also alias to normal paths
+                val = values[n];
                 if (this._paramsIds) {
-                    o[this._paramsIds[n]] = values[n];
+                    param = this._paramsIds[n];
+                    if (param.indexOf('?') === 0 && val) {
+                        //make a copy of the original string so array and
+                        //RegExp validation can be applied properly
+                        o[param +'_'] = val;
+                        //update vals_ array as well since it will be used
+                        //during dispatch
+                        val = decodeQueryString(val);
+                        values[n] = val;
+                    }
+                    o[param] = val;
                 }
+                //alias to paths and for RegExp pattern
+                o[n] = val;
             }
             o.request_ = shouldTypecast? typecastValue(request) : request;
             o.vals_ = values;
@@ -297,7 +331,7 @@ define(['signals'], function (signals) {
             if (norm && isFunction(norm)) {
                 params = norm(request, this._getParamsObject(request));
             } else {
-                params = crossroads.patternLexer.getParamValues(request, this._matchRegexp, this._router.shouldTypecast);
+                params = this._getParamsObject(request).vals_;
             }
             return params;
         },
@@ -343,25 +377,40 @@ define(['signals'], function (signals) {
             TOKENS = [
                 {
                     //optional slashes
-                    //slash between `::` or `}:` or `\w:`. $1 = before, $2 = after
-                    rgx : /([:}]|\w(?=\/))\/?(:)/g,
+                    //slash between `::` or `}:` or `\w:` or `:{?` or `}{?` or `\w{?`
+                    rgx : /([:}]|\w(?=\/))\/?(:|(?:\{\?))/g,
                     save : '$1{{id}}$2',
                     id : 'OS',
                     res : '\\/?'
                 },
                 {
                     //required slashes
-                    //slash between `::` or `}:` or `\w:`. $1 = before, $2 = after
+                    //used to insert slash between `:{` and `}{`
                     rgx : /([:}])\/?(\{)/g,
                     save : '$1{{id}}$2',
                     id : 'RS',
                     res : '\\/'
                 },
                 {
+                    //required query string - everything in between `{? }`
+                    rgx : /\{\?([^}]+)\}/g,
+                    id : 'RQ',
+                    //everything from `?` till `#` or end of string
+                    res : '\\?([^#]+)'
+                },
+                {
+                    //optional query string - everything in between `:? :`
+                    rgx : /:\?([^:]+):/g,
+                    id : 'OQ',
+                    //everything from `?` till `#` or end of string
+                    res : '(?:\\?([^#]*))?'
+                },
+                {
                     //optional rest - everything in between `: *:`
                     rgx : /:([^:]+)\*:/g,
                     id : 'OR',
-                    res : '(.*)?' // optional group to avoid passing empty string as captured
+                    // optional group to avoid passing empty string as captured
+                    res : '(.*)?'
                 },
                 {
                     //rest param - everything in between `{ *}`
@@ -373,13 +422,13 @@ define(['signals'], function (signals) {
                     //required params - everything between `{ }`
                     rgx : /\{([^}]+)\}/g,
                     id : 'RP',
-                    res : '([^\\/]+)'
+                    res : '([^\\/\\?]+)'
                 },
                 {
                     //optional params
                     rgx : OPTIONAL_PARAMS_REGEXP,
                     id : 'OP',
-                    res : '([^\\/]+)?\/?'
+                    res : '([^\\/\\?]+)?\/?'
                 }
             ],
 
@@ -431,11 +480,11 @@ define(['signals'], function (signals) {
                 //restore tokens
                 pattern = replaceTokens(pattern, 'rRestore', 'res');
                 if (_slashMode === LOOSE_SLASH) {
-                    pattern = '/?'+ pattern +'/?';
+                    pattern = '\\/?'+ pattern +'\\/?';
                 }
             } else {
                 //single slash is treated as empty
-                pattern = '/?';
+                pattern = '\\/?';
             }
             return new RegExp('^'+ pattern + '$');
         }
