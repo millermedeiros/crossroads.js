@@ -9,12 +9,16 @@
  - added `crossroads.greedyEnabled` (#46)
  - added `crossroads.patternLexer.strict()` and
    `crossroads.patternLexer.loose()` (#35)
+ - added query string support (#33)
 
 ### Other
 
  - change default behavior of slashes at begin/end of request (#35)
  - change the way rest segments are validated through `route.rules`, now it
    should use the segment ID without the "*" (eg. `foo` instead of `foo*`).
+ - query string support affected old segment rules, now `?` is considered as
+   a segment divisor as `/` otherwise optional query string RegExp wouldn't
+   match proper segment if following a required segment. (#33)
 
 
 

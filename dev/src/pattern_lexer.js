@@ -19,17 +19,29 @@
             TOKENS = {
                 'OS' : {
                     //optional slashes
-                    //slash between `::` or `}:` or `\w:`. $1 = before, $2 = after
-                    rgx : /([:}]|\w(?=\/))\/?(:)/g,
+                    //slash between `::` or `}:` or `\w:` or `:{?` or `}{?` or `\w{?`
+                    rgx : /([:}]|\w(?=\/))\/?(:|(?:\{\?))/g,
                     save : '$1{{id}}$2',
                     res : '\\/?'
                 },
                 'RS' : {
                     //required slashes
-                    //slash between `::` or `}:` or `\w:`. $1 = before, $2 = after
+                    //used to insert slash between `:{` and `}{`
                     rgx : /([:}])\/?(\{)/g,
                     save : '$1{{id}}$2',
                     res : '\\/'
+                },
+                'RQ' : {
+                    //required query string - everything in between `{? }`
+                    rgx : /\{\?([^}]+)\}/g,
+                    //everything from `?` till `#` or end of string
+                    res : '\\?([^#]+)'
+                },
+                'OQ' : {
+                    //optional query string - everything in between `:? :`
+                    rgx : /:\?([^:]+):/g,
+                    //everything from `?` till `#` or end of string
+                    res : '(?:\\?([^#]*))?'
                 },
                 'OR' : {
                     //optional rest - everything in between `: *:`
@@ -45,12 +57,12 @@
                 'RP' : {
                     //required params - everything between `{ }`
                     rgx : /\{([^}*]+)\*?\}/g,
-                    res : '([^\\/]+)'
+                    res : '([^\\/?]+)'
                 },
                 'OP' : {
                     //optional params - everything between `: :`
                     rgx : /:([^:*]+)\*?:/g,
-                    res : '([^\\/]+)?\/?'
+                    res : '([^\\/?]+)?\/?'
                 }
             },
 
@@ -91,7 +103,6 @@
         }
 
         function compilePattern(pattern) {
-            pattern = pattern || '';
             if(pattern){
                 if (_slashMode === LOOSE_SLASH) {
                     pattern = pattern.replace(UNNECESSARY_SLASHES_REGEXP, '');
@@ -103,11 +114,11 @@
                 //restore tokens
                 pattern = replaceTokens(pattern, 'rRestore', 'res');
                 if (_slashMode === LOOSE_SLASH) {
-                    pattern = '/?'+ pattern +'/?';
+                    pattern = '\\/?'+ pattern +'\\/?';
                 }
             } else {
                 //single slash is treated as empty
-                pattern = '/?';
+                pattern = (_slashMode === LOOSE_SLASH)? '\\/?' : '';
             }
             return new RegExp('^'+ pattern + '$');
         }

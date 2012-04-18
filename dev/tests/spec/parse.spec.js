@@ -884,4 +884,49 @@ describe('crossroads.parse()', function(){
 
     });
 
+    describe('query string', function () {
+
+        describe('required query string', function () {
+            it('should parse query string into an object and typecast vals', function () {
+                var r = crossroads.addRoute('{a}{?b}');
+                var t1, t2;
+                r.matched.addOnce(function(a, b){
+                    t1 = a;
+                    t2 = b;
+                });
+                crossroads.parse('foo.php?lorem=ipsum&asd=123&bar=false');
+
+                expect( t1 ).toEqual( 'foo.php' );
+                expect( t2 ).toEqual( {lorem : 'ipsum', asd : 123, bar : false} );
+            });
+        });
+
+        describe('optional query string', function () {
+            it('should parse query string into an object and typecast vals', function () {
+                var r = crossroads.addRoute('{a}:?b:');
+                var t1, t2;
+                r.matched.addOnce(function(a, b){
+                    t1 = a;
+                    t2 = b;
+                });
+                crossroads.parse('foo.php?lorem=ipsum&asd=123&bar=false');
+
+                expect( t1 ).toEqual( 'foo.php' );
+                expect( t2 ).toEqual( {lorem : 'ipsum', asd : 123, bar : false} );
+
+                var t3, t4;
+                r.matched.addOnce(function(a, b){
+                    t3 = a;
+                    t4 = b;
+                });
+                crossroads.parse('bar.php');
+
+                expect( t3 ).toEqual( 'bar.php' );
+                expect( t4 ).toBeUndefined();
+            });
+        });
+
+    });
+
+
 });

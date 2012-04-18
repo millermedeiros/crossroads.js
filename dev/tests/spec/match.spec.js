@@ -110,6 +110,86 @@ describe('Match', function(){
         });
     });
 
+    describe('query string', function () {
+        it('should match query string as first segment', function () {
+            var r = crossroads.addRoute('{?q}');
+            expect( r.match('') ).toBe( false );
+            expect( r.match('foo') ).toBe( false );
+            expect( r.match('/foo') ).toBe( false );
+            expect( r.match('foo/') ).toBe( false );
+            expect( r.match('/foo/') ).toBe( false );
+            expect( r.match('?foo') ).toBe( true );
+            expect( r.match('?foo=bar') ).toBe( true );
+            expect( r.match('?foo=bar&lorem=123') ).toBe( true );
+        });
+
+        it('should match optional query string as first segment', function () {
+            var r = crossroads.addRoute(':?q:');
+            expect( r.match('') ).toBe( true );
+            expect( r.match('foo') ).toBe( false );
+            expect( r.match('/foo') ).toBe( false );
+            expect( r.match('foo/') ).toBe( false );
+            expect( r.match('/foo/') ).toBe( false );
+            expect( r.match('?foo') ).toBe( true );
+            expect( r.match('?foo=bar') ).toBe( true );
+            expect( r.match('?foo=bar&lorem=123') ).toBe( true );
+        });
+
+        it('should match query string as 2nd segment', function () {
+            var r = crossroads.addRoute('{a}{?q}');
+            expect( r.match('') ).toBe( false );
+            expect( r.match('foo') ).toBe( false );
+            expect( r.match('/foo') ).toBe( false );
+            expect( r.match('foo/') ).toBe( false );
+            expect( r.match('/foo/') ).toBe( false );
+            expect( r.match('foo?foo') ).toBe( true );
+            expect( r.match('foo?foo=bar') ).toBe( true );
+            expect( r.match('foo?foo=bar&lorem=123') ).toBe( true );
+        });
+
+        it('should match optional query string as 2nd segment', function () {
+            var r = crossroads.addRoute('{a}:?q:');
+            expect( r.match('') ).toBe( false );
+            expect( r.match('foo') ).toBe( true );
+            expect( r.match('/foo') ).toBe( true );
+            expect( r.match('foo/') ).toBe( true );
+            expect( r.match('/foo/') ).toBe( true );
+            expect( r.match('foo?foo') ).toBe( true );
+            expect( r.match('foo?foo=bar') ).toBe( true );
+            expect( r.match('foo?foo=bar&lorem=123') ).toBe( true );
+        });
+
+        it('should match query string as middle segment', function () {
+            //if hash is required should use the literal "#" to avoid matching
+            //the last char of string as a string "foo?foo" shouldn't match
+            var r = crossroads.addRoute('{a}{?q}#{hash}');
+            expect( r.match('') ).toBe( false );
+            expect( r.match('foo') ).toBe( false );
+            expect( r.match('/foo') ).toBe( false );
+            expect( r.match('foo/') ).toBe( false );
+            expect( r.match('/foo/') ).toBe( false );
+            expect( r.match('foo?foo') ).toBe( false );
+            expect( r.match('foo?foo#bar') ).toBe( true );
+            expect( r.match('foo?foo=bar#bar') ).toBe( true );
+            expect( r.match('foo?foo=bar&lorem=123#bar') ).toBe( true );
+        });
+
+        it('should match optional query string as middle segment', function () {
+            var r = crossroads.addRoute('{a}:?q::hash:');
+            expect( r.match('') ).toBe( false );
+            expect( r.match('foo') ).toBe( true );
+            expect( r.match('/foo') ).toBe( true );
+            expect( r.match('foo/') ).toBe( true );
+            expect( r.match('/foo/') ).toBe( true );
+            expect( r.match('foo?foo') ).toBe( true );
+            expect( r.match('foo?foo=bar') ).toBe( true );
+            expect( r.match('foo?foo=bar#bar') ).toBe( true );
+            expect( r.match('foo?foo=bar&lorem=123') ).toBe( true );
+            expect( r.match('foo?foo=bar&lorem=123#bar') ).toBe( true );
+        });
+    });
+
+
     describe('slash between params are optional', function(){
 
         describe('between required params', function(){
@@ -254,6 +334,37 @@ describe('Match', function(){
             expect( b.match('/foo') ).toBe( true );
             expect( b.match('foo/') ).toBe( false );
             expect( b.match('/foo/') ).toBe( false );
+
+            var c = crossroads.addRoute('');
+            expect( c.match() ).toBe( true );
+            expect( c.match('') ).toBe( true );
+            expect( c.match('/') ).toBe( false );
+            expect( c.match('foo') ).toBe( false );
+
+            var d = crossroads.addRoute('/');
+            expect( d.match() ).toBe( false );
+            expect( d.match('') ).toBe( false );
+            expect( d.match('/') ).toBe( true );
+            expect( d.match('foo') ).toBe( false );
+        });
+
+    });
+
+
+    describe('loose slash rules', function () {
+
+        it('should treat single slash and empty string as same', function () {
+            var c = crossroads.addRoute('');
+            expect( c.match() ).toBe( true );
+            expect( c.match('') ).toBe( true );
+            expect( c.match('/') ).toBe( true );
+            expect( c.match('foo') ).toBe( false );
+
+            var d = crossroads.addRoute('/');
+            expect( d.match() ).toBe( true );
+            expect( d.match('') ).toBe( true );
+            expect( d.match('/') ).toBe( true );
+            expect( d.match('foo') ).toBe( false );
         });
 
     });
@@ -387,6 +498,43 @@ describe('Match', function(){
                 expect( s.match('/123/45/67') ).toBe( true );
 
                 crossroads.shouldTypecast = prevTypecast; //restore
+            });
+
+        });
+
+
+        describe('query string', function () {
+
+            it('should validate with array', function () {
+                var r = crossroads.addRoute('/foo.php{?query}');
+                r.rules = {
+                    '?query' : ['lorem=ipsum&dolor=456', 'amet=789']
+                };
+                expect( r.match('foo.php?bar=123&ipsum=dolor') ).toBe( false );
+                expect( r.match('foo.php?lorem=ipsum&dolor=456') ).toBe( true );
+                expect( r.match('foo.php?amet=789') ).toBe( true );
+            });
+
+            it('should validate with RegExp', function () {
+                var r = crossroads.addRoute('/foo.php{?query}');
+                r.rules = {
+                    '?query' : /^lorem=\w+&dolor=\d+$/
+                };
+                expect( r.match('foo.php?bar=123&ipsum=dolor') ).toBe( false );
+                expect( r.match('foo.php?lorem=ipsum&dolor=12345') ).toBe( true );
+                expect( r.match('foo.php?lorem=ipsum&dolor=amet') ).toBe( false );
+            });
+
+            it('should validate with Function', function () {
+                var r = crossroads.addRoute('/foo.php{?query}');
+                r.rules = {
+                    '?query' : function(val, req, vals){
+                        return (val.lorem === 'ipsum' && typeof val.dolor === 'number');
+                    }
+                };
+                expect( r.match('foo.php?bar=123&ipsum=dolor') ).toBe( false );
+                expect( r.match('foo.php?lorem=ipsum&dolor=12345') ).toBe( true );
+                expect( r.match('foo.php?lorem=ipsum&dolor=amet') ).toBe( false );
             });
 
         });
