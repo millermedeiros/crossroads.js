@@ -8,7 +8,8 @@
  - added `crossroads.greedy` (#46)
  - added `crossroads.greedyEnabled` (#46)
  - added `crossroads.patternLexer.strict()` and
-   `crossroads.patternLexer.loose()` (#35)
+   `crossroads.patternLexer.loose()` and
+   `crossroads.patternLexer.legacy()` (#35)
  - added query string support (#33)
 
 ### Other

@@ -366,6 +366,10 @@ describe('Match', function(){
 
     describe('loose slash rules', function () {
 
+        beforeEach(function(){
+            crossroads.patternLexer.loose();
+        });
+
         it('should treat single slash and empty string as same', function () {
             var c = crossroads.addRoute('');
             expect( c.match() ).toBe( true );
@@ -378,6 +382,48 @@ describe('Match', function(){
             expect( d.match('') ).toBe( true );
             expect( d.match('/') ).toBe( true );
             expect( d.match('foo') ).toBe( false );
+        });
+
+    });
+
+    describe('legacy slash rules', function () {
+
+        beforeEach(function(){
+            crossroads.patternLexer.legacy();
+        });
+
+        afterEach(function(){
+            crossroads.patternLexer.loose();
+        });
+
+        it('should treat single slash and empty string as same', function () {
+            var c = crossroads.addRoute('');
+            expect( c.match() ).toBe( true );
+            expect( c.match('') ).toBe( true );
+            expect( c.match('/') ).toBe( true );
+            expect( c.match('foo') ).toBe( false );
+
+            var d = crossroads.addRoute('/');
+            expect( d.match() ).toBe( true );
+            expect( d.match('') ).toBe( true );
+            expect( d.match('/') ).toBe( true );
+            expect( d.match('foo') ).toBe( false );
+        });
+
+        it('slash at end of string is optional', function () {
+            var a = crossroads.addRoute('/foo');
+            expect( a.match('/foo') ).toEqual( true );
+            expect( a.match('/foo/') ).toEqual( true );
+            expect( a.match('/foo/bar') ).toEqual( false );
+        });
+
+        it('slash at begin of string is required', function () {
+            var a = crossroads.addRoute('/foo');
+            expect( a.match('/foo') ).toEqual( true );
+            expect( a.match('/foo/') ).toEqual( true );
+            expect( a.match('foo') ).toEqual( false );
+            expect( a.match('foo/') ).toEqual( false );
+            expect( a.match('/foo/bar') ).toEqual( false );
         });
 
     });

@@ -2,7 +2,7 @@
  * crossroads <http://millermedeiros.github.com/crossroads.js/>
  * License: MIT
  * Author: Miller Medeiros
- * Version: 0.9.0-alpha (2012/4/18 13:50)
+ * Version: 0.9.0-alpha (2012/4/18 17:14)
  */
 
 (function (define) {
@@ -251,6 +251,7 @@ define(['signals'], function (signals) {
         rules : void(0),
 
         match : function (request) {
+            request = request || '';
             return this._matchRegexp.test(request) && this._validateParams(request); //validate params even if regexp because of `request_` rule.
         },
 
@@ -372,10 +373,11 @@ define(['signals'], function (signals) {
             ESCAPE_CHARS_REGEXP = /[\\.+*?\^$\[\](){}\/'#]/g,
 
             //trailing slashes (begin/end of string)
-            UNNECESSARY_SLASHES_REGEXP = /^\/|\/$/g,
+            LOOSE_SLASHES_REGEXP = /^\/|\/$/g,
+            LEGACY_SLASHES_REGEXP = /\/$/g,
 
             //params - everything between `{ }` or `: :`
-            PARAMS_REGEXP = /(?:\{|:)([^}:*]+)\*?(?:\}|:)/g,
+            PARAMS_REGEXP = /(?:\{|:)([^}:]+)(?:\}|:)/g,
 
             //used to save params during compile (avoid escaping things that
             //shouldn't be escaped).
@@ -419,18 +421,19 @@ define(['signals'], function (signals) {
                 // required/optional params should come after rest segments
                 'RP' : {
                     //required params - everything between `{ }`
-                    rgx : /\{([^}*]+)\*?\}/g,
+                    rgx : /\{([^}]+)\}/g,
                     res : '([^\\/?]+)'
                 },
                 'OP' : {
                     //optional params - everything between `: :`
-                    rgx : /:([^:*]+)\*?:/g,
+                    rgx : /:([^:]+):/g,
                     res : '([^\\/?]+)?\/?'
                 }
             },
 
             LOOSE_SLASH = 1,
             STRICT_SLASH = 2,
+            LEGACY_SLASH = 3,
 
             _slashMode = LOOSE_SLASH;
 
@@ -467,22 +470,30 @@ define(['signals'], function (signals) {
 
         function compilePattern(pattern) {
             pattern = pattern || '';
+
             if(pattern){
                 if (_slashMode === LOOSE_SLASH) {
-                    pattern = pattern.replace(UNNECESSARY_SLASHES_REGEXP, '');
+                    pattern = pattern.replace(LOOSE_SLASHES_REGEXP, '');
                 }
+                else if (_slashMode === LEGACY_SLASH) {
+                    pattern = pattern.replace(LEGACY_SLASHES_REGEXP, '');
+                }
+
                 //save tokens
                 pattern = replaceTokens(pattern, 'rgx', 'save');
                 //regexp escape
                 pattern = pattern.replace(ESCAPE_CHARS_REGEXP, '\\$&');
                 //restore tokens
                 pattern = replaceTokens(pattern, 'rRestore', 'res');
+
                 if (_slashMode === LOOSE_SLASH) {
-                    pattern = '\\/?'+ pattern +'\\/?';
+                    pattern = '\\/?'+ pattern;
                 }
-            } else {
-                //single slash is treated as empty
-                pattern = '\\/?';
+            }
+
+            if (_slashMode !== STRICT_SLASH) {
+                //single slash is treated as empty and end slash is optional
+                pattern += '\\/?';
             }
             return new RegExp('^'+ pattern + '$');
         }
@@ -549,6 +560,9 @@ define(['signals'], function (signals) {
             },
             loose : function(){
                 _slashMode = LOOSE_SLASH;
+            },
+            legacy : function(){
+                _slashMode = LEGACY_SLASH;
             },
             getParamIds : getParamIds,
             getOptionalParamsIds : getOptionalParamsIds,

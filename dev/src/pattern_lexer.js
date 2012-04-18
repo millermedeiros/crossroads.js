@@ -9,7 +9,8 @@
             ESCAPE_CHARS_REGEXP = /[\\.+*?\^$\[\](){}\/'#]/g,
 
             //trailing slashes (begin/end of string)
-            UNNECESSARY_SLASHES_REGEXP = /^\/|\/$/g,
+            LOOSE_SLASHES_REGEXP = /^\/|\/$/g,
+            LEGACY_SLASHES_REGEXP = /\/$/g,
 
             //params - everything between `{ }` or `: :`
             PARAMS_REGEXP = /(?:\{|:)([^}:]+)(?:\}|:)/g,
@@ -68,6 +69,7 @@
 
             LOOSE_SLASH = 1,
             STRICT_SLASH = 2,
+            LEGACY_SLASH = 3,
 
             _slashMode = LOOSE_SLASH;
 
@@ -103,22 +105,31 @@
         }
 
         function compilePattern(pattern) {
+            pattern = pattern || '';
+
             if(pattern){
                 if (_slashMode === LOOSE_SLASH) {
-                    pattern = pattern.replace(UNNECESSARY_SLASHES_REGEXP, '');
+                    pattern = pattern.replace(LOOSE_SLASHES_REGEXP, '');
                 }
+                else if (_slashMode === LEGACY_SLASH) {
+                    pattern = pattern.replace(LEGACY_SLASHES_REGEXP, '');
+                }
+
                 //save tokens
                 pattern = replaceTokens(pattern, 'rgx', 'save');
                 //regexp escape
                 pattern = pattern.replace(ESCAPE_CHARS_REGEXP, '\\$&');
                 //restore tokens
                 pattern = replaceTokens(pattern, 'rRestore', 'res');
+
                 if (_slashMode === LOOSE_SLASH) {
-                    pattern = '\\/?'+ pattern +'\\/?';
+                    pattern = '\\/?'+ pattern;
                 }
-            } else {
-                //single slash is treated as empty
-                pattern = (_slashMode === LOOSE_SLASH)? '\\/?' : '';
+            }
+
+            if (_slashMode !== STRICT_SLASH) {
+                //single slash is treated as empty and end slash is optional
+                pattern += '\\/?';
             }
             return new RegExp('^'+ pattern + '$');
         }
@@ -185,6 +196,9 @@
             },
             loose : function(){
                 _slashMode = LOOSE_SLASH;
+            },
+            legacy : function(){
+                _slashMode = LEGACY_SLASH;
             },
             getParamIds : getParamIds,
             getOptionalParamsIds : getOptionalParamsIds,
