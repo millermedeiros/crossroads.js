@@ -44,7 +44,7 @@ describe('Route.interpolate()', function(){
         var a = crossroads.addRoute('/{foo}/:bar:');
         expect( function(){
             a.interpolate({foo: 'lorem/ipsum', bar: 'dolor'});
-        }).toThrow( 'The generated string "/lorem/ipsum/dolor" doesn\'t match the pattern "/{foo}/:bar:". Check supplied arguments.' );
+        }).toThrow( 'Invalid value "lorem/ipsum" for segment "{foo}".' );
     });
 
     it('should throw an error if route was created by an RegExp pattern', function () {

@@ -13,6 +13,8 @@
 ### Other
 
  - change default behavior of slashes at begin/end of request (#35)
+ - change the way rest segments are validated through `route.rules`, now it
+   should use the segment ID without the "*" (eg. `foo` instead of `foo*`).
 
 
 

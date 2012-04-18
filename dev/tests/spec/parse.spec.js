@@ -801,7 +801,7 @@ describe('crossroads.parse()', function(){
             r.rules = {
                 a : ['news', 'article'],
                 b : /[\-0-9a-zA-Z]+/,
-                'c*' : ['foo/bar', 'edit', '123/456/789']
+                c : ['foo/bar', 'edit', '123/456/789']
             };
 
             r.matched.addOnce(function(a, b, c){

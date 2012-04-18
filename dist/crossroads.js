@@ -2,7 +2,7 @@
  * crossroads <http://millermedeiros.github.com/crossroads.js/>
  * License: MIT
  * Author: Miller Medeiros
- * Version: 0.9.0-alpha (2012/4/17 23:47)
+ * Version: 0.9.0-alpha (2012/4/18 12:59)
  */
 
 (function (define) {
@@ -303,32 +303,7 @@ define(['signals'], function (signals) {
         },
 
         interpolate : function(replacements) {
-            if (typeof this._pattern !== 'string') {
-                throw new Error('Route pattern should be a string.');
-            }
-            var replaceFn = function(match, prop){
-                    if (prop in replacements) {
-                        return replacements[prop];
-                    } else if (match.indexOf('{') !== -1){
-                        throw new Error('The segment '+ match +' is required.');
-                    } else {
-                        return '';
-                    }
-                },
-                str;
-
-            //TODO: extract this logic into pattern lexer and reuse TOKENS
-            str = this._pattern
-                        .replace(/([:}]|\w(?=\/))\/?(:)/g, '$1__CR_OS__$2')
-                        .replace(/\{([^}*]+)\*?\}/g, replaceFn)
-                        .replace(/:([^:*]+)\*?:/g, replaceFn)
-                        .replace(/(?:__CR_OS__)+$/, '') // remove trailing
-                        .replace(/__CR_OS__/g, '/'); // add slash between segments
-
-            if (! this._matchRegexp.test(str) ) {
-                throw new Error('The generated string "'+ str +'" doesn\'t match the pattern "'+ this._pattern +'". Check supplied arguments.');
-            }
-            return str;
+            return crossroads.patternLexer.interpolate(this._pattern, replacements);
         },
 
         dispose : function () {
@@ -362,55 +337,47 @@ define(['signals'], function (signals) {
             UNNECESSARY_SLASHES_REGEXP = /^\/|\/$/g,
 
             //params - everything between `{ }` or `: :`
-            PARAMS_REGEXP = /(?:\{|:)([^}:]+)(?:\}|:)/g,
-
-            //optional params - everything between `: :`
-            OPTIONAL_PARAMS_REGEXP = /:([^:]+):/g,
+            PARAMS_REGEXP = /(?:\{|:)([^}:*]+)\*?(?:\}|:)/g,
 
             //used to save params during compile (avoid escaping things that
             //shouldn't be escaped).
-            TOKENS = [
-                {
+            TOKENS = {
+                'OS' : {
                     //optional slashes
                     //slash between `::` or `}:` or `\w:`. $1 = before, $2 = after
                     rgx : /([:}]|\w(?=\/))\/?(:)/g,
                     save : '$1{{id}}$2',
-                    id : 'OS',
                     res : '\\/?'
                 },
-                {
+                'RS' : {
                     //required slashes
                     //slash between `::` or `}:` or `\w:`. $1 = before, $2 = after
                     rgx : /([:}])\/?(\{)/g,
                     save : '$1{{id}}$2',
-                    id : 'RS',
                     res : '\\/'
                 },
-                {
+                'OR' : {
                     //optional rest - everything in between `: *:`
                     rgx : /:([^:]+)\*:/g,
-                    id : 'OR',
                     res : '(.*)?' // optional group to avoid passing empty string as captured
                 },
-                {
+                'RR' : {
                     //rest param - everything in between `{ *}`
                     rgx : /\{([^}]+)\*\}/g,
-                    id : 'RR',
                     res : '(.+)'
                 },
-                {
+                // required/optional params should come after rest segments
+                'RP' : {
                     //required params - everything between `{ }`
-                    rgx : /\{([^}]+)\}/g,
-                    id : 'RP',
+                    rgx : /\{([^}*]+)\*?\}/g,
                     res : '([^\\/]+)'
                 },
-                {
-                    //optional params
-                    rgx : OPTIONAL_PARAMS_REGEXP,
-                    id : 'OP',
+                'OP' : {
+                    //optional params - everything between `: :`
+                    rgx : /:([^:*]+)\*?:/g,
                     res : '([^\\/]+)?\/?'
                 }
-            ],
+            },
 
             LOOSE_SLASH = 1,
             STRICT_SLASH = 2,
@@ -419,13 +386,14 @@ define(['signals'], function (signals) {
 
 
         function precompileTokens(){
-            var n = TOKENS.length,
-                cur,
-                id;
-            while (cur = TOKENS[--n]) {
-                id = '__CR_'+ cur.id +'__';
-                cur.save = ('save' in cur)? cur.save.replace('{{id}}', id) : id;
-                cur.rRestore = new RegExp(id, 'g');
+            var key, cur;
+            for (key in TOKENS) {
+                if (TOKENS.hasOwnProperty(key)) {
+                    cur = TOKENS[key];
+                    cur.id = '__CR_'+ key +'__';
+                    cur.save = ('save' in cur)? cur.save.replace('{{id}}', cur.id) : cur.id;
+                    cur.rRestore = new RegExp(cur.id, 'g');
+                }
             }
         }
         precompileTokens();
@@ -444,7 +412,7 @@ define(['signals'], function (signals) {
         }
 
         function getOptionalParamsIds(pattern) {
-            return captureVals(OPTIONAL_PARAMS_REGEXP, pattern);
+            return captureVals(TOKENS.OP.rgx, pattern);
         }
 
         function compilePattern(pattern) {
@@ -470,9 +438,12 @@ define(['signals'], function (signals) {
         }
 
         function replaceTokens(pattern, regexpName, replaceName) {
-            var i = 0, cur;
-            while (cur = TOKENS[i++]) {
-                pattern = pattern.replace(cur[regexpName], cur[replaceName]);
+            var cur, key;
+            for (key in TOKENS) {
+                if (TOKENS.hasOwnProperty(key)) {
+                    cur = TOKENS[key];
+                    pattern = pattern.replace(cur[regexpName], cur[replaceName]);
+                }
             }
             return pattern;
         }
@@ -488,6 +459,39 @@ define(['signals'], function (signals) {
             return vals;
         }
 
+        function interpolate(pattern, replacements) {
+            if (typeof pattern !== 'string') {
+                throw new Error('Route pattern should be a string.');
+            }
+
+            var replaceFn = function(match, prop){
+                    var val;
+                    if (prop in replacements) {
+                        val = replacements[prop];
+                        if (match.indexOf('*') === -1 && val.indexOf('/') !== -1) {
+                            throw new Error('Invalid value "'+ val +'" for segment "'+ match +'".');
+                        }
+                    }
+                    else if (match.indexOf('{') !== -1) {
+                        throw new Error('The segment '+ match +' is required.');
+                    }
+                    else {
+                        val = '';
+                    }
+                    return val;
+                };
+
+            if (! TOKENS.OS.trail) {
+                TOKENS.OS.trail = new RegExp('(?:'+ TOKENS.OS.id +')+$');
+            }
+
+            return pattern
+                        .replace(TOKENS.OS.rgx, TOKENS.OS.save)
+                        .replace(PARAMS_REGEXP, replaceFn)
+                        .replace(TOKENS.OS.trail, '') // remove trailing
+                        .replace(TOKENS.OS.rRestore, '/'); // add slash between segments
+        }
+
         //API
         return {
             strict : function(){
@@ -499,7 +503,8 @@ define(['signals'], function (signals) {
             getParamIds : getParamIds,
             getOptionalParamsIds : getOptionalParamsIds,
             getParamValues : getParamValues,
-            compilePattern : compilePattern
+            compilePattern : compilePattern,
+            interpolate : interpolate
         };
 
     }());
