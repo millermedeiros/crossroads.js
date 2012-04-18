@@ -54,4 +54,15 @@ describe('Route.interpolate()', function(){
         }).toThrow( 'Route pattern should be a string.' );
     });
 
+    it('should throw an error if generated string doesn\'t validate against rules', function () {
+        var a = crossroads.addRoute('/{foo}/:bar:');
+        a.rules = {
+            foo : ['lorem', 'news'],
+            bar : /^\d+$/
+        };
+        expect( function(){
+            a.interpolate({foo: 'lorem', bar: 'ipsum'});
+        }).toThrow( 'Generated string doesn\'t validate against `Route.rules`.' );
+    });
+
 });

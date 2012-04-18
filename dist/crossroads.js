@@ -2,7 +2,7 @@
  * crossroads <http://millermedeiros.github.com/crossroads.js/>
  * License: MIT
  * Author: Miller Medeiros
- * Version: 0.9.0-alpha (2012/4/18 12:59)
+ * Version: 0.9.0-alpha (2012/4/18 13:27)
  */
 
 (function (define) {
@@ -303,7 +303,11 @@ define(['signals'], function (signals) {
         },
 
         interpolate : function(replacements) {
-            return crossroads.patternLexer.interpolate(this._pattern, replacements);
+            var str = crossroads.patternLexer.interpolate(this._pattern, replacements);
+            if (! this._validateParams(str) ) {
+                throw new Error('Generated string doesn\'t validate against `Route.rules`.');
+            }
+            return str;
         },
 
         dispose : function () {

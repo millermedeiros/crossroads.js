@@ -94,7 +94,11 @@
         },
 
         interpolate : function(replacements) {
-            return crossroads.patternLexer.interpolate(this._pattern, replacements);
+            var str = crossroads.patternLexer.interpolate(this._pattern, replacements);
+            if (! this._validateParams(str) ) {
+                throw new Error('Generated string doesn\'t validate against `Route.rules`.');
+            }
+            return str;
         },
 
         dispose : function () {
