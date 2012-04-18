@@ -801,7 +801,7 @@ describe('crossroads.parse()', function(){
             r.rules = {
                 a : ['news', 'article'],
                 b : /[\-0-9a-zA-Z]+/,
-                c : ['foo/bar', 'edit', '123/456/789']
+                'c*' : ['foo/bar', 'edit', '123/456/789']
             };
 
             r.matched.addOnce(function(a, b, c){
@@ -886,7 +886,24 @@ describe('crossroads.parse()', function(){
 
     describe('query string', function () {
 
-        describe('required query string', function () {
+        describe('old syntax', function () {
+            it('should only parse query string if using special capturing group', function () {
+                var r = crossroads.addRoute('{a}?{q}#{hash}');
+                var t1, t2, t3;
+                r.matched.addOnce(function(a, b, c){
+                    t1 = a;
+                    t2 = b;
+                    t3 = c;
+                });
+                crossroads.parse('foo.php?foo=bar&lorem=123#bar');
+
+                expect( t1 ).toEqual( 'foo.php' );
+                expect( t2 ).toEqual( 'foo=bar&lorem=123' );
+                expect( t3 ).toEqual( 'bar' );
+            });
+        });
+
+        describe('required query string after required segment', function () {
             it('should parse query string into an object and typecast vals', function () {
                 var r = crossroads.addRoute('{a}{?b}');
                 var t1, t2;
@@ -901,9 +918,59 @@ describe('crossroads.parse()', function(){
             });
         });
 
-        describe('optional query string', function () {
+        describe('required query string after optional segment', function () {
+            it('should parse query string into an object and typecast vals', function () {
+                var r = crossroads.addRoute(':a:{?b}');
+                var t1, t2;
+                r.matched.addOnce(function(a, b){
+                    t1 = a;
+                    t2 = b;
+                });
+                crossroads.parse('foo.php?lorem=ipsum&asd=123&bar=false');
+
+                expect( t1 ).toEqual( 'foo.php' );
+                expect( t2 ).toEqual( {lorem : 'ipsum', asd : 123, bar : false} );
+
+                var t3, t4;
+                r.matched.addOnce(function(a, b){
+                    t3 = a;
+                    t4 = b;
+                });
+                crossroads.parse('?lorem=ipsum&asd=123');
+
+                expect( t3 ).toBeUndefined();
+                expect( t4 ).toEqual( {lorem : 'ipsum', asd : 123} );
+            });
+        });
+
+        describe('optional query string after required segment', function () {
             it('should parse query string into an object and typecast vals', function () {
                 var r = crossroads.addRoute('{a}:?b:');
+                var t1, t2;
+                r.matched.addOnce(function(a, b){
+                    t1 = a;
+                    t2 = b;
+                });
+                crossroads.parse('foo.php?lorem=ipsum&asd=123&bar=false');
+
+                expect( t1 ).toEqual( 'foo.php' );
+                expect( t2 ).toEqual( {lorem : 'ipsum', asd : 123, bar : false} );
+
+                var t3, t4;
+                r.matched.addOnce(function(a, b){
+                    t3 = a;
+                    t4 = b;
+                });
+                crossroads.parse('bar.php');
+
+                expect( t3 ).toEqual( 'bar.php' );
+                expect( t4 ).toBeUndefined();
+            });
+        });
+
+        describe('optional query string after optional segment', function () {
+            it('should parse query string into an object and typecast vals', function () {
+                var r = crossroads.addRoute(':a::?b:');
                 var t1, t2;
                 r.matched.addOnce(function(a, b){
                     t1 = a;

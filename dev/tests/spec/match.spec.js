@@ -187,6 +187,19 @@ describe('Match', function(){
             expect( r.match('foo?foo=bar&lorem=123') ).toBe( true );
             expect( r.match('foo?foo=bar&lorem=123#bar') ).toBe( true );
         });
+
+        it('should match query string even if not using the special query syntax', function () {
+            var r = crossroads.addRoute('{a}?{q}#{hash}');
+            expect( r.match('') ).toBe( false );
+            expect( r.match('foo') ).toBe( false );
+            expect( r.match('/foo') ).toBe( false );
+            expect( r.match('foo/') ).toBe( false );
+            expect( r.match('/foo/') ).toBe( false );
+            expect( r.match('foo?foo') ).toBe( false );
+            expect( r.match('foo?foo#bar') ).toBe( true );
+            expect( r.match('foo?foo=bar#bar') ).toBe( true );
+            expect( r.match('foo?foo=bar&lorem=123#bar') ).toBe( true );
+        });
     });
 
 

@@ -12,7 +12,7 @@
             UNNECESSARY_SLASHES_REGEXP = /^\/|\/$/g,
 
             //params - everything between `{ }` or `: :`
-            PARAMS_REGEXP = /(?:\{|:)([^}:*]+)\*?(?:\}|:)/g,
+            PARAMS_REGEXP = /(?:\{|:)([^}:]+)(?:\}|:)/g,
 
             //used to save params during compile (avoid escaping things that
             //shouldn't be escaped).
@@ -56,12 +56,12 @@
                 // required/optional params should come after rest segments
                 'RP' : {
                     //required params - everything between `{ }`
-                    rgx : /\{([^}*]+)\*?\}/g,
+                    rgx : /\{([^}]+)\}/g,
                     res : '([^\\/?]+)'
                 },
                 'OP' : {
                     //optional params - everything between `: :`
-                    rgx : /:([^:*]+)\*?:/g,
+                    rgx : /:([^:]+):/g,
                     res : '([^\\/?]+)?\/?'
                 }
             },

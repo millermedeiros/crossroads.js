@@ -21,8 +21,8 @@ describe('Route.interpolate()', function(){
 
     it('should replace rest segments', function(){
         var a = crossroads.addRoute('lorem/{foo*}:bar*:');
-        expect( a.interpolate({foo: 'ipsum/dolor', bar: 'sit/amet'}) ).toEqual( 'lorem/ipsum/dolor/sit/amet' );
-        expect( a.interpolate({foo: 'dolor-sit'}) ).toEqual( 'lorem/dolor-sit' );
+        expect( a.interpolate({'foo*': 'ipsum/dolor', 'bar*': 'sit/amet'}) ).toEqual( 'lorem/ipsum/dolor/sit/amet' );
+        expect( a.interpolate({'foo*': 'dolor-sit'}) ).toEqual( 'lorem/dolor-sit' );
     });
 
     it('should replace multiple optional segments', function(){
