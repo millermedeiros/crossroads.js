@@ -2,7 +2,7 @@
  * crossroads <http://millermedeiros.github.com/crossroads.js/>
  * License: MIT
  * Author: Miller Medeiros
- * Version: 0.9.0-alpha (2012/4/18 17:14)
+ * Version: 0.9.0-alpha (2012/5/28 22:54)
  */
 
 (function (define) {
@@ -149,7 +149,7 @@ define(['signals'], function (signals) {
                 cur;
 
             if (n) {
-                this._notifyPrevRoutes(request);
+                this._notifyPrevRoutes(routes, request);
                 this._prevRoutes = routes;
                 //shold be incremental loop, execute routes in order
                 while (i < n) {
@@ -164,12 +164,26 @@ define(['signals'], function (signals) {
             }
         },
 
-        _notifyPrevRoutes : function(request) {
-            var i = 0, cur;
-            while (cur = this._prevRoutes[i++]) {
+        _notifyPrevRoutes : function(matchedRoutes, request) {
+            var i = 0, prev;
+            while (prev = this._prevRoutes[i++]) {
                 //check if switched exist since route may be disposed
-                if(cur.route.switched) cur.route.switched.dispatch(request);
+                if(prev.route.switched && this._didSwitch(prev.route, matchedRoutes)) {
+                    prev.route.switched.dispatch(request);
+                }
             }
+        },
+
+        _didSwitch : function (route, matchedRoutes){
+            var matched,
+                i = 0;
+            while (matched = matchedRoutes[i++]) {
+                // only dispatch switched if it is going to a different route
+                if (matched.route === route) {
+                    return false;
+                }
+            }
+            return true;
         },
 
         getNumRoutes : function () {

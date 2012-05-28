@@ -12,6 +12,10 @@
    `crossroads.patternLexer.legacy()` (#35)
  - added query string support (#33)
 
+### Fixes
+
+ - `Route.switched` is only dispatched if matching a different route. (#50)
+
 ### Other
 
  - change default behavior of slashes at begin/end of request (#35)
