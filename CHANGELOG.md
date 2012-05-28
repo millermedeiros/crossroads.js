@@ -1,5 +1,30 @@
 # Crossroads.js Changelog #
 
+
+## Next ##
+
+### API Changes ###
+
+ - added `crossroads.greedy` (#46)
+ - added `crossroads.greedyEnabled` (#46)
+ - added `crossroads.patternLexer.strict()` and
+   `crossroads.patternLexer.loose()` and
+   `crossroads.patternLexer.legacy()` (#35)
+ - added query string support (#33)
+
+### Fixes
+
+ - `Route.switched` is only dispatched if matching a different route. (#50)
+
+### Other
+
+ - change default behavior of slashes at begin/end of request (#35)
+ - query string support affected old segment rules, now `?` is considered as
+   a segment divisor as `/` otherwise optional query string RegExp wouldn't
+   match proper segment if following a required segment. (#33)
+
+
+
 ## v0.8.0 (2012/03/05) ##
 
 ### API Changes ###

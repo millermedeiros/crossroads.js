@@ -4,32 +4,88 @@
 
     crossroads.patternLexer = (function () {
 
+        var
+            //match chars that should be escaped on string regexp
+            ESCAPE_CHARS_REGEXP = /[\\.+*?\^$\[\](){}\/'#]/g,
 
-        var ESCAPE_CHARS_REGEXP = /[\\.+*?\^$\[\](){}\/'#]/g, //match chars that should be escaped on string regexp
-            UNNECESSARY_SLASHES_REGEXP = /\/$/g, //trailing slash
-            OPTIONAL_SLASHES_REGEXP = /([:}]|\w(?=\/))\/?(:)/g, //slash between `::` or `}:` or `\w:`. $1 = before, $2 = after
-            REQUIRED_SLASHES_REGEXP = /([:}])\/?(\{)/g, //used to insert slash between `:{` and `}{`
+            //trailing slashes (begin/end of string)
+            LOOSE_SLASHES_REGEXP = /^\/|\/$/g,
+            LEGACY_SLASHES_REGEXP = /\/$/g,
 
-            REQUIRED_PARAMS_REGEXP = /\{([^}]+)\}/g, //match everything between `{ }`
-            OPTIONAL_PARAMS_REGEXP = /:([^:]+):/g, //match everything between `: :`
-            PARAMS_REGEXP = /(?:\{|:)([^}:]+)(?:\}|:)/g, //capture everything between `{ }` or `: :`
-            REQUIRED_REST = /\{([^}]+)\*\}/g,
-            OPTIONAL_REST = /:([^:]+)\*:/g,
+            //params - everything between `{ }` or `: :`
+            PARAMS_REGEXP = /(?:\{|:)([^}:]+)(?:\}|:)/g,
 
             //used to save params during compile (avoid escaping things that
             //shouldn't be escaped).
-            SAVE_REQUIRED_PARAMS = '__CR_RP__',
-            SAVE_OPTIONAL_PARAMS = '__CR_OP__',
-            SAVE_REQUIRED_REST = '__CR_RR__',
-            SAVE_OPTIONAL_REST = '__CR_OR__',
-            SAVE_REQUIRED_SLASHES = '__CR_RS__',
-            SAVE_OPTIONAL_SLASHES = '__CR_OS__',
-            SAVED_REQUIRED_REGEXP = new RegExp(SAVE_REQUIRED_PARAMS, 'g'),
-            SAVED_OPTIONAL_REGEXP = new RegExp(SAVE_OPTIONAL_PARAMS, 'g'),
-            SAVED_REQUIRED_REST_REGEXP = new RegExp(SAVE_REQUIRED_REST, 'g'),
-            SAVED_OPTIONAL_REST_REGEXP = new RegExp(SAVE_OPTIONAL_REST, 'g'),
-            SAVED_OPTIONAL_SLASHES_REGEXP = new RegExp(SAVE_OPTIONAL_SLASHES, 'g'),
-            SAVED_REQUIRED_SLASHES_REGEXP = new RegExp(SAVE_REQUIRED_SLASHES, 'g');
+            TOKENS = {
+                'OS' : {
+                    //optional slashes
+                    //slash between `::` or `}:` or `\w:` or `:{?` or `}{?` or `\w{?`
+                    rgx : /([:}]|\w(?=\/))\/?(:|(?:\{\?))/g,
+                    save : '$1{{id}}$2',
+                    res : '\\/?'
+                },
+                'RS' : {
+                    //required slashes
+                    //used to insert slash between `:{` and `}{`
+                    rgx : /([:}])\/?(\{)/g,
+                    save : '$1{{id}}$2',
+                    res : '\\/'
+                },
+                'RQ' : {
+                    //required query string - everything in between `{? }`
+                    rgx : /\{\?([^}]+)\}/g,
+                    //everything from `?` till `#` or end of string
+                    res : '\\?([^#]+)'
+                },
+                'OQ' : {
+                    //optional query string - everything in between `:? :`
+                    rgx : /:\?([^:]+):/g,
+                    //everything from `?` till `#` or end of string
+                    res : '(?:\\?([^#]*))?'
+                },
+                'OR' : {
+                    //optional rest - everything in between `: *:`
+                    rgx : /:([^:]+)\*:/g,
+                    res : '(.*)?' // optional group to avoid passing empty string as captured
+                },
+                'RR' : {
+                    //rest param - everything in between `{ *}`
+                    rgx : /\{([^}]+)\*\}/g,
+                    res : '(.+)'
+                },
+                // required/optional params should come after rest segments
+                'RP' : {
+                    //required params - everything between `{ }`
+                    rgx : /\{([^}]+)\}/g,
+                    res : '([^\\/?]+)'
+                },
+                'OP' : {
+                    //optional params - everything between `: :`
+                    rgx : /:([^:]+):/g,
+                    res : '([^\\/?]+)?\/?'
+                }
+            },
+
+            LOOSE_SLASH = 1,
+            STRICT_SLASH = 2,
+            LEGACY_SLASH = 3,
+
+            _slashMode = LOOSE_SLASH;
+
+
+        function precompileTokens(){
+            var key, cur;
+            for (key in TOKENS) {
+                if (TOKENS.hasOwnProperty(key)) {
+                    cur = TOKENS[key];
+                    cur.id = '__CR_'+ key +'__';
+                    cur.save = ('save' in cur)? cur.save.replace('{{id}}', cur.id) : cur.id;
+                    cur.rRestore = new RegExp(cur.id, 'g');
+                }
+            }
+        }
+        precompileTokens();
 
 
         function captureVals(regex, pattern) {
@@ -45,37 +101,48 @@
         }
 
         function getOptionalParamsIds(pattern) {
-            return captureVals(OPTIONAL_PARAMS_REGEXP, pattern);
+            return captureVals(TOKENS.OP.rgx, pattern);
         }
 
         function compilePattern(pattern) {
             pattern = pattern || '';
+
             if(pattern){
-                pattern = pattern.replace(UNNECESSARY_SLASHES_REGEXP, '');
-                pattern = tokenize(pattern);
+                if (_slashMode === LOOSE_SLASH) {
+                    pattern = pattern.replace(LOOSE_SLASHES_REGEXP, '');
+                }
+                else if (_slashMode === LEGACY_SLASH) {
+                    pattern = pattern.replace(LEGACY_SLASHES_REGEXP, '');
+                }
+
+                //save tokens
+                pattern = replaceTokens(pattern, 'rgx', 'save');
+                //regexp escape
                 pattern = pattern.replace(ESCAPE_CHARS_REGEXP, '\\$&');
-                pattern = untokenize(pattern);
+                //restore tokens
+                pattern = replaceTokens(pattern, 'rRestore', 'res');
+
+                if (_slashMode === LOOSE_SLASH) {
+                    pattern = '\\/?'+ pattern;
+                }
             }
-            return new RegExp('^'+ pattern + '/?$'); //trailing slash is optional
+
+            if (_slashMode !== STRICT_SLASH) {
+                //single slash is treated as empty and end slash is optional
+                pattern += '\\/?';
+            }
+            return new RegExp('^'+ pattern + '$');
         }
 
-        function tokenize(pattern) {
-            //save chars that shouldn't be escaped
-            pattern = pattern.replace(OPTIONAL_SLASHES_REGEXP, '$1'+ SAVE_OPTIONAL_SLASHES +'$2');
-            pattern = pattern.replace(REQUIRED_SLASHES_REGEXP, '$1'+ SAVE_REQUIRED_SLASHES +'$2');
-            pattern = pattern.replace(OPTIONAL_REST, SAVE_OPTIONAL_REST);
-            pattern = pattern.replace(REQUIRED_REST, SAVE_REQUIRED_REST);
-            pattern = pattern.replace(OPTIONAL_PARAMS_REGEXP, SAVE_OPTIONAL_PARAMS);
-            return pattern.replace(REQUIRED_PARAMS_REGEXP, SAVE_REQUIRED_PARAMS);
-        }
-
-        function untokenize(pattern) {
-            pattern = pattern.replace(SAVED_OPTIONAL_SLASHES_REGEXP, '\\/?');
-            pattern = pattern.replace(SAVED_REQUIRED_SLASHES_REGEXP, '\\/');
-            pattern = pattern.replace(SAVED_OPTIONAL_REST_REGEXP, '(.*)?'); // optional group to avoid passing empty string as captured
-            pattern = pattern.replace(SAVED_REQUIRED_REST_REGEXP, '(.+)');
-            pattern = pattern.replace(SAVED_OPTIONAL_REGEXP, '([^\\/]+)?\/?');
-            return pattern.replace(SAVED_REQUIRED_REGEXP, '([^\\/]+)');
+        function replaceTokens(pattern, regexpName, replaceName) {
+            var cur, key;
+            for (key in TOKENS) {
+                if (TOKENS.hasOwnProperty(key)) {
+                    cur = TOKENS[key];
+                    pattern = pattern.replace(cur[regexpName], cur[replaceName]);
+                }
+            }
+            return pattern;
         }
 
         function getParamValues(request, regexp, shouldTypecast) {
@@ -89,12 +156,55 @@
             return vals;
         }
 
+        function interpolate(pattern, replacements) {
+            if (typeof pattern !== 'string') {
+                throw new Error('Route pattern should be a string.');
+            }
+
+            var replaceFn = function(match, prop){
+                    var val;
+                    if (prop in replacements) {
+                        val = replacements[prop];
+                        if (match.indexOf('*') === -1 && val.indexOf('/') !== -1) {
+                            throw new Error('Invalid value "'+ val +'" for segment "'+ match +'".');
+                        }
+                    }
+                    else if (match.indexOf('{') !== -1) {
+                        throw new Error('The segment '+ match +' is required.');
+                    }
+                    else {
+                        val = '';
+                    }
+                    return val;
+                };
+
+            if (! TOKENS.OS.trail) {
+                TOKENS.OS.trail = new RegExp('(?:'+ TOKENS.OS.id +')+$');
+            }
+
+            return pattern
+                        .replace(TOKENS.OS.rgx, TOKENS.OS.save)
+                        .replace(PARAMS_REGEXP, replaceFn)
+                        .replace(TOKENS.OS.trail, '') // remove trailing
+                        .replace(TOKENS.OS.rRestore, '/'); // add slash between segments
+        }
+
         //API
         return {
+            strict : function(){
+                _slashMode = STRICT_SLASH;
+            },
+            loose : function(){
+                _slashMode = LOOSE_SLASH;
+            },
+            legacy : function(){
+                _slashMode = LEGACY_SLASH;
+            },
             getParamIds : getParamIds,
             getOptionalParamsIds : getOptionalParamsIds,
             getParamValues : getParamValues,
-            compilePattern : compilePattern
+            compilePattern : compilePattern,
+            interpolate : interpolate
         };
 
     }());

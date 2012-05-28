@@ -2,7 +2,7 @@
  * crossroads <http://millermedeiros.github.com/crossroads.js/>
  * License: MIT
  * Author: Miller Medeiros
- * Version: 0.8.0 (2012/3/5 14:26)
+ * Version: 0.9.0-alpha (2012/5/28 22:54)
  */
 
 (function (define) {
@@ -42,7 +42,7 @@ define(['signals'], function (signals) {
     }
 
     function isFunction(val) {
-        return isKind(val, 'Function');
+        return typeof val === 'function';
     }
 
     //borrowed from AMD-utils
@@ -75,6 +75,20 @@ define(['signals'], function (signals) {
         return result;
     }
 
+    //borrowed from AMD-Utils
+    function decodeQueryString(str) {
+        var queryArr = (str || '').replace('?', '').split('&'),
+            n = queryArr.length,
+            obj = {},
+            item, val;
+        while (n--) {
+            item = queryArr[n].split('=');
+            val = typecastValue(item[1]);
+            obj[item[0]] = (typeof val === 'string')? decodeURIComponent(val) : val;
+        }
+        return obj;
+    }
+
 
     // Crossroads --------
     //====================
@@ -90,6 +104,10 @@ define(['signals'], function (signals) {
     }
 
     Crossroads.prototype = {
+
+        greedy : false,
+
+        greedyEnabled : true,
 
         normalizeFn : null,
 
@@ -131,7 +149,7 @@ define(['signals'], function (signals) {
                 cur;
 
             if (n) {
-                this._notifyPrevRoutes(request);
+                this._notifyPrevRoutes(routes, request);
                 this._prevRoutes = routes;
                 //shold be incremental loop, execute routes in order
                 while (i < n) {
@@ -146,12 +164,26 @@ define(['signals'], function (signals) {
             }
         },
 
-        _notifyPrevRoutes : function(request) {
-            var i = 0, cur;
-            while (cur = this._prevRoutes[i++]) {
+        _notifyPrevRoutes : function(matchedRoutes, request) {
+            var i = 0, prev;
+            while (prev = this._prevRoutes[i++]) {
                 //check if switched exist since route may be disposed
-                if(cur.route.switched) cur.route.switched.dispatch(request);
+                if(prev.route.switched && this._didSwitch(prev.route, matchedRoutes)) {
+                    prev.route.switched.dispatch(request);
+                }
             }
+        },
+
+        _didSwitch : function (route, matchedRoutes){
+            var matched,
+                i = 0;
+            while (matched = matchedRoutes[i++]) {
+                // only dispatch switched if it is going to a different route
+                if (matched.route === route) {
+                    return false;
+                }
+            }
+            return true;
         },
 
         getNumRoutes : function () {
@@ -173,11 +205,14 @@ define(['signals'], function (signals) {
                 route;
             //should be decrement loop since higher priorities are added at the end of array
             while (route = routes[--n]) {
-                if ((!res.length || route.greedy) && route.match(request)) {
+                if ((!res.length || this.greedy || route.greedy) && route.match(request)) {
                     res.push({
                         route : route,
                         params : route._getParamsArray(request)
                     });
+                }
+                if (!this.greedyEnabled && res.length) {
+                    break;
                 }
             }
             return res;
@@ -190,7 +225,7 @@ define(['signals'], function (signals) {
 
     //"static" instance
     crossroads = new Crossroads();
-    crossroads.VERSION = '0.8.0';
+    crossroads.VERSION = '0.9.0-alpha';
 
     crossroads.NORM_AS_ARRAY = function (req, vals) {
         return [vals.vals_];
@@ -230,6 +265,7 @@ define(['signals'], function (signals) {
         rules : void(0),
 
         match : function (request) {
+            request = request || '';
             return this._matchRegexp.test(request) && this._validateParams(request); //validate params even if regexp because of `request_` rule.
         },
 
@@ -249,15 +285,22 @@ define(['signals'], function (signals) {
         _isValidParam : function (request, prop, values) {
             var validationRule = this.rules[prop],
                 val = values[prop],
-                isValid = false;
+                isValid = false,
+                isQuery = (prop.indexOf('?') === 0);
 
             if (val == null && this._optionalParamsIds && arrayIndexOf(this._optionalParamsIds, prop) !== -1) {
                 isValid = true;
             }
             else if (isRegExp(validationRule)) {
+                if (isQuery) {
+                    val = values[prop +'_']; //use raw string
+                }
                 isValid = validationRule.test(val);
             }
             else if (isArray(validationRule)) {
+                if (isQuery) {
+                    val = values[prop +'_']; //use raw string
+                }
                 isValid = arrayIndexOf(validationRule, val) !== -1;
             }
             else if (isFunction(validationRule)) {
@@ -271,12 +314,25 @@ define(['signals'], function (signals) {
             var shouldTypecast = this._router.shouldTypecast,
                 values = crossroads.patternLexer.getParamValues(request, this._matchRegexp, shouldTypecast),
                 o = {},
-                n = values.length;
+                n = values.length,
+                param, val;
             while (n--) {
-                o[n] = values[n]; //for RegExp pattern and also alias to normal paths
+                val = values[n];
                 if (this._paramsIds) {
-                    o[this._paramsIds[n]] = values[n];
+                    param = this._paramsIds[n];
+                    if (param.indexOf('?') === 0 && val) {
+                        //make a copy of the original string so array and
+                        //RegExp validation can be applied properly
+                        o[param +'_'] = val;
+                        //update vals_ array as well since it will be used
+                        //during dispatch
+                        val = decodeQueryString(val);
+                        values[n] = val;
+                    }
+                    o[param] = val;
                 }
+                //alias to paths and for RegExp pattern
+                o[n] = val;
             }
             o.request_ = shouldTypecast? typecastValue(request) : request;
             o.vals_ = values;
@@ -290,9 +346,17 @@ define(['signals'], function (signals) {
             if (norm && isFunction(norm)) {
                 params = norm(request, this._getParamsObject(request));
             } else {
-                params = crossroads.patternLexer.getParamValues(request, this._matchRegexp, this._router.shouldTypecast);
+                params = this._getParamsObject(request).vals_;
             }
             return params;
+        },
+
+        interpolate : function(replacements) {
+            var str = crossroads.patternLexer.interpolate(this._pattern, replacements);
+            if (! this._validateParams(str) ) {
+                throw new Error('Generated string doesn\'t validate against `Route.rules`.');
+            }
+            return str;
         },
 
         dispose : function () {
@@ -318,32 +382,88 @@ define(['signals'], function (signals) {
 
     crossroads.patternLexer = (function () {
 
+        var
+            //match chars that should be escaped on string regexp
+            ESCAPE_CHARS_REGEXP = /[\\.+*?\^$\[\](){}\/'#]/g,
 
-        var ESCAPE_CHARS_REGEXP = /[\\.+*?\^$\[\](){}\/'#]/g, //match chars that should be escaped on string regexp
-            UNNECESSARY_SLASHES_REGEXP = /\/$/g, //trailing slash
-            OPTIONAL_SLASHES_REGEXP = /([:}]|\w(?=\/))\/?(:)/g, //slash between `::` or `}:` or `\w:`. $1 = before, $2 = after
-            REQUIRED_SLASHES_REGEXP = /([:}])\/?(\{)/g, //used to insert slash between `:{` and `}{`
+            //trailing slashes (begin/end of string)
+            LOOSE_SLASHES_REGEXP = /^\/|\/$/g,
+            LEGACY_SLASHES_REGEXP = /\/$/g,
 
-            REQUIRED_PARAMS_REGEXP = /\{([^}]+)\}/g, //match everything between `{ }`
-            OPTIONAL_PARAMS_REGEXP = /:([^:]+):/g, //match everything between `: :`
-            PARAMS_REGEXP = /(?:\{|:)([^}:]+)(?:\}|:)/g, //capture everything between `{ }` or `: :`
-            REQUIRED_REST = /\{([^}]+)\*\}/g,
-            OPTIONAL_REST = /:([^:]+)\*:/g,
+            //params - everything between `{ }` or `: :`
+            PARAMS_REGEXP = /(?:\{|:)([^}:]+)(?:\}|:)/g,
 
             //used to save params during compile (avoid escaping things that
             //shouldn't be escaped).
-            SAVE_REQUIRED_PARAMS = '__CR_RP__',
-            SAVE_OPTIONAL_PARAMS = '__CR_OP__',
-            SAVE_REQUIRED_REST = '__CR_RR__',
-            SAVE_OPTIONAL_REST = '__CR_OR__',
-            SAVE_REQUIRED_SLASHES = '__CR_RS__',
-            SAVE_OPTIONAL_SLASHES = '__CR_OS__',
-            SAVED_REQUIRED_REGEXP = new RegExp(SAVE_REQUIRED_PARAMS, 'g'),
-            SAVED_OPTIONAL_REGEXP = new RegExp(SAVE_OPTIONAL_PARAMS, 'g'),
-            SAVED_REQUIRED_REST_REGEXP = new RegExp(SAVE_REQUIRED_REST, 'g'),
-            SAVED_OPTIONAL_REST_REGEXP = new RegExp(SAVE_OPTIONAL_REST, 'g'),
-            SAVED_OPTIONAL_SLASHES_REGEXP = new RegExp(SAVE_OPTIONAL_SLASHES, 'g'),
-            SAVED_REQUIRED_SLASHES_REGEXP = new RegExp(SAVE_REQUIRED_SLASHES, 'g');
+            TOKENS = {
+                'OS' : {
+                    //optional slashes
+                    //slash between `::` or `}:` or `\w:` or `:{?` or `}{?` or `\w{?`
+                    rgx : /([:}]|\w(?=\/))\/?(:|(?:\{\?))/g,
+                    save : '$1{{id}}$2',
+                    res : '\\/?'
+                },
+                'RS' : {
+                    //required slashes
+                    //used to insert slash between `:{` and `}{`
+                    rgx : /([:}])\/?(\{)/g,
+                    save : '$1{{id}}$2',
+                    res : '\\/'
+                },
+                'RQ' : {
+                    //required query string - everything in between `{? }`
+                    rgx : /\{\?([^}]+)\}/g,
+                    //everything from `?` till `#` or end of string
+                    res : '\\?([^#]+)'
+                },
+                'OQ' : {
+                    //optional query string - everything in between `:? :`
+                    rgx : /:\?([^:]+):/g,
+                    //everything from `?` till `#` or end of string
+                    res : '(?:\\?([^#]*))?'
+                },
+                'OR' : {
+                    //optional rest - everything in between `: *:`
+                    rgx : /:([^:]+)\*:/g,
+                    res : '(.*)?' // optional group to avoid passing empty string as captured
+                },
+                'RR' : {
+                    //rest param - everything in between `{ *}`
+                    rgx : /\{([^}]+)\*\}/g,
+                    res : '(.+)'
+                },
+                // required/optional params should come after rest segments
+                'RP' : {
+                    //required params - everything between `{ }`
+                    rgx : /\{([^}]+)\}/g,
+                    res : '([^\\/?]+)'
+                },
+                'OP' : {
+                    //optional params - everything between `: :`
+                    rgx : /:([^:]+):/g,
+                    res : '([^\\/?]+)?\/?'
+                }
+            },
+
+            LOOSE_SLASH = 1,
+            STRICT_SLASH = 2,
+            LEGACY_SLASH = 3,
+
+            _slashMode = LOOSE_SLASH;
+
+
+        function precompileTokens(){
+            var key, cur;
+            for (key in TOKENS) {
+                if (TOKENS.hasOwnProperty(key)) {
+                    cur = TOKENS[key];
+                    cur.id = '__CR_'+ key +'__';
+                    cur.save = ('save' in cur)? cur.save.replace('{{id}}', cur.id) : cur.id;
+                    cur.rRestore = new RegExp(cur.id, 'g');
+                }
+            }
+        }
+        precompileTokens();
 
 
         function captureVals(regex, pattern) {
@@ -359,37 +479,48 @@ define(['signals'], function (signals) {
         }
 
         function getOptionalParamsIds(pattern) {
-            return captureVals(OPTIONAL_PARAMS_REGEXP, pattern);
+            return captureVals(TOKENS.OP.rgx, pattern);
         }
 
         function compilePattern(pattern) {
             pattern = pattern || '';
+
             if(pattern){
-                pattern = pattern.replace(UNNECESSARY_SLASHES_REGEXP, '');
-                pattern = tokenize(pattern);
+                if (_slashMode === LOOSE_SLASH) {
+                    pattern = pattern.replace(LOOSE_SLASHES_REGEXP, '');
+                }
+                else if (_slashMode === LEGACY_SLASH) {
+                    pattern = pattern.replace(LEGACY_SLASHES_REGEXP, '');
+                }
+
+                //save tokens
+                pattern = replaceTokens(pattern, 'rgx', 'save');
+                //regexp escape
                 pattern = pattern.replace(ESCAPE_CHARS_REGEXP, '\\$&');
-                pattern = untokenize(pattern);
+                //restore tokens
+                pattern = replaceTokens(pattern, 'rRestore', 'res');
+
+                if (_slashMode === LOOSE_SLASH) {
+                    pattern = '\\/?'+ pattern;
+                }
             }
-            return new RegExp('^'+ pattern + '/?$'); //trailing slash is optional
+
+            if (_slashMode !== STRICT_SLASH) {
+                //single slash is treated as empty and end slash is optional
+                pattern += '\\/?';
+            }
+            return new RegExp('^'+ pattern + '$');
         }
 
-        function tokenize(pattern) {
-            //save chars that shouldn't be escaped
-            pattern = pattern.replace(OPTIONAL_SLASHES_REGEXP, '$1'+ SAVE_OPTIONAL_SLASHES +'$2');
-            pattern = pattern.replace(REQUIRED_SLASHES_REGEXP, '$1'+ SAVE_REQUIRED_SLASHES +'$2');
-            pattern = pattern.replace(OPTIONAL_REST, SAVE_OPTIONAL_REST);
-            pattern = pattern.replace(REQUIRED_REST, SAVE_REQUIRED_REST);
-            pattern = pattern.replace(OPTIONAL_PARAMS_REGEXP, SAVE_OPTIONAL_PARAMS);
-            return pattern.replace(REQUIRED_PARAMS_REGEXP, SAVE_REQUIRED_PARAMS);
-        }
-
-        function untokenize(pattern) {
-            pattern = pattern.replace(SAVED_OPTIONAL_SLASHES_REGEXP, '\\/?');
-            pattern = pattern.replace(SAVED_REQUIRED_SLASHES_REGEXP, '\\/');
-            pattern = pattern.replace(SAVED_OPTIONAL_REST_REGEXP, '(.*)?'); // optional group to avoid passing empty string as captured
-            pattern = pattern.replace(SAVED_REQUIRED_REST_REGEXP, '(.+)');
-            pattern = pattern.replace(SAVED_OPTIONAL_REGEXP, '([^\\/]+)?\/?');
-            return pattern.replace(SAVED_REQUIRED_REGEXP, '([^\\/]+)');
+        function replaceTokens(pattern, regexpName, replaceName) {
+            var cur, key;
+            for (key in TOKENS) {
+                if (TOKENS.hasOwnProperty(key)) {
+                    cur = TOKENS[key];
+                    pattern = pattern.replace(cur[regexpName], cur[replaceName]);
+                }
+            }
+            return pattern;
         }
 
         function getParamValues(request, regexp, shouldTypecast) {
@@ -403,12 +534,55 @@ define(['signals'], function (signals) {
             return vals;
         }
 
+        function interpolate(pattern, replacements) {
+            if (typeof pattern !== 'string') {
+                throw new Error('Route pattern should be a string.');
+            }
+
+            var replaceFn = function(match, prop){
+                    var val;
+                    if (prop in replacements) {
+                        val = replacements[prop];
+                        if (match.indexOf('*') === -1 && val.indexOf('/') !== -1) {
+                            throw new Error('Invalid value "'+ val +'" for segment "'+ match +'".');
+                        }
+                    }
+                    else if (match.indexOf('{') !== -1) {
+                        throw new Error('The segment '+ match +' is required.');
+                    }
+                    else {
+                        val = '';
+                    }
+                    return val;
+                };
+
+            if (! TOKENS.OS.trail) {
+                TOKENS.OS.trail = new RegExp('(?:'+ TOKENS.OS.id +')+$');
+            }
+
+            return pattern
+                        .replace(TOKENS.OS.rgx, TOKENS.OS.save)
+                        .replace(PARAMS_REGEXP, replaceFn)
+                        .replace(TOKENS.OS.trail, '') // remove trailing
+                        .replace(TOKENS.OS.rRestore, '/'); // add slash between segments
+        }
+
         //API
         return {
+            strict : function(){
+                _slashMode = STRICT_SLASH;
+            },
+            loose : function(){
+                _slashMode = LOOSE_SLASH;
+            },
+            legacy : function(){
+                _slashMode = LEGACY_SLASH;
+            },
             getParamIds : getParamIds,
             getOptionalParamsIds : getOptionalParamsIds,
             getParamValues : getParamValues,
-            compilePattern : compilePattern
+            compilePattern : compilePattern,
+            interpolate : interpolate
         };
 
     }());

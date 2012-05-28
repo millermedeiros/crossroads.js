@@ -28,7 +28,7 @@ describe('crossroads.parse()', function(){
             crossroads.parse('/foo');
             crossroads.parse('foo');
 
-            expect( t1 ).toBe( 1 );
+            expect( t1 ).toBe( 2 );
         });
 
         it('should pass params and allow multiple routes', function(){
@@ -660,6 +660,96 @@ describe('crossroads.parse()', function(){
 
         });
 
+        it('should allow global greedy setting', function () {
+
+            var t1, t2, t3, t4, t5, t6, t7, t8;
+
+            crossroads.greedy = true;
+
+            var r1 = crossroads.addRoute('/{a}/{b}/', function(a,b){
+                t1 = a;
+                t2 = b;
+            });
+
+            var r2 = crossroads.addRoute('/bar/{b}/', function(a,b){
+                t3 = a;
+                t4 = b;
+            });
+
+            var r3 = crossroads.addRoute('/foo/{b}/', function(a,b){
+                t5 = a;
+                t6 = b;
+            });
+
+            var r4 = crossroads.addRoute('/{a}/:b:/', function(a,b){
+                t7 = a;
+                t8 = b;
+            });
+
+            crossroads.parse('/foo/lorem');
+
+            expect( t1 ).toEqual( 'foo' );
+            expect( t2 ).toEqual( 'lorem' );
+            expect( t3 ).toBeUndefined();
+            expect( t4 ).toBeUndefined();
+            expect( t5 ).toEqual( 'lorem' );
+            expect( t6 ).toBeUndefined();
+            expect( t7 ).toEqual( 'foo' );
+            expect( t8 ).toEqual( 'lorem' );
+
+            crossroads.greedy = false;
+
+        });
+
+        describe('greedyEnabled', function () {
+
+            afterEach(function(){
+                crossroads.greedyEnabled = true;
+            });
+
+            it('should toggle greedy behavior', function () {
+                crossroads.greedyEnabled = false;
+
+                var t1, t2, t3, t4, t5, t6, t7, t8;
+
+                var r1 = crossroads.addRoute('/{a}/{b}/', function(a,b){
+                    t1 = a;
+                    t2 = b;
+                });
+                r1.greedy = false;
+
+                var r2 = crossroads.addRoute('/bar/{b}/', function(a,b){
+                    t3 = a;
+                    t4 = b;
+                });
+                r2.greedy = true;
+
+                var r3 = crossroads.addRoute('/foo/{b}/', function(a,b){
+                    t5 = a;
+                    t6 = b;
+                });
+                r3.greedy = true;
+
+                var r4 = crossroads.addRoute('/{a}/:b:/', function(a,b){
+                    t7 = a;
+                    t8 = b;
+                });
+                r4.greedy = true;
+
+                crossroads.parse('/foo/lorem');
+
+                expect( t1 ).toEqual( 'foo' );
+                expect( t2 ).toEqual( 'lorem' );
+                expect( t3 ).toBeUndefined();
+                expect( t4 ).toBeUndefined();
+                expect( t5 ).toBeUndefined();
+                expect( t6 ).toBeUndefined();
+                expect( t7 ).toBeUndefined();
+                expect( t8 ).toBeUndefined();
+            });
+
+        });
+
     });
 
     describe('default arguments', function () {
@@ -793,5 +883,117 @@ describe('crossroads.parse()', function(){
         });
 
     });
+
+    describe('query string', function () {
+
+        describe('old syntax', function () {
+            it('should only parse query string if using special capturing group', function () {
+                var r = crossroads.addRoute('{a}?{q}#{hash}');
+                var t1, t2, t3;
+                r.matched.addOnce(function(a, b, c){
+                    t1 = a;
+                    t2 = b;
+                    t3 = c;
+                });
+                crossroads.parse('foo.php?foo=bar&lorem=123#bar');
+
+                expect( t1 ).toEqual( 'foo.php' );
+                expect( t2 ).toEqual( 'foo=bar&lorem=123' );
+                expect( t3 ).toEqual( 'bar' );
+            });
+        });
+
+        describe('required query string after required segment', function () {
+            it('should parse query string into an object and typecast vals', function () {
+                var r = crossroads.addRoute('{a}{?b}');
+                var t1, t2;
+                r.matched.addOnce(function(a, b){
+                    t1 = a;
+                    t2 = b;
+                });
+                crossroads.parse('foo.php?lorem=ipsum&asd=123&bar=false');
+
+                expect( t1 ).toEqual( 'foo.php' );
+                expect( t2 ).toEqual( {lorem : 'ipsum', asd : 123, bar : false} );
+            });
+        });
+
+        describe('required query string after optional segment', function () {
+            it('should parse query string into an object and typecast vals', function () {
+                var r = crossroads.addRoute(':a:{?b}');
+                var t1, t2;
+                r.matched.addOnce(function(a, b){
+                    t1 = a;
+                    t2 = b;
+                });
+                crossroads.parse('foo.php?lorem=ipsum&asd=123&bar=false');
+
+                expect( t1 ).toEqual( 'foo.php' );
+                expect( t2 ).toEqual( {lorem : 'ipsum', asd : 123, bar : false} );
+
+                var t3, t4;
+                r.matched.addOnce(function(a, b){
+                    t3 = a;
+                    t4 = b;
+                });
+                crossroads.parse('?lorem=ipsum&asd=123');
+
+                expect( t3 ).toBeUndefined();
+                expect( t4 ).toEqual( {lorem : 'ipsum', asd : 123} );
+            });
+        });
+
+        describe('optional query string after required segment', function () {
+            it('should parse query string into an object and typecast vals', function () {
+                var r = crossroads.addRoute('{a}:?b:');
+                var t1, t2;
+                r.matched.addOnce(function(a, b){
+                    t1 = a;
+                    t2 = b;
+                });
+                crossroads.parse('foo.php?lorem=ipsum&asd=123&bar=false');
+
+                expect( t1 ).toEqual( 'foo.php' );
+                expect( t2 ).toEqual( {lorem : 'ipsum', asd : 123, bar : false} );
+
+                var t3, t4;
+                r.matched.addOnce(function(a, b){
+                    t3 = a;
+                    t4 = b;
+                });
+                crossroads.parse('bar.php');
+
+                expect( t3 ).toEqual( 'bar.php' );
+                expect( t4 ).toBeUndefined();
+            });
+        });
+
+        describe('optional query string after optional segment', function () {
+            it('should parse query string into an object and typecast vals', function () {
+                var r = crossroads.addRoute(':a::?b:');
+                var t1, t2;
+                r.matched.addOnce(function(a, b){
+                    t1 = a;
+                    t2 = b;
+                });
+                crossroads.parse('foo.php?lorem=ipsum&asd=123&bar=false');
+
+                expect( t1 ).toEqual( 'foo.php' );
+                expect( t2 ).toEqual( {lorem : 'ipsum', asd : 123, bar : false} );
+
+                var t3, t4;
+                r.matched.addOnce(function(a, b){
+                    t3 = a;
+                    t4 = b;
+                });
+                crossroads.parse('bar.php');
+
+                expect( t3 ).toEqual( 'bar.php' );
+                expect( t4 ).toBeUndefined();
+            });
+        });
+
+    });
+
 
 });

@@ -14,6 +14,10 @@
 
     Crossroads.prototype = {
 
+        greedy : false,
+
+        greedyEnabled : true,
+
         normalizeFn : null,
 
         create : function () {
@@ -54,7 +58,7 @@
                 cur;
 
             if (n) {
-                this._notifyPrevRoutes(request);
+                this._notifyPrevRoutes(routes, request);
                 this._prevRoutes = routes;
                 //shold be incremental loop, execute routes in order
                 while (i < n) {
@@ -69,12 +73,26 @@
             }
         },
 
-        _notifyPrevRoutes : function(request) {
-            var i = 0, cur;
-            while (cur = this._prevRoutes[i++]) {
+        _notifyPrevRoutes : function(matchedRoutes, request) {
+            var i = 0, prev;
+            while (prev = this._prevRoutes[i++]) {
                 //check if switched exist since route may be disposed
-                if(cur.route.switched) cur.route.switched.dispatch(request);
+                if(prev.route.switched && this._didSwitch(prev.route, matchedRoutes)) {
+                    prev.route.switched.dispatch(request);
+                }
             }
+        },
+
+        _didSwitch : function (route, matchedRoutes){
+            var matched,
+                i = 0;
+            while (matched = matchedRoutes[i++]) {
+                // only dispatch switched if it is going to a different route
+                if (matched.route === route) {
+                    return false;
+                }
+            }
+            return true;
         },
 
         getNumRoutes : function () {
@@ -96,11 +114,14 @@
                 route;
             //should be decrement loop since higher priorities are added at the end of array
             while (route = routes[--n]) {
-                if ((!res.length || route.greedy) && route.match(request)) {
+                if ((!res.length || this.greedy || route.greedy) && route.match(request)) {
                     res.push({
                         route : route,
                         params : route._getParamsArray(request)
                     });
+                }
+                if (!this.greedyEnabled && res.length) {
+                    break;
                 }
             }
             return res;

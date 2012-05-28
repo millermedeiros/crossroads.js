@@ -33,7 +33,7 @@
     }
 
     function isFunction(val) {
-        return isKind(val, 'Function');
+        return typeof val === 'function';
     }
 
     //borrowed from AMD-utils
@@ -64,4 +64,18 @@
             result[n] = typecastValue(values[n]);
         }
         return result;
+    }
+
+    //borrowed from AMD-Utils
+    function decodeQueryString(str) {
+        var queryArr = (str || '').replace('?', '').split('&'),
+            n = queryArr.length,
+            obj = {},
+            item, val;
+        while (n--) {
+            item = queryArr[n].split('=');
+            val = typecastValue(item[1]);
+            obj[item[0]] = (typeof val === 'string')? decodeURIComponent(val) : val;
+        }
+        return obj;
     }

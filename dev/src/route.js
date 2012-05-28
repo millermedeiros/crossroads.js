@@ -28,6 +28,7 @@
         rules : void(0),
 
         match : function (request) {
+            request = request || '';
             return this._matchRegexp.test(request) && this._validateParams(request); //validate params even if regexp because of `request_` rule.
         },
 
@@ -47,15 +48,22 @@
         _isValidParam : function (request, prop, values) {
             var validationRule = this.rules[prop],
                 val = values[prop],
-                isValid = false;
+                isValid = false,
+                isQuery = (prop.indexOf('?') === 0);
 
             if (val == null && this._optionalParamsIds && arrayIndexOf(this._optionalParamsIds, prop) !== -1) {
                 isValid = true;
             }
             else if (isRegExp(validationRule)) {
+                if (isQuery) {
+                    val = values[prop +'_']; //use raw string
+                }
                 isValid = validationRule.test(val);
             }
             else if (isArray(validationRule)) {
+                if (isQuery) {
+                    val = values[prop +'_']; //use raw string
+                }
                 isValid = arrayIndexOf(validationRule, val) !== -1;
             }
             else if (isFunction(validationRule)) {
@@ -69,12 +77,25 @@
             var shouldTypecast = this._router.shouldTypecast,
                 values = crossroads.patternLexer.getParamValues(request, this._matchRegexp, shouldTypecast),
                 o = {},
-                n = values.length;
+                n = values.length,
+                param, val;
             while (n--) {
-                o[n] = values[n]; //for RegExp pattern and also alias to normal paths
+                val = values[n];
                 if (this._paramsIds) {
-                    o[this._paramsIds[n]] = values[n];
+                    param = this._paramsIds[n];
+                    if (param.indexOf('?') === 0 && val) {
+                        //make a copy of the original string so array and
+                        //RegExp validation can be applied properly
+                        o[param +'_'] = val;
+                        //update vals_ array as well since it will be used
+                        //during dispatch
+                        val = decodeQueryString(val);
+                        values[n] = val;
+                    }
+                    o[param] = val;
                 }
+                //alias to paths and for RegExp pattern
+                o[n] = val;
             }
             o.request_ = shouldTypecast? typecastValue(request) : request;
             o.vals_ = values;
@@ -88,9 +109,17 @@
             if (norm && isFunction(norm)) {
                 params = norm(request, this._getParamsObject(request));
             } else {
-                params = crossroads.patternLexer.getParamValues(request, this._matchRegexp, this._router.shouldTypecast);
+                params = this._getParamsObject(request).vals_;
             }
             return params;
+        },
+
+        interpolate : function(replacements) {
+            var str = crossroads.patternLexer.interpolate(this._pattern, replacements);
+            if (! this._validateParams(str) ) {
+                throw new Error('Generated string doesn\'t validate against `Route.rules`.');
+            }
+            return str;
         },
 
         dispose : function () {

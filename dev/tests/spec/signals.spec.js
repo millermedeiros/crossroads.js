@@ -115,7 +115,7 @@ describe('crossroads Signals', function(){
         });
 
         r1.switched.add(function(r){
-            vals.push('lorem'); //make sure happened before next matched
+            vals.push('SWITCH'); //make sure happened before next matched
             req = r;
             count += 1;
         });
@@ -125,11 +125,14 @@ describe('crossroads Signals', function(){
             count += 1;
         });
 
+        // matching same route twice shouldn't trigger a switched signal (#50)
         crossroads.parse('/foo');
+        crossroads.parse('/dolor');
+
         crossroads.parse('/foo/bar');
 
-        expect( count ).toBe( 3 );
-        expect( vals ).toEqual( ['foo', 'lorem',  'bar'] );
+        expect( count ).toBe( 4 );
+        expect( vals ).toEqual( ['foo', 'dolor', 'SWITCH', 'bar'] );
         expect( req ).toEqual( '/foo/bar' );
 
     });
