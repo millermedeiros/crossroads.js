@@ -3,7 +3,7 @@
     "description" : "Flexible router which can be used in multiple environments",
     "keywords" : ["routes", "event", "observer", "routing", "router"],
     "homepage" : "http://millermedeiros.github.com/crossroads.js/",
-    "version" : "0.9.0-alpha",
+    "version" : "0.9.0",
     "author" : {
         "name" : "Miller Medeiros",
         "url" : "http://blog.millermedeiros.com/"

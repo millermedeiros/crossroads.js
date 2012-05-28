@@ -2,7 +2,7 @@
  * crossroads <http://millermedeiros.github.com/crossroads.js/>
  * License: MIT
  * Author: Miller Medeiros
- * Version: 0.9.0-alpha (2012/5/28 22:54)
+ * Version: 0.9.0 (2012/5/28 23:9)
  */
 
 (function (define) {
@@ -225,7 +225,7 @@ define(['signals'], function (signals) {
 
     //"static" instance
     crossroads = new Crossroads();
-    crossroads.VERSION = '0.9.0-alpha';
+    crossroads.VERSION = '0.9.0';
 
     crossroads.NORM_AS_ARRAY = function (req, vals) {
         return [vals.vals_];

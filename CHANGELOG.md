@@ -1,7 +1,7 @@
 # Crossroads.js Changelog #
 
 
-## Next ##
+## v0.9.0 (2012/05/28) ##
 
 ### API Changes ###
 
@@ -10,6 +10,7 @@
  - added `crossroads.patternLexer.strict()` and
    `crossroads.patternLexer.loose()` and
    `crossroads.patternLexer.legacy()` (#35)
+ - added `Route.interpolate()` (#34)
  - added query string support (#33)
 
 ### Fixes
