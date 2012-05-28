@@ -438,12 +438,13 @@ describe('Match', function(){
                 var s = crossroads.addRoute('/{foo}/{bar}');
 
                 s.rules = {
-                    foo : ['lorem-ipsum', '123'],
-                    bar : ['dolor', '45']
+                    foo : ['lorem-Ipsum', '123'],
+                    bar : ['DoLoR', '45']
                 };
 
                 expect( s.match('/lorem-ipsum') ).toBe( false );
                 expect( s.match('/lorem-ipsum/dolor') ).toBe( true );
+                expect( s.match('/LoReM-IpSuM/DOLoR') ).toBe( true );
                 expect( s.match('lorem-ipsum') ).toBe( false );
                 expect( s.match('/123') ).toBe( false );
                 expect( s.match('123') ).toBe( false );

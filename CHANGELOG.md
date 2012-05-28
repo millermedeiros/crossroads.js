@@ -18,6 +18,7 @@
  - query string support affected old segment rules, now `?` is considered as
    a segment divisor as `/` otherwise optional query string RegExp wouldn't
    match proper segment if following a required segment. (#33)
+ - changed `Route.rules` array validation to be case insensitive (#49)
 
 
 
