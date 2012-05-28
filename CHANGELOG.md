@@ -19,6 +19,7 @@
    a segment divisor as `/` otherwise optional query string RegExp wouldn't
    match proper segment if following a required segment. (#33)
  - changed `Route.rules` array validation to be case insensitive (#49)
+ - route matching is case insensitive. (#53)
 
 
 

@@ -131,7 +131,7 @@
                 //single slash is treated as empty and end slash is optional
                 pattern += '\\/?';
             }
-            return new RegExp('^'+ pattern + '$');
+            return new RegExp('^'+ pattern + '$', 'i');
         }
 
         function replaceTokens(pattern, regexpName, replaceName) {

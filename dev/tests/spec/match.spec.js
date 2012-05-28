@@ -85,6 +85,15 @@ describe('Match', function(){
         expect( s.match('/123/asd/45/qwe') ).toBe( false );
     });
 
+    it('should be case insensitive', function () {
+        var s = crossroads.addRoute('foo/bar');
+        expect( s.match('foo') ).toBe( false );
+        expect( s.match('Foo') ).toBe( false );
+        expect( s.match('foo/bar') ).toBe( true );
+        expect( s.match('Foo/Bar') ).toBe( true );
+        expect( s.match('FoO/BAR') ).toBe( true );
+    });
+
     describe('rest params', function () {
         it('should support rest params', function () {
             var s = crossroads.addRoute('/123/{bar}/:ipsum*:');
