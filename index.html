@@ -183,6 +183,8 @@ hasher.setHash('lorem/ipsum');
                             <li><a href="#crossroads-normalize_fn">crossroads.normalizeFn</a></li>
                             <li><a href="#crossroads-should_typecast">crossroads.shouldTypecast</a></li>
                             <li><a href="#crossroads-version">crossroads.VERSION</a></li>
+                            <li><a href="#crossroads-greedy">crossroads.greedy</a></li>
+                            <li><a href="#crossroads-greedyEnabled">crossroads.greedyEnabled</a></li>
                         </ul>
                         <ul class="col col-1_2 code">
                             <li><a href="#route-matched">Route.matched</a></li>
@@ -191,6 +193,7 @@ hasher.setHash('lorem/ipsum');
                             <li><a href="#route-greedy">Route.greedy</a></li>
                             <li><a href="#route-dispose">Route.dispose()</a></li>
                             <li><a href="#route-match">Route.match()</a></li>
+                            <li><a href="#route-interpolate">Route.interpolate()</a></li>
                         </ul>
                     </nav>
                     <hr />
@@ -210,7 +213,7 @@ hasher.setHash('lorem/ipsum');
                             </dd>
                             <dd>
                                 The pattern <code>"{foo}/{bar}"</code> will match <code>"lorem/ipsum-dolor"</code> but won't match <code>"lorem/ipsum-dolor/sit"</code>.
-                                                A single trailing slash at the end of the request is ignored, so <code>{foo}/</code> matches same requests as <code>{foo}</code>. - If you need to
+                                                Trailing slashes at the end/begin of the request are ignored by default, so <code>/{foo}/</code> matches same requests as <code>{foo}</code>. - If you need to
                                 match segments that may contain "/" use a regular expression instead of a string pattern.
                             </dd>
                             <dd>
@@ -221,6 +224,9 @@ hasher.setHash('lorem/ipsum');
                             </dd>
                             <dd>
                                 It also allows "rest" segments (ending with <code>*</code>) which can match multiple segments. Rest segments can be optional and/or required and don't need to be the last segment of the pattern. The pattern <code>"{foo}/:bar*:"</code> will match <code>news</code> <code>"news/123"</code>, <code>"news/123/bar"</code>, <code>"news/123/lorem/ipsum"</code>.
+                            </dd>
+                            <dd>
+                                After version 0.9.0 crossroads added support to decoding query strings as well by starting the capturing groups with a <code>&quot;?&quot;</code> (eg: <code>{?foo}</code>, <code>:?bar:</code>). The matched value will be converted into an object.
                             </dd>
                         <dt><code>[handler]</code><em>:Function (optional)</em></dt>
                             <dd>
@@ -270,6 +276,13 @@ var route3 = crossroads.addRoute(/^\/lorem\/([a-z]+)$/, function(id){
 var route4 = crossroads.addRoute('/foo/{id*}/edit');
 //addRoute returns a Route object
 route4.matched.add(console.log, console);
+
+//Query String:
+//match 'foo.php?lorem=ipsum&amp;dolor=amet'
+crossroads.addRoute('foo.php{?query}', function(query){
+    // query strings are decoded into objects
+    console.log('lorem '+ query.lorem +' dolor sit '+ query.dolor);
+});
 </pre>
                     <hr />
 
@@ -512,6 +525,24 @@ crossroads.parse('/news/00012');
                     </p>
                     <hr />
 
+                    <h3 class="code" id="crossroads-greedy">crossroads.greedy<em>:Boolean</em></h3>
+                    <p>
+                        Sets global route matching behavior to <code>greedy</code> so crossroads will try to match every single route with the supplied request <small>(if <code>true</code> it won't stop at first match)</small>. See: <a href="#route-greedy">Route.greedy</a> for more info.
+                    </p>
+                    <p>
+                        The default value is <code>false</code>.
+                    </p>
+                    <hr />
+
+                    <h3 class="code" id="crossroads-greedyEnabled">crossroads.greedyEnabled<em>:Boolean</em></h3>
+                    <p>
+                        Sets if the <a href="#route-greedy">greedy routes</a> feature is enabled. If <code>false</code> it won't try to match multiple routes (faster).
+                    </p>
+                    <p>
+                        The default value is <code>true</code>.
+                    </p>
+                    <hr />
+
                     <h3 class="code" id="route-matched">Route.matched<em>:Signal</em></h3>
                     <p>Signal dispatched every time a request matches the route pattern.</p>
                     <p>
@@ -713,6 +744,18 @@ var route1 = crossroads.addRoute('/news/{id}');
 route1.match('/foo/bar'); //false
 route1.match('/news/123'); //true
 route1.match('/news/foo-bar'); //true
+</pre>
+                    <hr />
+
+                    <h3 class="code" id="route-interpolate">Route.interpolate(<em>replacements</em>):<em>String</em></h3>
+                    <p>
+                        Return a string that matches the route replacing the capturing groups with the values provided in the <code>replacements</code> object. If the generated string doesn't pass the <a href="#route-rules">validation rules</a> it throws an error <small>(help spotting errors sooner)</small>.
+                    </p>
+                    <h4>Example</h4>
+<pre class="brush: js; gutter:false; toolbar:false">
+var route1 = crossroads.addRoute('news/{id}');
+route1.interpolate({id: 123});   // "news/123"
+route1.interpolate({id: 'foo'}); // "news/foo"
 </pre>
                     <hr />
 
