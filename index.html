@@ -98,7 +98,7 @@
 
                     <h2>Should I use it for every kind of project?</h2>
                     <p>
-                        <strong>Certainly no.</strong> If your project have just a few static pages a simple switch statement may be enough to solve your
+                        <strong>Nope.</strong> If your project have just a few static pages a simple switch statement may be enough to solve your
             problems, but as applications start to grow and you have a slightly more complex <em>flow</em>, having a system that supports
                         dynamic variable parsing and a flexible validation schema may help you to reduce the overhead of doing those things manually
                         and also reduce chance of errors.
@@ -284,6 +284,16 @@ crossroads.addRoute('foo.php{?query}', function(query){
     console.log('lorem '+ query.lorem +' dolor sit '+ query.dolor);
 });
 </pre>
+                    <h4>More Info</h4>
+                    <p>
+                        The <code>String</code> patterns are converted into
+                        <code>RegExp</code> during <code>addRoute</code>.
+                        The &quot;named segments&quot; and optional
+                        segments are also captured during this phase to avoid
+                        extra work on <a href="#crossroads-parse"><code>crossroads.parse()</code></a>
+                        and improve performance.
+                    </p>
+                    <p>Capturing groups are used to match named arguments and to validate them.</p>
                     <hr />
 
                     <h3 class="code" id="crossroads-remove_route">crossroads.removeRoute(<em>route</em>)</h3>
@@ -347,6 +357,21 @@ sectionRoute.matched.add(onSectionMatch);
 //will match `sectionRoute` and pass "lorem" and "ipsum" as first arguments
 crossroads.parse('/news/123', ["lorem", "ipsum"]);
 </pre>
+                    <h4>More Info</h4>
+                    <p>
+                    The <code>parse</code> algorithm is very straightforward,
+                    since the string patterns were already converted into
+                    regular expressions during <code>addRoute</code> the router
+                    just need to loop through all the routes (following the
+                    priority order) and check which one matches the current
+                    input. If it does find a route that matches the
+                    &quot;request&quot; it will check if route contains the
+                    special property <code>rules</code> and then it will
+                    validate each segment (capturing group). If after all that
+                    route is considered &quot;matched&quot; than the
+                    <code>Route.matched</code> signal is dispatched together
+                    with the <code>crossroads.routed</code> signal
+                    </p>
                     <hr />
 
                     <h3 class="code" id="crossroads-get_num_routes">crossroads.getNumRoutes()<em>:Number</em></h3>
