@@ -24,7 +24,7 @@ var _fs = require('fs'),
 
 function purgeDeploy(){
     [DIST_PATH, DIST_MIN_PATH].forEach(function(filePath){
-        if( _path.existsSync(filePath) ){
+        if( _fs.existsSync(filePath) ){
             _fs.unlinkSync(filePath);
         }
     });
