@@ -168,7 +168,8 @@
             var replaceFn = function(match, prop){
                     var val;
                     if (prop in replacements) {
-                        val = replacements[prop];
+                        // make sure value is a string see #gh-54
+                        val = String(replacements[prop]);
                         if (match.indexOf('*') === -1 && val.indexOf('/') !== -1) {
                             throw new Error('Invalid value "'+ val +'" for segment "'+ match +'".');
                         }

@@ -19,6 +19,12 @@ describe('Route.interpolate()', function(){
         expect( a.interpolate({foo: 'dolor-sit'}) ).toEqual( '/dolor-sit' );
     });
 
+    it('should allow number as segment (#gh-54)', function(){
+        var a = crossroads.addRoute('/{foo}/:bar:');
+        expect( a.interpolate({foo: 123, bar: 456}) ).toEqual( '/123/456' );
+        expect( a.interpolate({foo: 123}) ).toEqual( '/123' );
+    });
+
     it('should replace rest segments', function(){
         var a = crossroads.addRoute('lorem/{foo*}:bar*:');
         expect( a.interpolate({'foo*': 'ipsum/dolor', 'bar*': 'sit/amet'}) ).toEqual( 'lorem/ipsum/dolor/sit/amet' );
