@@ -90,6 +90,10 @@
 
         function captureVals(regex, pattern) {
             var vals = [], match;
+            // very important to reset lastIndex since RegExp can have "g" flag
+            // and multiple runs might affect the result, specially if matching
+            // same string multiple times on IE 7-8
+            regex.lastIndex = 0;
             while (match = regex.exec(pattern)) {
                 vals.push(match[1]);
             }

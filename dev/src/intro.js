@@ -1,9 +1,14 @@
 
     var crossroads,
+        _hasOptionalGroupBug,
         UNDEF;
 
     // Helpers -----------
     //====================
+
+    // IE 7-8 capture optional groups as empty strings while other browsers
+    // capture as `undefined`
+    _hasOptionalGroupBug = (/t(.+)?/).exec('t')[1] === '';
 
     function arrayIndexOf(arr, val) {
         if (arr.indexOf) {
