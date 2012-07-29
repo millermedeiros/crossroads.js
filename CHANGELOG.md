@@ -1,6 +1,19 @@
 # Crossroads.js Changelog #
 
 
+## Next ##
+
+### Fixes
+
+ - Normalize optional segments behavior on IE 7-8 (#58, #59, #60)
+ - Fix `captureVals` on IE 7-8, make sure global flag works properly (#61, #62,
+   #63)
+
+### Improvements
+
+ - `Route.interpolate()` accepts Numbers as segments. (#54)
+
+
 ## v0.9.0 (2012/05/28) ##
 
 ### API Changes ###

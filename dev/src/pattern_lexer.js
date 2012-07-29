@@ -90,6 +90,10 @@
 
         function captureVals(regex, pattern) {
             var vals = [], match;
+            // very important to reset lastIndex since RegExp can have "g" flag
+            // and multiple runs might affect the result, specially if matching
+            // same string multiple times on IE 7-8
+            regex.lastIndex = 0;
             while (match = regex.exec(pattern)) {
                 vals.push(match[1]);
             }
@@ -164,7 +168,8 @@
             var replaceFn = function(match, prop){
                     var val;
                     if (prop in replacements) {
-                        val = replacements[prop];
+                        // make sure value is a string see #gh-54
+                        val = String(replacements[prop]);
                         if (match.indexOf('*') === -1 && val.indexOf('/') !== -1) {
                             throw new Error('Invalid value "'+ val +'" for segment "'+ match +'".');
                         }

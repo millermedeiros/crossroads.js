@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html>
     <head>
+        <meta charset="utf-8">
         <title>DEV | Crossroads.js | Jasmine Test Runner</title>
         <link rel="stylesheet" href="lib/jasmine/jasmine.css">
         <script src="lib/jasmine/jasmine.js"></script>
@@ -26,8 +27,13 @@
     <body>
         <script>
             //run specs and add reporter
-            jasmine.getEnv().addReporter(new jasmine.TrivialReporter());
-            jasmine.getEnv().execute();
+            var reporter = new jasmine.HtmlReporter,
+                env = jasmine.getEnv();
+            env.specFilter = function(spec){
+                return reporter.specFilter(spec)
+            };
+            env.addReporter(reporter);
+            env.execute();
         </script>
     </body>
 </html>

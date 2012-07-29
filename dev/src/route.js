@@ -10,8 +10,8 @@
             patternLexer = crossroads.patternLexer;
         this._router = router;
         this._pattern = pattern;
-        this._paramsIds = isRegexPattern? null : patternLexer.getParamIds(this._pattern);
-        this._optionalParamsIds = isRegexPattern? null : patternLexer.getOptionalParamsIds(this._pattern);
+        this._paramsIds = isRegexPattern? null : patternLexer.getParamIds(pattern);
+        this._optionalParamsIds = isRegexPattern? null : patternLexer.getOptionalParamsIds(pattern);
         this._matchRegexp = isRegexPattern? pattern : patternLexer.compilePattern(pattern);
         this.matched = new signals.Signal();
         this.switched = new signals.Signal();
@@ -90,6 +90,13 @@
                         //update vals_ array as well since it will be used
                         //during dispatch
                         val = decodeQueryString(val);
+                        values[n] = val;
+                    }
+                    // IE will capture optional groups as empty strings while other
+                    // browsers will capture `undefined` so normalize behavior.
+                    // see: #gh-58, #gh-59, #gh-60
+                    if ( _hasOptionalGroupBug && val === '' && arrayIndexOf(this._optionalParamsIds, param) !== -1 ) {
+                        val = void(0);
                         values[n] = val;
                     }
                     o[param] = val;
