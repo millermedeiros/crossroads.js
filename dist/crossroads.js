@@ -2,17 +2,22 @@
  * crossroads <http://millermedeiros.github.com/crossroads.js/>
  * License: MIT
  * Author: Miller Medeiros
- * Version: 0.9.0 (2012/5/28 23:9)
+ * Version: 0.9.1 (2012/7/29 15:56)
  */
 
 (function (define) {
 define(['signals'], function (signals) {
 
     var crossroads,
+        _hasOptionalGroupBug,
         UNDEF;
 
     // Helpers -----------
     //====================
+
+    // IE 7-8 capture optional groups as empty strings while other browsers
+    // capture as `undefined`
+    _hasOptionalGroupBug = (/t(.+)?/).exec('t')[1] === '';
 
     function arrayIndexOf(arr, val) {
         if (arr.indexOf) {
@@ -225,7 +230,7 @@ define(['signals'], function (signals) {
 
     //"static" instance
     crossroads = new Crossroads();
-    crossroads.VERSION = '0.9.0';
+    crossroads.VERSION = '0.9.1';
 
     crossroads.NORM_AS_ARRAY = function (req, vals) {
         return [vals.vals_];
@@ -247,8 +252,8 @@ define(['signals'], function (signals) {
             patternLexer = crossroads.patternLexer;
         this._router = router;
         this._pattern = pattern;
-        this._paramsIds = isRegexPattern? null : patternLexer.getParamIds(this._pattern);
-        this._optionalParamsIds = isRegexPattern? null : patternLexer.getOptionalParamsIds(this._pattern);
+        this._paramsIds = isRegexPattern? null : patternLexer.getParamIds(pattern);
+        this._optionalParamsIds = isRegexPattern? null : patternLexer.getOptionalParamsIds(pattern);
         this._matchRegexp = isRegexPattern? pattern : patternLexer.compilePattern(pattern);
         this.matched = new signals.Signal();
         this.switched = new signals.Signal();
@@ -327,6 +332,13 @@ define(['signals'], function (signals) {
                         //update vals_ array as well since it will be used
                         //during dispatch
                         val = decodeQueryString(val);
+                        values[n] = val;
+                    }
+                    // IE will capture optional groups as empty strings while other
+                    // browsers will capture `undefined` so normalize behavior.
+                    // see: #gh-58, #gh-59, #gh-60
+                    if ( _hasOptionalGroupBug && val === '' && arrayIndexOf(this._optionalParamsIds, param) !== -1 ) {
+                        val = void(0);
                         values[n] = val;
                     }
                     o[param] = val;
@@ -468,6 +480,10 @@ define(['signals'], function (signals) {
 
         function captureVals(regex, pattern) {
             var vals = [], match;
+            // very important to reset lastIndex since RegExp can have "g" flag
+            // and multiple runs might affect the result, specially if matching
+            // same string multiple times on IE 7-8
+            regex.lastIndex = 0;
             while (match = regex.exec(pattern)) {
                 vals.push(match[1]);
             }
@@ -542,7 +558,8 @@ define(['signals'], function (signals) {
             var replaceFn = function(match, prop){
                     var val;
                     if (prop in replacements) {
-                        val = replacements[prop];
+                        // make sure value is a string see #gh-54
+                        val = String(replacements[prop]);
                         if (match.indexOf('*') === -1 && val.indexOf('/') !== -1) {
                             throw new Error('Invalid value "'+ val +'" for segment "'+ match +'".');
                         }
