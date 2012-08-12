@@ -9,6 +9,7 @@ describe('crossroads.parse()', function(){
 
 
     afterEach(function(){
+        crossroads.resetState();
         crossroads.removeAllRoutes();
         crossroads.routed.removeAll();
         crossroads.bypassed.removeAll();

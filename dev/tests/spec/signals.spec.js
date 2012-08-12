@@ -9,6 +9,7 @@ var crossroads = crossroads || require('crossroads');
 describe('crossroads Signals', function(){
 
     afterEach(function(){
+        crossroads.resetState();
         crossroads.removeAllRoutes();
         crossroads.bypassed.removeAll();
         crossroads.routed.removeAll();
@@ -75,6 +76,58 @@ describe('crossroads Signals', function(){
         expect( count2 ).toBe( 1 );
         expect( routed ).toEqual( true );
         expect( first ).toEqual( true );
+
+    });
+
+    it('should not dispatch routed/bypassed/matched twice for same request multiple times in a row', function(){
+        var bypassed = [],
+            routed = [],
+            matched = [],
+            switched = [];
+
+        var a = crossroads.addRoute('/{foo}_{bar}');
+        a.matched.add(function(a, b){
+            matched.push(a, b);
+        });
+        a.switched.add(function(req){
+            switched.push(req);
+        });
+
+        crossroads.bypassed.add(function(req){
+            bypassed.push(req);
+        });
+
+        crossroads.routed.add(function(req, data){
+            routed.push(req);
+            expect( data.route ).toBe( a );
+        });
+
+        crossroads.parse('/lorem/ipsum'); // bypass
+        crossroads.parse('/foo_bar'); // match
+        crossroads.parse('/foo_bar'); // this shouldn't trigger routed/matched
+        crossroads.parse('/lorem_ipsum'); // match
+        crossroads.parse('/dolor'); // bypass
+        crossroads.parse('/dolor'); // this shouldn't trigger bypassed
+        crossroads.parse('/lorem_ipsum'); // this shouldn't trigger routed/matched
+        crossroads.parse('/lorem_ipsum'); // this shouldn't trigger routed/matched
+        crossroads.parse('/lorem_ipsum'); // this shouldn't trigger routed/matched
+
+        // it should skip duplicates
+        expect( routed ).toEqual( [
+            '/foo_bar',
+            '/lorem_ipsum'
+        ]);
+        expect( bypassed ).toEqual( [
+            '/lorem/ipsum',
+            '/dolor'
+        ]);
+        expect( switched ).toEqual( [] );
+        expect( matched ).toEqual( [
+            'foo',
+            'bar',
+            'lorem',
+            'ipsum'
+        ]);
 
     });
 

@@ -10,6 +10,7 @@ describe('crossroads.addRoute()', function(){
 
     afterEach(function(){
         crossroads.removeAllRoutes();
+        crossroads.resetState();
     });
 
 

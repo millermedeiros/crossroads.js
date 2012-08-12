@@ -9,6 +9,7 @@ describe('Match', function(){
 
     afterEach(function(){
         crossroads.removeAllRoutes();
+        crossroads.resetState();
     });
 
 
