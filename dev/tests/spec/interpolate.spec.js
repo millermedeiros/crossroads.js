@@ -9,6 +9,7 @@ var crossroads = crossroads || require('crossroads');
 describe('Route.interpolate()', function(){
 
     afterEach(function(){
+        crossroads.resetState();
         crossroads.removeAllRoutes();
     });
 
