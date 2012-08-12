@@ -1,7 +1,7 @@
 # Crossroads.js Changelog #
 
 
-## Next ##
+## v0.9.1 (2012/07/29) ##
 
 ### Fixes
 
