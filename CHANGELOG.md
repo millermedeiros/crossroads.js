@@ -1,12 +1,13 @@
 # Crossroads.js Changelog #
 
-## next
+## v0.10.0 (2012/08/12) ##
 
 ### Improvements
 
  - Avoid dispatching the routed/bypassed/matched signals if passing same
    request in subsequent calls. (#57)
  - Add `crossroads.resetState()` (#66)
+
 
 
 ## v0.9.1 (2012/07/29) ##

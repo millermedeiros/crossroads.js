@@ -2,7 +2,7 @@
  * crossroads <http://millermedeiros.github.com/crossroads.js/>
  * License: MIT
  * Author: Miller Medeiros
- * Version: 0.9.1 (2012/7/29 15:56)
+ * Version: 0.10.0 (2012/08/12 03:41)
  */
 
 (function (define) {
@@ -102,13 +102,20 @@ define(['signals'], function (signals) {
      * @constructor
      */
     function Crossroads() {
-        this._routes = [];
-        this._prevRoutes = [];
         this.bypassed = new signals.Signal();
         this.routed = new signals.Signal();
+        this._routes = [];
+        this._prevRoutes = [];
+        this.resetState();
     }
 
     Crossroads.prototype = {
+
+        resetState : function(){
+            this._prevRoutes.length = 0;
+            this._prevMatchedRequest = null;
+            this._prevBypassedRequest = null;
+        },
 
         greedy : false,
 
@@ -148,15 +155,22 @@ define(['signals'], function (signals) {
             request = request || '';
             defaultArgs = defaultArgs || [];
 
+            // should only care about different requests
+            if (request === this._prevMatchedRequest || request === this._prevBypassedRequest) {
+                return;
+            }
+
             var routes = this._getMatchedRoutes(request),
                 i = 0,
                 n = routes.length,
                 cur;
 
             if (n) {
+                this._prevMatchedRequest = request;
+
                 this._notifyPrevRoutes(routes, request);
                 this._prevRoutes = routes;
-                //shold be incremental loop, execute routes in order
+                //should be incremental loop, execute routes in order
                 while (i < n) {
                     cur = routes[i];
                     cur.route.matched.dispatch.apply(cur.route.matched, defaultArgs.concat(cur.params));
@@ -165,8 +179,10 @@ define(['signals'], function (signals) {
                     i += 1;
                 }
             } else {
+                this._prevBypassedRequest = request;
                 this.bypassed.dispatch.apply(this.bypassed, defaultArgs.concat([request]));
             }
+
         },
 
         _notifyPrevRoutes : function(matchedRoutes, request) {
@@ -230,7 +246,7 @@ define(['signals'], function (signals) {
 
     //"static" instance
     crossroads = new Crossroads();
-    crossroads.VERSION = '0.9.1';
+    crossroads.VERSION = '0.10.0';
 
     crossroads.NORM_AS_ARRAY = function (req, vals) {
         return [vals.vals_];

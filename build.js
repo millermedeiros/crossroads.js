@@ -18,7 +18,7 @@ var _fs = require('fs'),
         VERSION_NUMBER : _pkg.version,
         HOMEPAGE : _pkg.homepage,
         LICENSE : _pkg.licenses[0].type,
-        BUILD_DATE : _now.getUTCFullYear() +'/'+ (_now.getUTCMonth() + 1) +'/'+ _now.getUTCDate() +' '+ _now.getUTCHours() +':'+ _now.getUTCMinutes()
+        BUILD_DATE : _now.getUTCFullYear() +'/'+ pad(_now.getUTCMonth() + 1) +'/'+ pad(_now.getUTCDate()) +' '+ pad(_now.getUTCHours()) +':'+ pad(_now.getUTCMinutes())
     };
 
 
@@ -78,6 +78,16 @@ function minify(){
     var license = tmpl( readFile(SRC_DIR +'/license.txt'), _replacements );
     _fs.writeFileSync(DIST_MIN_PATH, license + uglify(DIST_PATH), FILE_ENCODING);
     console.log(' '+ DIST_MIN_PATH +' built.');
+}
+
+
+function pad(val){
+    val = String(val);
+    if (val.length < 2) {
+        return '0'+ val;
+    } else {
+        return val;
+    }
 }
 
 
