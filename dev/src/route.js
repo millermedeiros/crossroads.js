@@ -12,7 +12,7 @@
         this._pattern = pattern;
         this._paramsIds = isRegexPattern? null : patternLexer.getParamIds(this._pattern);
         this._optionalParamsIds = isRegexPattern? null : patternLexer.getOptionalParamsIds(this._pattern);
-        this._matchRegexp = isRegexPattern? pattern : patternLexer.compilePattern(pattern);
+        this._matchRegexp = isRegexPattern? pattern : patternLexer.compilePattern(pattern, router.ignoreCase);
         this.matched = new signals.Signal();
         this.switched = new signals.Signal();
         if (callback) {
@@ -74,6 +74,10 @@
         },
 
         _isValidArrayRule : function (arr, val) {
+            if (! this._router.ignoreCase) {
+                return arrayIndexOf(arr, val) !== -1;
+            }
+
             if (typeof val === 'string') {
                 val = val.toLowerCase();
             }
@@ -82,7 +86,7 @@
                 item,
                 compareVal;
 
-            while (n-- > 0) {
+            while (n--) {
                 item = arr[n];
                 compareVal = (typeof item === 'string')? item.toLowerCase() : item;
                 if (compareVal === val) {
