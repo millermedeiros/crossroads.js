@@ -9,7 +9,7 @@ describe('Match', function(){
 
     afterEach(function(){
         crossroads.removeAllRoutes();
-        crossroads.ignoreCase = true;
+        crossroads.ignoreCase = false;
     });
 
 
@@ -86,23 +86,24 @@ describe('Match', function(){
         expect( s.match('/123/asd/45/qwe') ).toBe( false );
     });
 
-    it('should be case insensitive by default', function () {
-        var s = crossroads.addRoute('foo/bar');
-        expect( s.match('foo') ).toBe( false );
-        expect( s.match('Foo') ).toBe( false );
-        expect( s.match('foo/bar') ).toBe( true );
-        expect( s.match('Foo/Bar') ).toBe( true );
-        expect( s.match('FoO/BAR') ).toBe( true );
-    });
-
-    it('should be allow toggling case sensitivity', function () {
-        crossroads.ignoreCase = false;
+    it('should be case sensitive by default', function () {
         var s = crossroads.addRoute('foo/bar');
         expect( s.match('foo') ).toBe( false );
         expect( s.match('Foo') ).toBe( false );
         expect( s.match('foo/bar') ).toBe( true );
         expect( s.match('Foo/Bar') ).toBe( false );
         expect( s.match('FoO/BAR') ).toBe( false );
+    });
+
+    it('should be allow toggling case sensitivity', function () {
+        crossroads.ignoreCase = true;
+
+        var s = crossroads.addRoute('foo/bar');
+        expect( s.match('foo') ).toBe( false );
+        expect( s.match('Foo') ).toBe( false );
+        expect( s.match('foo/bar') ).toBe( true );
+        expect( s.match('Foo/Bar') ).toBe( true );
+        expect( s.match('FoO/BAR') ).toBe( true );
     });
 
     describe('rest params', function () {
@@ -454,6 +455,24 @@ describe('Match', function(){
         describe('basic rules', function(){
 
             it('should allow array options', function(){
+                var s = crossroads.addRoute('/{foo}/{bar}');
+                s.rules = {
+                    foo : ['lorem-ipsum', '123'],
+                    bar : ['DoLoR', '45']
+                };
+
+                expect( s.match('/lorem-ipsum') ).toBe( false );
+                expect( s.match('/lorem-ipsum/DoLoR') ).toBe( true );
+                expect( s.match('/LoReM-IpSuM/DOLoR') ).toBe( false );
+                expect( s.match('lorem-ipsum') ).toBe( false );
+                expect( s.match('/123') ).toBe( false );
+                expect( s.match('123') ).toBe( false );
+                expect( s.match('/123/123') ).toBe( false );
+                expect( s.match('/123/45') ).toBe( true );
+            });
+
+            it('should change array validation behavior when ignoreCase is true', function(){
+                crossroads.ignoreCase = true;
 
                 var s = crossroads.addRoute('/{foo}/{bar}');
 
@@ -471,25 +490,6 @@ describe('Match', function(){
                 expect( s.match('/123/123') ).toBe( false );
                 expect( s.match('/123/45') ).toBe( true );
 
-            });
-
-            it('should change array validation behavior when ignoreCase is false', function(){
-                crossroads.ignoreCase = false;
-                var s = crossroads.addRoute('/{foo}/{bar}');
-
-                s.rules = {
-                    foo : ['lorem-ipsum', '123'],
-                    bar : ['DoLoR', '45']
-                };
-
-                expect( s.match('/lorem-ipsum') ).toBe( false );
-                expect( s.match('/lorem-ipsum/DoLoR') ).toBe( true );
-                expect( s.match('/LoReM-IpSuM/DOLoR') ).toBe( false );
-                expect( s.match('lorem-ipsum') ).toBe( false );
-                expect( s.match('/123') ).toBe( false );
-                expect( s.match('123') ).toBe( false );
-                expect( s.match('/123/123') ).toBe( false );
-                expect( s.match('/123/45') ).toBe( true );
             });
 
 

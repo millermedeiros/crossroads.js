@@ -2,9 +2,10 @@
 
 ## ignorecase branch
 
- - changed `Route.rules` array validation to be case insensitive (#49)
- - route matching is case insensitive. (#53)
- - added way to toggle case sensitivity `Route.ignoreCase` (#53)
+ - added way to toggle case sensitivity `Route.ignoreCase`, default is `false`
+   to match old behavior (#53)
+ - changed `Route.rules` array validation to be case insensitive if
+   `Route.ignoreCase = true` (#49)
 
 
 ## Next ##

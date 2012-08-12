@@ -14,7 +14,7 @@
 
     Crossroads.prototype = {
 
-        ignoreCase : true,
+        ignoreCase : false,
 
         greedy : false,
 
