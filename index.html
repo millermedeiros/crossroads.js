@@ -185,6 +185,7 @@ hasher.setHash('lorem/ipsum');
                             <li><a href="#crossroads-version">crossroads.VERSION</a></li>
                             <li><a href="#crossroads-greedy">crossroads.greedy</a></li>
                             <li><a href="#crossroads-greedyEnabled">crossroads.greedyEnabled</a></li>
+                            <li><a href="#crossroads-resetState">crossroads.resetState</a></li>
                         </ul>
                         <ul class="col col-1_2 code">
                             <li><a href="#route-matched">Route.matched</a></li>
@@ -370,7 +371,13 @@ crossroads.parse('/news/123', ["lorem", "ipsum"]);
                     validate each segment (capturing group). If after all that
                     route is considered &quot;matched&quot; than the
                     <code>Route.matched</code> signal is dispatched together
-                    with the <code>crossroads.routed</code> signal
+                    with the <code>crossroads.routed</code> signal.
+                    </p>
+                    <p>
+                        After <code>v0.10.0</code> calling <code>parse()</code> multiple times
+                        on a row passing the same <code>request</code> will dispatch the
+                        <code>matched</code>/<code>routed</code>/<code>bypassed</code>
+                        signals only once.
                     </p>
                     <hr />
 
@@ -567,6 +574,21 @@ crossroads.parse('/news/00012');
                         The default value is <code>true</code>.
                     </p>
                     <hr />
+
+
+                    <h3 class="code" id="crossroads-resetState">crossroads.resetState()</h3>
+                    <p>
+                        Resets the Router internal state. Will clear reference
+                        to previously matched routes (so they won't dispatch
+                        <a href="#route-switched">switched</a> signal when
+                        matching a new route) and reset last request.
+                    </p>
+                    <p>
+                        This feature should NOT be needed by most users.
+                    </p>
+                    <hr />
+
+<!-- =================== Route ======================== -->
 
                     <h3 class="code" id="route-matched">Route.matched<em>:Signal</em></h3>
                     <p>Signal dispatched every time a request matches the route pattern.</p>
