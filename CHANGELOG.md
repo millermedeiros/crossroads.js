@@ -2,10 +2,10 @@
 
 ## ignorecase branch
 
- - added way to toggle case sensitivity `Route.ignoreCase`, default is `false`
-   to match old behavior (#53)
+ - added way to toggle case sensitivity `crossroads.ignoreCase`, default is
+   `false` to match old behavior (#53)
  - changed `Route.rules` array validation to be case insensitive if
-   `Route.ignoreCase = true` (#49)
+   `crossroads.ignoreCase = true` (#49)
 
 
 ## Next ##
