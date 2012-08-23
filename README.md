@@ -1,3 +1,4 @@
+[![build status](https://secure.travis-ci.org/millermedeiros/crossroads.js.png)](http://travis-ci.org/millermedeiros/crossroads.js)
 
 ![Crossroads - JavaScript Routes](https://github.com/millermedeiros/crossroads.js/raw/master/_assets/crossroads_logo.png)
 
