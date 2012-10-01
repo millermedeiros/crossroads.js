@@ -23,8 +23,13 @@
     <body>
         <script>
             //run specs and add reporter
-            jasmine.getEnv().addReporter(new jasmine.TrivialReporter());
-            jasmine.getEnv().execute();
+            var reporter = new jasmine.HtmlReporter,
+                env = jasmine.getEnv();
+            env.specFilter = function(spec){
+                return reporter.specFilter(spec)
+            };
+            env.addReporter(reporter);
+            env.execute();
         </script>
     </body>
 </html>
