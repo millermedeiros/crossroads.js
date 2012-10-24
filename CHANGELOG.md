@@ -5,10 +5,14 @@
 ### API Changes
 
  - add `crossroads.pipe()` and `crossroads.unpipe()` (#70)
+ - added way to toggle case sensitivity `crossroads.ignoreCase`, default is
+   `true` (#53)
 
 ### Improvements
 
  - `decodeQueryString()` now respects `shouldTypecast` (#71)
+ - changed `Route.rules` array validation to be case insensitive if
+   `crossroads.ignoreCase = true` (#49)
 
 
 

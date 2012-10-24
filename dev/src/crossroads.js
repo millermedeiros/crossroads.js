@@ -16,6 +16,8 @@
 
     Crossroads.prototype = {
 
+        ignoreCase : true,
+
         resetState : function(){
             this._prevRoutes.length = 0;
             this._prevMatchedRequest = null;
