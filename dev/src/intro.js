@@ -25,6 +25,13 @@
         }
     }
 
+    function arrayRemove(arr, item) {
+        var i = arrayIndexOf(arr, item);
+        if (i !== -1) {
+            arr.splice(i, 1);
+        }
+    }
+
     function isKind(val, kind) {
         return '[object '+ kind +']' === Object.prototype.toString.call(val);
     }

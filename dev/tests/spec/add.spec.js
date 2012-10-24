@@ -7,6 +7,13 @@ var crossroads = crossroads || require('crossroads');
 
 describe('crossroads.addRoute()', function(){
 
+    beforeEach(function(){
+        // specs are run out of order since we check the amount of routes
+        // added we need to make sure other tests won't mess up these results
+        // otherwise we might spend time trying to debug the wrong issues
+        crossroads.removeAllRoutes();
+        crossroads.resetState();
+    });
 
     afterEach(function(){
         crossroads.removeAllRoutes();

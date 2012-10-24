@@ -2,6 +2,10 @@
 
 ## Next ##
 
+### API Changes
+
+ - add `crossroads.pipe()` and `crossroads.unpipe()` (#70)
+
 ### Improvements
 
  - `decodeQueryString()` now respects `shouldTypecast` (#71)

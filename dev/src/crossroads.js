@@ -10,6 +10,7 @@
         this.routed = new signals.Signal();
         this._routes = [];
         this._prevRoutes = [];
+        this._piped = [];
         this.resetState();
     }
 
@@ -40,10 +41,7 @@
         },
 
         removeRoute : function (route) {
-            var i = arrayIndexOf(this._routes, route);
-            if (i !== -1) {
-                this._routes.splice(i, 1);
-            }
+            arrayRemove(this._routes, route);
             route._destroy();
         },
 
@@ -87,6 +85,7 @@
                 this.bypassed.dispatch.apply(this.bypassed, defaultArgs.concat([request]));
             }
 
+            this._pipeParse(request, defaultArgs);
         },
 
         _notifyPrevRoutes : function(matchedRoutes, request) {
@@ -109,6 +108,13 @@
                 }
             }
             return true;
+        },
+
+        _pipeParse : function(request, defaultArgs) {
+            var i = 0, route;
+            while (route = this._piped[i++]) {
+                route.parse(request, defaultArgs);
+            }
         },
 
         getNumRoutes : function () {
@@ -141,6 +147,14 @@
                 }
             }
             return res;
+        },
+
+        pipe : function (otherRouter) {
+            this._piped.push(otherRouter);
+        },
+
+        unpipe : function (otherRouter) {
+            arrayRemove(this._piped, otherRouter);
         },
 
         toString : function () {
