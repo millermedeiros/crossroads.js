@@ -586,7 +586,11 @@ describe('Match', function(){
             });
 
             it('should validate with Function', function () {
+                var prevTypecast = crossroads.shouldTypecast;
                 var r = crossroads.addRoute('/foo.php{?query}');
+
+                crossroads.shouldTypecast = true;
+
                 r.rules = {
                     '?query' : function(val, req, vals){
                         return (val.lorem === 'ipsum' && typeof val.dolor === 'number');
@@ -595,6 +599,8 @@ describe('Match', function(){
                 expect( r.match('foo.php?bar=123&ipsum=dolor') ).toBe( false );
                 expect( r.match('foo.php?lorem=ipsum&dolor=12345') ).toBe( true );
                 expect( r.match('foo.php?lorem=ipsum&dolor=amet') ).toBe( false );
+
+                crossroads.shouldTypecast = prevTypecast; //restore
             });
 
         });

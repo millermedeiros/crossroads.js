@@ -906,6 +906,9 @@ describe('crossroads.parse()', function(){
 
         describe('required query string after required segment', function () {
             it('should parse query string into an object and typecast vals', function () {
+                var prevTypecast = crossroads.shouldTypecast;
+                crossroads.shouldTypecast = true;
+
                 var r = crossroads.addRoute('{a}{?b}');
                 var t1, t2;
                 r.matched.addOnce(function(a, b){
@@ -916,11 +919,16 @@ describe('crossroads.parse()', function(){
 
                 expect( t1 ).toEqual( 'foo.php' );
                 expect( t2 ).toEqual( {lorem : 'ipsum', asd : 123, bar : false} );
+
+                crossroads.shouldTypecast = prevTypecast; //restore
             });
         });
 
         describe('required query string after optional segment', function () {
             it('should parse query string into an object and typecast vals', function () {
+                var prevTypecast = crossroads.shouldTypecast;
+                crossroads.shouldTypecast = true;
+
                 var r = crossroads.addRoute(':a:{?b}');
                 var t1, t2;
                 r.matched.addOnce(function(a, b){
@@ -941,11 +949,16 @@ describe('crossroads.parse()', function(){
 
                 expect( t3 ).toBeUndefined();
                 expect( t4 ).toEqual( {lorem : 'ipsum', asd : 123} );
+
+                crossroads.shouldTypecast = prevTypecast; //restore
             });
         });
 
         describe('optional query string after required segment', function () {
             it('should parse query string into an object and typecast vals', function () {
+                var prevTypecast = crossroads.shouldTypecast;
+                crossroads.shouldTypecast = true;
+
                 var r = crossroads.addRoute('{a}:?b:');
                 var t1, t2;
                 r.matched.addOnce(function(a, b){
@@ -966,11 +979,16 @@ describe('crossroads.parse()', function(){
 
                 expect( t3 ).toEqual( 'bar.php' );
                 expect( t4 ).toBeUndefined();
+
+                crossroads.shouldTypecast = prevTypecast; //restore
             });
         });
 
         describe('optional query string after optional segment', function () {
             it('should parse query string into an object and typecast vals', function () {
+                var prevTypecast = crossroads.shouldTypecast;
+                crossroads.shouldTypecast = true;
+
                 var r = crossroads.addRoute(':a::?b:');
                 var t1, t2;
                 r.matched.addOnce(function(a, b){
@@ -991,9 +1009,26 @@ describe('crossroads.parse()', function(){
 
                 expect( t3 ).toEqual( 'bar.php' );
                 expect( t4 ).toBeUndefined();
+
+                crossroads.shouldTypecast = prevTypecast; //restore
             });
         });
 
+        describe('optional query string after required segment without typecasting', function () {
+            it('should parse query string into an object and not typecast vals', function () {
+                var r = crossroads.addRoute('{a}:?b:');
+                var t1, t2;
+
+                r.matched.addOnce(function(a, b){
+                    t1 = a;
+                    t2 = b;
+                });
+                crossroads.parse('foo.php?lorem=ipsum&asd=123&bar=false');
+
+                expect( t1 ).toEqual( 'foo.php' );
+                expect( t2 ).toEqual( {lorem : 'ipsum', asd : '123', bar : 'false'} );
+            });
+        });
     });
 
 

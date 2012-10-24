@@ -89,7 +89,7 @@
                         o[param +'_'] = val;
                         //update vals_ array as well since it will be used
                         //during dispatch
-                        val = decodeQueryString(val);
+                        val = decodeQueryString(val, shouldTypecast);
                         values[n] = val;
                     }
                     // IE will capture optional groups as empty strings while other
