@@ -7,10 +7,20 @@ var crossroads = crossroads || require('crossroads');
 
 describe('Match', function(){
 
+    var _prevTypecast;
+
+    beforeEach(function(){
+        _prevTypecast = crossroads.shouldTypecast;
+    });
+
     afterEach(function(){
         crossroads.removeAllRoutes();
         crossroads.resetState();
+        crossroads.shouldTypecast = _prevTypecast;
     });
+
+
+    // ---
 
 
     it('should match simple string', function(){
@@ -537,7 +547,6 @@ describe('Match', function(){
 
 
             it('should work with shouldTypecast=false', function(){
-                var prevTypecast = crossroads.shouldTypecast;
                 var s = crossroads.addRoute('/{foo}/{bar}/{ipsum}');
 
                 crossroads.shouldTypecast = false;
@@ -556,8 +565,6 @@ describe('Match', function(){
                 expect( s.match('/123') ).toBe( false );
                 expect( s.match('123') ).toBe( false );
                 expect( s.match('/123/45/67') ).toBe( true );
-
-                crossroads.shouldTypecast = prevTypecast; //restore
             });
 
         });
@@ -586,7 +593,6 @@ describe('Match', function(){
             });
 
             it('should validate with Function', function () {
-                var prevTypecast = crossroads.shouldTypecast;
                 var r = crossroads.addRoute('/foo.php{?query}');
 
                 crossroads.shouldTypecast = true;
@@ -599,8 +605,6 @@ describe('Match', function(){
                 expect( r.match('foo.php?bar=123&ipsum=dolor') ).toBe( false );
                 expect( r.match('foo.php?lorem=ipsum&dolor=12345') ).toBe( true );
                 expect( r.match('foo.php?lorem=ipsum&dolor=amet') ).toBe( false );
-
-                crossroads.shouldTypecast = prevTypecast; //restore
             });
 
         });

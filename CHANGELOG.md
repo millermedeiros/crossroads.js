@@ -1,5 +1,13 @@
 # Crossroads.js Changelog #
 
+## Next ##
+
+### Improvements
+
+ - `decodeQueryString()` now respects `shouldTypecast` (#71)
+
+
+
 ## v0.10.0 (2012/08/12) ##
 
 ### Improvements

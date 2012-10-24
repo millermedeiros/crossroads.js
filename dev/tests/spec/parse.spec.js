@@ -7,14 +7,24 @@ var crossroads = crossroads || require('crossroads');
 
 describe('crossroads.parse()', function(){
 
+    var _prevTypecast;
+
+
+    beforeEach(function(){
+        _prevTypecast = crossroads.shouldTypecast;
+    });
+
 
     afterEach(function(){
         crossroads.resetState();
         crossroads.removeAllRoutes();
         crossroads.routed.removeAll();
         crossroads.bypassed.removeAll();
+        crossroads.shouldTypecast = _prevTypecast;
     });
 
+
+    // ---
 
 
     describe('simple string route', function(){
@@ -233,7 +243,6 @@ describe('crossroads.parse()', function(){
     describe('typecast values', function(){
 
         it('should typecast values if shouldTypecast is set to true', function(){
-            var prevTypecast = crossroads.shouldTypecast;
             crossroads.shouldTypecast = true;
 
             var t1, t2, t3, t4, t5, t6;
@@ -256,12 +265,9 @@ describe('crossroads.parse()', function(){
             expect( t4 ).toBe( false );
             expect( t5 ).toBe( null );
             expect( t6 ).toBe( undefined );
-
-            crossroads.shouldTypecast = prevTypecast; //restore
         });
 
         it('should not typecast if shouldTypecast is set to false', function(){
-            var prevTypecast = crossroads.shouldTypecast;
             crossroads.shouldTypecast = false;
 
             var t1, t2, t3, t4;
@@ -280,8 +286,6 @@ describe('crossroads.parse()', function(){
             expect( t2 ).toBe( '123' );
             expect( t3 ).toBe( 'true' );
             expect( t4 ).toBe( 'false' );
-
-            crossroads.shouldTypecast = prevTypecast; //restore
         });
 
     });
@@ -906,7 +910,6 @@ describe('crossroads.parse()', function(){
 
         describe('required query string after required segment', function () {
             it('should parse query string into an object and typecast vals', function () {
-                var prevTypecast = crossroads.shouldTypecast;
                 crossroads.shouldTypecast = true;
 
                 var r = crossroads.addRoute('{a}{?b}');
@@ -919,14 +922,11 @@ describe('crossroads.parse()', function(){
 
                 expect( t1 ).toEqual( 'foo.php' );
                 expect( t2 ).toEqual( {lorem : 'ipsum', asd : 123, bar : false} );
-
-                crossroads.shouldTypecast = prevTypecast; //restore
             });
         });
 
         describe('required query string after optional segment', function () {
             it('should parse query string into an object and typecast vals', function () {
-                var prevTypecast = crossroads.shouldTypecast;
                 crossroads.shouldTypecast = true;
 
                 var r = crossroads.addRoute(':a:{?b}');
@@ -949,14 +949,11 @@ describe('crossroads.parse()', function(){
 
                 expect( t3 ).toBeUndefined();
                 expect( t4 ).toEqual( {lorem : 'ipsum', asd : 123} );
-
-                crossroads.shouldTypecast = prevTypecast; //restore
             });
         });
 
         describe('optional query string after required segment', function () {
             it('should parse query string into an object and typecast vals', function () {
-                var prevTypecast = crossroads.shouldTypecast;
                 crossroads.shouldTypecast = true;
 
                 var r = crossroads.addRoute('{a}:?b:');
@@ -979,14 +976,11 @@ describe('crossroads.parse()', function(){
 
                 expect( t3 ).toEqual( 'bar.php' );
                 expect( t4 ).toBeUndefined();
-
-                crossroads.shouldTypecast = prevTypecast; //restore
             });
         });
 
         describe('optional query string after optional segment', function () {
             it('should parse query string into an object and typecast vals', function () {
-                var prevTypecast = crossroads.shouldTypecast;
                 crossroads.shouldTypecast = true;
 
                 var r = crossroads.addRoute(':a::?b:');
@@ -1009,8 +1003,6 @@ describe('crossroads.parse()', function(){
 
                 expect( t3 ).toEqual( 'bar.php' );
                 expect( t4 ).toBeUndefined();
-
-                crossroads.shouldTypecast = prevTypecast; //restore
             });
         });
 
