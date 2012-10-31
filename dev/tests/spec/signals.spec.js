@@ -215,6 +215,70 @@ describe('crossroads Signals', function(){
     });
 
 
+    it('should dispatch routed/bypassed/matched multiple times for same request if ignoreState == true', function(){
+        var bypassed = [],
+            routed = [],
+            matched = [],
+            switched = [];
+
+        // toggle behavior
+        crossroads.ignoreState = true;
+
+        var a = crossroads.addRoute('/{foo}_{bar}');
+        a.matched.add(function(a, b){
+            matched.push(a, b);
+        });
+        a.switched.add(function(req){
+            switched.push(req);
+        });
+
+        crossroads.bypassed.add(function(req){
+            bypassed.push(req);
+        });
+
+        crossroads.routed.add(function(req, data){
+            routed.push(req);
+            expect( data.route ).toBe( a );
+        });
+
+        crossroads.parse('/lorem/ipsum'); // bypass
+        crossroads.parse('/foo_bar'); // routed/matched
+        crossroads.parse('/foo_bar'); // routed/matched
+        crossroads.parse('/lorem_ipsum'); // routed/matched
+        crossroads.parse('/dolor'); // bypass
+        crossroads.parse('/dolor'); // bypass
+        crossroads.parse('/lorem_ipsum'); // routed/matched
+        crossroads.parse('/lorem_ipsum'); // routed/matched
+
+        // it should skip duplicates
+        expect( routed ).toEqual( [
+            '/foo_bar',
+            '/foo_bar',
+            '/lorem_ipsum',
+            '/lorem_ipsum',
+            '/lorem_ipsum'
+        ]);
+        expect( bypassed ).toEqual( [
+            '/lorem/ipsum',
+            '/dolor',
+            '/dolor'
+        ]);
+        expect( switched ).toEqual( [] );
+        expect( matched ).toEqual( [
+            'foo',
+            'bar',
+            'foo',
+            'bar',
+            'lorem',
+            'ipsum',
+            'lorem',
+            'ipsum',
+            'lorem',
+            'ipsum'
+        ]);
+
+    });
+
     it('isFirst should be false on greedy matches', function () {
 
         var count = 0,

@@ -7,6 +7,7 @@
  - add `crossroads.pipe()` and `crossroads.unpipe()` (#70)
  - added way to toggle case sensitivity `crossroads.ignoreCase`, default is
    `true` (#53)
+ - add `crossroads.ignoreState`. (#57)
 
 ### Improvements
 

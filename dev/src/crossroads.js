@@ -16,7 +16,17 @@
 
     Crossroads.prototype = {
 
+        greedy : false,
+
+        greedyEnabled : true,
+
         ignoreCase : true,
+
+        ignoreState : false,
+
+        shouldTypecast : false,
+
+        normalizeFn : null,
 
         resetState : function(){
             this._prevRoutes.length = 0;
@@ -24,17 +34,9 @@
             this._prevBypassedRequest = null;
         },
 
-        greedy : false,
-
-        greedyEnabled : true,
-
-        normalizeFn : null,
-
         create : function () {
             return new Crossroads();
         },
-
-        shouldTypecast : false,
 
         addRoute : function (pattern, callback, priority) {
             var route = new Route(pattern, callback, priority, this);
@@ -59,8 +61,10 @@
             request = request || '';
             defaultArgs = defaultArgs || [];
 
-            // should only care about different requests
-            if (request === this._prevMatchedRequest || request === this._prevBypassedRequest) {
+            // should only care about different requests if ignoreState isn't true
+            if ( !this.ignoreState &&
+                (request === this._prevMatchedRequest ||
+                 request === this._prevBypassedRequest) ) {
                 return;
             }
 
