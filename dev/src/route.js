@@ -12,7 +12,7 @@
         this._pattern = pattern;
         this._paramsIds = isRegexPattern? null : patternLexer.getParamIds(pattern);
         this._optionalParamsIds = isRegexPattern? null : patternLexer.getOptionalParamsIds(pattern);
-        this._matchRegexp = isRegexPattern? pattern : patternLexer.compilePattern(pattern);
+        this._matchRegexp = isRegexPattern? pattern : patternLexer.compilePattern(pattern, router.ignoreCase);
         this.matched = new signals.Signal();
         this.switched = new signals.Signal();
         if (callback) {
@@ -64,13 +64,36 @@
                 if (isQuery) {
                     val = values[prop +'_']; //use raw string
                 }
-                isValid = arrayIndexOf(validationRule, val) !== -1;
+                isValid = this._isValidArrayRule(validationRule, val);
             }
             else if (isFunction(validationRule)) {
                 isValid = validationRule(val, request, values);
             }
 
             return isValid; //fail silently if validationRule is from an unsupported type
+        },
+
+        _isValidArrayRule : function (arr, val) {
+            if (! this._router.ignoreCase) {
+                return arrayIndexOf(arr, val) !== -1;
+            }
+
+            if (typeof val === 'string') {
+                val = val.toLowerCase();
+            }
+
+            var n = arr.length,
+                item,
+                compareVal;
+
+            while (n--) {
+                item = arr[n];
+                compareVal = (typeof item === 'string')? item.toLowerCase() : item;
+                if (compareVal === val) {
+                    return true;
+                }
+            }
+            return false;
         },
 
         _getParamsObject : function (request) {
@@ -89,7 +112,7 @@
                         o[param +'_'] = val;
                         //update vals_ array as well since it will be used
                         //during dispatch
-                        val = decodeQueryString(val);
+                        val = decodeQueryString(val, shouldTypecast);
                         values[n] = val;
                     }
                     // IE will capture optional groups as empty strings while other

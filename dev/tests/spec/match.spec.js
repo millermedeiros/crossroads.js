@@ -7,10 +7,23 @@ var crossroads = crossroads || require('crossroads');
 
 describe('Match', function(){
 
+    var _prevTypecast;
+    var _prevCase;
+
+    beforeEach(function(){
+        _prevTypecast = crossroads.shouldTypecast;
+        _prevCase = crossroads.ignoreCase;
+    });
+
     afterEach(function(){
         crossroads.removeAllRoutes();
         crossroads.resetState();
+        crossroads.shouldTypecast = _prevTypecast;
+        crossroads.ignoreCase = _prevCase;
     });
+
+
+    // ---
 
 
     it('should match simple string', function(){
@@ -84,6 +97,26 @@ describe('Match', function(){
         expect( s.match('/123/asd/45') ).toBe( true );
         expect( s.match('/123/asd/45/') ).toBe( true );
         expect( s.match('/123/asd/45/qwe') ).toBe( false );
+    });
+
+    it('should not be case sensitive by default', function () {
+        var s = crossroads.addRoute('foo/bar');
+        expect( s.match('foo') ).toBe( false );
+        expect( s.match('Foo') ).toBe( false );
+        expect( s.match('foo/bar') ).toBe( true );
+        expect( s.match('Foo/Bar') ).toBe( true );
+        expect( s.match('FoO/BAR') ).toBe( true );
+    });
+
+    it('should be allow toggling case sensitivity', function () {
+        crossroads.ignoreCase = true;
+
+        var s = crossroads.addRoute('foo/bar');
+        expect( s.match('foo') ).toBe( false );
+        expect( s.match('Foo') ).toBe( false );
+        expect( s.match('foo/bar') ).toBe( true );
+        expect( s.match('Foo/Bar') ).toBe( true );
+        expect( s.match('FoO/BAR') ).toBe( true );
     });
 
     describe('rest params', function () {
@@ -435,16 +468,36 @@ describe('Match', function(){
         describe('basic rules', function(){
 
             it('should allow array options', function(){
+                var s = crossroads.addRoute('/{foo}/{bar}');
+                s.rules = {
+                    foo : ['lorem-ipsum', '123'],
+                    bar : ['DoLoR', '45']
+                };
+
+                expect( s.match('/lorem-ipsum') ).toBe( false );
+                expect( s.match('/lorem-ipsum/DoLoR') ).toBe( true );
+                expect( s.match('/LoReM-IpSuM/DOLoR') ).toBe( true );
+                expect( s.match('lorem-ipsum') ).toBe( false );
+                expect( s.match('/123') ).toBe( false );
+                expect( s.match('123') ).toBe( false );
+                expect( s.match('/123/123') ).toBe( false );
+                expect( s.match('/123/45') ).toBe( true );
+            });
+
+            it('should change array validation behavior when ignoreCase is false', function(){
+                crossroads.ignoreCase = false;
 
                 var s = crossroads.addRoute('/{foo}/{bar}');
 
                 s.rules = {
                     foo : ['lorem-ipsum', '123'],
-                    bar : ['dolor', '45']
+                    bar : ['DoLoR', '45']
                 };
 
                 expect( s.match('/lorem-ipsum') ).toBe( false );
-                expect( s.match('/lorem-ipsum/dolor') ).toBe( true );
+                expect( s.match('/lorem-ipsum/dolor') ).toBe( false );
+                expect( s.match('/lorem-ipsum/DoLoR') ).toBe( true );
+                expect( s.match('/LoReM-IpSuM/DOLoR') ).toBe( false );
                 expect( s.match('lorem-ipsum') ).toBe( false );
                 expect( s.match('/123') ).toBe( false );
                 expect( s.match('123') ).toBe( false );
@@ -452,6 +505,7 @@ describe('Match', function(){
                 expect( s.match('/123/45') ).toBe( true );
 
             });
+
 
             it('should allow RegExp options', function(){
                 var s = crossroads.addRoute('/{foo}/{bar}');
@@ -537,7 +591,6 @@ describe('Match', function(){
 
 
             it('should work with shouldTypecast=false', function(){
-                var prevTypecast = crossroads.shouldTypecast;
                 var s = crossroads.addRoute('/{foo}/{bar}/{ipsum}');
 
                 crossroads.shouldTypecast = false;
@@ -556,8 +609,6 @@ describe('Match', function(){
                 expect( s.match('/123') ).toBe( false );
                 expect( s.match('123') ).toBe( false );
                 expect( s.match('/123/45/67') ).toBe( true );
-
-                crossroads.shouldTypecast = prevTypecast; //restore
             });
 
         });
@@ -587,6 +638,9 @@ describe('Match', function(){
 
             it('should validate with Function', function () {
                 var r = crossroads.addRoute('/foo.php{?query}');
+
+                crossroads.shouldTypecast = true;
+
                 r.rules = {
                     '?query' : function(val, req, vals){
                         return (val.lorem === 'ipsum' && typeof val.dolor === 'number');

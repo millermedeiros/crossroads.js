@@ -2,7 +2,7 @@
  * crossroads <http://millermedeiros.github.com/crossroads.js/>
  * License: MIT
  * Author: Miller Medeiros
- * Version: 0.10.0 (2012/08/12 03:41)
+ * Version: 0.11.0a (2012/10/24 13:36)
  */
 
 (function (define) {
@@ -31,6 +31,13 @@ define(['signals'], function (signals) {
                 }
             }
             return -1;
+        }
+    }
+
+    function arrayRemove(arr, item) {
+        var i = arrayIndexOf(arr, item);
+        if (i !== -1) {
+            arr.splice(i, 1);
         }
     }
 
@@ -81,14 +88,14 @@ define(['signals'], function (signals) {
     }
 
     //borrowed from AMD-Utils
-    function decodeQueryString(str) {
+    function decodeQueryString(str, shouldTypecast) {
         var queryArr = (str || '').replace('?', '').split('&'),
             n = queryArr.length,
             obj = {},
             item, val;
         while (n--) {
             item = queryArr[n].split('=');
-            val = typecastValue(item[1]);
+            val = shouldTypecast ? typecastValue(item[1]) : item[1];
             obj[item[0]] = (typeof val === 'string')? decodeURIComponent(val) : val;
         }
         return obj;
@@ -106,10 +113,13 @@ define(['signals'], function (signals) {
         this.routed = new signals.Signal();
         this._routes = [];
         this._prevRoutes = [];
+        this._piped = [];
         this.resetState();
     }
 
     Crossroads.prototype = {
+
+        ignoreCase : true,
 
         resetState : function(){
             this._prevRoutes.length = 0;
@@ -136,10 +146,7 @@ define(['signals'], function (signals) {
         },
 
         removeRoute : function (route) {
-            var i = arrayIndexOf(this._routes, route);
-            if (i !== -1) {
-                this._routes.splice(i, 1);
-            }
+            arrayRemove(this._routes, route);
             route._destroy();
         },
 
@@ -183,6 +190,7 @@ define(['signals'], function (signals) {
                 this.bypassed.dispatch.apply(this.bypassed, defaultArgs.concat([request]));
             }
 
+            this._pipeParse(request, defaultArgs);
         },
 
         _notifyPrevRoutes : function(matchedRoutes, request) {
@@ -205,6 +213,13 @@ define(['signals'], function (signals) {
                 }
             }
             return true;
+        },
+
+        _pipeParse : function(request, defaultArgs) {
+            var i = 0, route;
+            while (route = this._piped[i++]) {
+                route.parse(request, defaultArgs);
+            }
         },
 
         getNumRoutes : function () {
@@ -239,6 +254,14 @@ define(['signals'], function (signals) {
             return res;
         },
 
+        pipe : function (otherRouter) {
+            this._piped.push(otherRouter);
+        },
+
+        unpipe : function (otherRouter) {
+            arrayRemove(this._piped, otherRouter);
+        },
+
         toString : function () {
             return '[crossroads numRoutes:'+ this.getNumRoutes() +']';
         }
@@ -246,7 +269,7 @@ define(['signals'], function (signals) {
 
     //"static" instance
     crossroads = new Crossroads();
-    crossroads.VERSION = '0.10.0';
+    crossroads.VERSION = '0.11.0a';
 
     crossroads.NORM_AS_ARRAY = function (req, vals) {
         return [vals.vals_];
@@ -270,7 +293,7 @@ define(['signals'], function (signals) {
         this._pattern = pattern;
         this._paramsIds = isRegexPattern? null : patternLexer.getParamIds(pattern);
         this._optionalParamsIds = isRegexPattern? null : patternLexer.getOptionalParamsIds(pattern);
-        this._matchRegexp = isRegexPattern? pattern : patternLexer.compilePattern(pattern);
+        this._matchRegexp = isRegexPattern? pattern : patternLexer.compilePattern(pattern, router.ignoreCase);
         this.matched = new signals.Signal();
         this.switched = new signals.Signal();
         if (callback) {
@@ -322,13 +345,36 @@ define(['signals'], function (signals) {
                 if (isQuery) {
                     val = values[prop +'_']; //use raw string
                 }
-                isValid = arrayIndexOf(validationRule, val) !== -1;
+                isValid = this._isValidArrayRule(validationRule, val);
             }
             else if (isFunction(validationRule)) {
                 isValid = validationRule(val, request, values);
             }
 
             return isValid; //fail silently if validationRule is from an unsupported type
+        },
+
+        _isValidArrayRule : function (arr, val) {
+            if (! this._router.ignoreCase) {
+                return arrayIndexOf(arr, val) !== -1;
+            }
+
+            if (typeof val === 'string') {
+                val = val.toLowerCase();
+            }
+
+            var n = arr.length,
+                item,
+                compareVal;
+
+            while (n--) {
+                item = arr[n];
+                compareVal = (typeof item === 'string')? item.toLowerCase() : item;
+                if (compareVal === val) {
+                    return true;
+                }
+            }
+            return false;
         },
 
         _getParamsObject : function (request) {
@@ -347,7 +393,7 @@ define(['signals'], function (signals) {
                         o[param +'_'] = val;
                         //update vals_ array as well since it will be used
                         //during dispatch
-                        val = decodeQueryString(val);
+                        val = decodeQueryString(val, shouldTypecast);
                         values[n] = val;
                     }
                     // IE will capture optional groups as empty strings while other
@@ -514,7 +560,7 @@ define(['signals'], function (signals) {
             return captureVals(TOKENS.OP.rgx, pattern);
         }
 
-        function compilePattern(pattern) {
+        function compilePattern(pattern, ignoreCase) {
             pattern = pattern || '';
 
             if(pattern){
@@ -541,7 +587,7 @@ define(['signals'], function (signals) {
                 //single slash is treated as empty and end slash is optional
                 pattern += '\\/?';
             }
-            return new RegExp('^'+ pattern + '$');
+            return new RegExp('^'+ pattern + '$', ignoreCase? 'i' : '');
         }
 
         function replaceTokens(pattern, regexpName, replaceName) {

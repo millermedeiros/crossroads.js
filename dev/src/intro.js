@@ -25,6 +25,13 @@
         }
     }
 
+    function arrayRemove(arr, item) {
+        var i = arrayIndexOf(arr, item);
+        if (i !== -1) {
+            arr.splice(i, 1);
+        }
+    }
+
     function isKind(val, kind) {
         return '[object '+ kind +']' === Object.prototype.toString.call(val);
     }
@@ -72,14 +79,14 @@
     }
 
     //borrowed from AMD-Utils
-    function decodeQueryString(str) {
+    function decodeQueryString(str, shouldTypecast) {
         var queryArr = (str || '').replace('?', '').split('&'),
             n = queryArr.length,
             obj = {},
             item, val;
         while (n--) {
             item = queryArr[n].split('=');
-            val = typecastValue(item[1]);
+            val = shouldTypecast ? typecastValue(item[1]) : item[1];
             obj[item[0]] = (typeof val === 'string')? decodeURIComponent(val) : val;
         }
         return obj;

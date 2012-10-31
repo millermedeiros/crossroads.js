@@ -10,10 +10,23 @@
         this.routed = new signals.Signal();
         this._routes = [];
         this._prevRoutes = [];
+        this._piped = [];
         this.resetState();
     }
 
     Crossroads.prototype = {
+
+        greedy : false,
+
+        greedyEnabled : true,
+
+        ignoreCase : true,
+
+        ignoreState : false,
+
+        shouldTypecast : false,
+
+        normalizeFn : null,
 
         resetState : function(){
             this._prevRoutes.length = 0;
@@ -21,17 +34,9 @@
             this._prevBypassedRequest = null;
         },
 
-        greedy : false,
-
-        greedyEnabled : true,
-
-        normalizeFn : null,
-
         create : function () {
             return new Crossroads();
         },
-
-        shouldTypecast : false,
 
         addRoute : function (pattern, callback, priority) {
             var route = new Route(pattern, callback, priority, this);
@@ -40,10 +45,7 @@
         },
 
         removeRoute : function (route) {
-            var i = arrayIndexOf(this._routes, route);
-            if (i !== -1) {
-                this._routes.splice(i, 1);
-            }
+            arrayRemove(this._routes, route);
             route._destroy();
         },
 
@@ -59,8 +61,10 @@
             request = request || '';
             defaultArgs = defaultArgs || [];
 
-            // should only care about different requests
-            if (request === this._prevMatchedRequest || request === this._prevBypassedRequest) {
+            // should only care about different requests if ignoreState isn't true
+            if ( !this.ignoreState &&
+                (request === this._prevMatchedRequest ||
+                 request === this._prevBypassedRequest) ) {
                 return;
             }
 
@@ -87,6 +91,7 @@
                 this.bypassed.dispatch.apply(this.bypassed, defaultArgs.concat([request]));
             }
 
+            this._pipeParse(request, defaultArgs);
         },
 
         _notifyPrevRoutes : function(matchedRoutes, request) {
@@ -109,6 +114,13 @@
                 }
             }
             return true;
+        },
+
+        _pipeParse : function(request, defaultArgs) {
+            var i = 0, route;
+            while (route = this._piped[i++]) {
+                route.parse(request, defaultArgs);
+            }
         },
 
         getNumRoutes : function () {
@@ -141,6 +153,14 @@
                 }
             }
             return res;
+        },
+
+        pipe : function (otherRouter) {
+            this._piped.push(otherRouter);
+        },
+
+        unpipe : function (otherRouter) {
+            arrayRemove(this._piped, otherRouter);
         },
 
         toString : function () {
