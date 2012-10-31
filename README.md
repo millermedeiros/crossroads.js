@@ -94,9 +94,8 @@ Open `dev/tests/spec_runner-dist.html` on your browser.
 Install [npm](http://npmjs.org) and run:
 
 ```
-npm install jasmine-node -g
-npm link
-jasmine-node dev/tests/spec
+npm install --dev
+npm test
 ```
 
 Note that node.js can only run the distribution file, so any change to the
