@@ -137,7 +137,7 @@
 
                     <h2>Saving history state &amp; updating browser URL</h2>
                     <p>If you are using Crossroads in the browser you may also need a library to handle history state changes. <a href="https://github.com/millermedeiros/hasher/">Hasher</a> is a "sibling" library designed to work together with Crossroads.js, both follow the same principles and use JS-Signals for the event dispatch. Example:</p>
-<pre class="brush: js; gutter:false; toolbar:false">
+<pre class="brush: js">
 //setup crossroads
 crossroads.addRoute('foo');
 crossroads.addRoute('lorem/ipsum');
@@ -185,7 +185,10 @@ hasher.setHash('lorem/ipsum');
                             <li><a href="#crossroads-version">crossroads.VERSION</a></li>
                             <li><a href="#crossroads-greedy">crossroads.greedy</a></li>
                             <li><a href="#crossroads-greedyEnabled">crossroads.greedyEnabled</a></li>
-                            <li><a href="#crossroads-resetState">crossroads.resetState</a></li>
+                            <li><a href="#crossroads-resetState">crossroads.resetState()</a></li>
+                            <li><a href="#crossroads-ignoreState">crossroads.ignoreState</a></li>
+                            <li><a href="#crossroads-pipe">crossroads.pipe()</a></li>
+                            <li><a href="#crossroads-unpipe">crossroads.unpipe()</a></li>
                         </ul>
                         <ul class="col col-1_2 code">
                             <li><a href="#route-matched">Route.matched</a></li>
@@ -227,7 +230,7 @@ hasher.setHash('lorem/ipsum');
                                 It also allows "rest" segments (ending with <code>*</code>) which can match multiple segments. Rest segments can be optional and/or required and don't need to be the last segment of the pattern. The pattern <code>"{foo}/:bar*:"</code> will match <code>news</code> <code>"news/123"</code>, <code>"news/123/bar"</code>, <code>"news/123/lorem/ipsum"</code>.
                             </dd>
                             <dd>
-                                After version 0.9.0 crossroads added support to decoding query strings as well by starting the capturing groups with a <code>&quot;?&quot;</code> (eg: <code>{?foo}</code>, <code>:?bar:</code>). The matched value will be converted into an object.
+                                After version 0.9.0 crossroads added support to decoding query strings as well by starting the capturing groups with a <code>&quot;?&quot;</code> (eg: <code>{?foo}</code>, <code>:?bar:</code>). The matched value will be converted into an object and values will be typecasted if <a href="#crossroads-should_typecast"><code>crossroads.shouldTypecast = true</code></a>.
                             </dd>
                         <dt><code>[handler]</code><em>:Function (optional)</em></dt>
                             <dd>
@@ -250,7 +253,7 @@ hasher.setHash('lorem/ipsum');
                         <code>addRoute</code> returns a <code>Route</code> object.
                     </p>
                     <h4>Example</h4>
-<pre class="brush: js; gutter:false; toolbar:false">
+<pre class="brush: js">
 //String rule with param:
 //match '/news/123' passing "123" as param to handler
 var route1 = crossroads.addRoute('/news/{id}', function(id){
@@ -340,7 +343,7 @@ crossroads.addRoute('foo.php{?query}', function(query){
                             </dd>
                     </dl>
                     <h4>Example</h4>
-<pre class="brush: js; gutter:false; toolbar:false">
+<pre class="brush: js">
 var sectionRoute = crossroads.addRoute('/{section}/{id}');
 function onSectionMatch(section, id){
   console.log(section +' - '+ id);
@@ -349,7 +352,7 @@ sectionRoute.matched.add(onSectionMatch);
 //will match `sectionRoute` passing "news" and `123` as param
 crossroads.parse('/news/123');
 </pre>
-<pre class="brush: js; gutter:false; toolbar:false">
+<pre class="brush: js">
 var sectionRoute = crossroads.addRoute('/{section}/{id}');
 function onSectionMatch(foo, bar, section, id){
   console.log(foo +' - '+ bar +' - '+ section +' - '+ id);
@@ -398,7 +401,7 @@ crossroads.parse('/news/123', ["lorem", "ipsum"]);
                             </dd>
                     </dl>
 <h4>Example</h4>
-<pre class="brush: js; gutter:false; toolbar:false">
+<pre class="brush: js">
 var route1 = crossroads.addRoute('/news/{id}');
 crossroads.bypassed.add(function(request){
     console.log(request);
@@ -443,7 +446,7 @@ crossroads.parse('/foo');
                             </dd>
                     </dl>
 <h4>Example</h4>
-<pre class="brush: js; gutter:false; toolbar:false">
+<pre class="brush: js">
 var route1 = crossroads.addRoute('/news/{id}');
 crossroads.routed.add(function(request, data){
     console.log(request);
@@ -458,21 +461,25 @@ crossroads.parse('/news/123'); //match `route1`, triggering `routed` Signal
                         Create a new independent Router instance. The instance shares same API as <code>crossroads</code> but won't share any properties, so adding a new Route to the created Router won't add the route to the crossroads object and vice-versa. <small>(crossroads is just an instance of the Router object)</small>
                     </p>
 <h4>Basic Example</h4>
-<pre class="brush: js; gutter:false; toolbar:false">
+<pre class="brush: js">
 var otherRouter = crossroads.create();
 otherRouter.addRoute('/news/{id}', function(id){
     console.log(id);
 });
 otherRouter.parse('/news/123');
 </pre>
-<h4>Chain Routers</h4>
+<h4>Chain/Pipe Routers</h4>
 <p>
-    Since Crossroads uses JS-Signals for the event system it is easy to chain multiple Routers together.
+    Since Crossroads uses JS-Signals for the event system it is easy to chain/pipe multiple Routers together.
 </p>
-<pre class="brush: js; gutter:false; toolbar:false">
+<pre class="brush: js">
 crossroads.routed.add(otherRouter.parse, otherRouter);
 crossroads.bypassed.add(otherRouter.parse, otherRouter);
+// same effect as calling: `crossroads.pipe(otherRouter)`
 </pre>
+<p>
+    See: <a href="#crossroads-pipe">crossroads.pipe()</a>
+</p>
                     <hr />
 
                     <h3 class="code" id="crossroads-normalize_fn">crossroads.normalizeFn<em>:Function</em></h3>
@@ -490,7 +497,7 @@ crossroads.bypassed.add(otherRouter.parse, otherRouter);
                         The 2 most common normalizations are are provided as static properties <code>crossroads.NORM_AS_ARRAY</code> and <code>crossroads.NORM_AS_OBJECT</code>.
                     </p>
 <h4>Example</h4>
-<pre class="brush: js; gutter:false; toolbar:false">
+<pre class="brush: js">
 crossroads.normalizeFn = crossroads.NORM_AS_OBJECT;
 crossroads.addRoute('/{foo}/{bar}', function(vals){
     //can access captured values as object properties
@@ -498,7 +505,7 @@ crossroads.addRoute('/{foo}/{bar}', function(vals){
 });
 crossroads.parse('/lorem/ipsum');
 </pre>
-<pre class="brush: js; gutter:false; toolbar:false">
+<pre class="brush: js">
 crossroads.normalizeFn = crossroads.NORM_AS_ARRAY;
 crossroads.addRoute('/{foo}/{bar}', function(vals){
     //can access captured values as Array items
@@ -506,7 +513,7 @@ crossroads.addRoute('/{foo}/{bar}', function(vals){
 });
 crossroads.parse('/dolor/amet');
 </pre>
-<pre class="brush: js; gutter:false; toolbar:false">
+<pre class="brush: js">
 crossroads.normalizeFn = function(request, vals){
     //make sure first argument is always "news"
     return ['news', vals.id];
@@ -535,20 +542,23 @@ crossroads.parse('/article/123');
                         <li>numeric values</li>
                     </ul>
 <h4>Example</h4>
-<pre class="brush: js; gutter:false; toolbar:false">
+<pre class="brush: js">
 crossroads.shouldTypecast = true; //default = false
 crossroads.addRoute('/news/{id}', function(id){
     console.log(id); // 12 (remove trailing zeroes since it's typecasted)
 });
 crossroads.parse('/news/00012');
 </pre>
-<pre class="brush: js; gutter:false; toolbar:false">
+<pre class="brush: js">
 crossroads.shouldTypecast = false; //default = false
 crossroads.addRoute('/news/{id}', function(id){
     console.log(id); // "00012" (keep trailing zeroes)
 });
 crossroads.parse('/news/00012');
 </pre>
+<p>
+    This affects also the values parsed by query strings.
+</p>
                     <hr />
 
                     <h3 class="code" id="crossroads-version">crossroads.VERSION<em>:String</em></h3>
@@ -584,9 +594,79 @@ crossroads.parse('/news/00012');
                         matching a new route) and reset last request.
                     </p>
                     <p>
-                        This feature should NOT be needed by most users.
+                        This feature should NOT be needed by most users. Introduced on v0.10.0.
+                    </p>
+                    <p>
+                        See: <a href="#crossroads-ignoreState">crossroads.ignoreState</a>
                     </p>
                     <hr />
+
+
+                    <h3 class="code" id="crossroads-ignoreState">crossroads.ignoreState<em>:Boolean</em></h3>
+                    <p>
+                        Sets if Router should care about previous state, so multiple <code>crossroads.parse()</code> calls
+                        passing same argument would not trigger the <code>routed</code>, <code>matched</code> and <code>bypassed</code>
+                        signals.
+                    </p>
+                    <p>
+                        The default value is <code>false</code>.
+                    </p>
+                    <p>
+                        PS: The behavior prior to version 0.10.0 was the same
+                        as if this options was set to <code>true</code>. This feature was introduced on v0.11.0.
+                    </p>
+                    <p>
+                        See: <a href="#crossroads-resetState">crossroads.resetState()</a>
+                    </p>
+                    <hr />
+
+
+                    <h3 class="code" id="crossroads-pipe">crossroads.pipe(<em>Router</em>)</h3>
+                    <p>
+                        Pipe routers, so all <code>crossroads.parse()</code> calls will be
+                        forwarded to the other router as well.
+                    </p>
+<pre class="brush:js">
+var sectionRouter = crossroads.create();
+var navRouter = crossroads.create();
+
+sectionRouter.pipe(navRouter);
+// will also call `parse()` on `navRouter`
+sectionRouter.parse('foo');
+</pre>
+<p>
+  This feature was introduced on v0.11.0.
+</p>
+<p>
+    See: <a href="#crossroads-unpipe">crossroads.unpipe()</a>
+</p>
+                    <hr />
+
+
+                    <h3 class="code" id="crossroads-unpipe">crossroads.unpipe(<em>Router</em>)</h3>
+                    <p>
+                        <em>&quot;Ceci n'est pas une pipe&quot;</em>
+                    </p>
+<pre class="brush:js">
+var sectionRouter = crossroads.create();
+var navRouter = crossroads.create();
+
+sectionRouter.pipe(navRouter);
+// will also call `parse()` on `navRouter`
+sectionRouter.parse('foo');
+
+sectionRoute.unpipe(navRouter);
+// won't forward url since they aren't piped anymore
+sectionRouter.parse('bar');
+</pre>
+<p>
+  This feature was introduced on v0.11.0.
+</p>
+<p>
+    See: <a href="#crossroads-pipe">crossroads.pipe()</a>
+</p>
+                    <hr />
+
 
 <!-- =================== Route ======================== -->
 
@@ -596,7 +676,7 @@ crossroads.parse('/news/00012');
                         Signal handlers will receive all parameters captured by the Route pattern.
                     </p>
                     <h4>Example</h4>
-<pre class="brush: js; gutter:false; toolbar:false">
+<pre class="brush: js">
 var route1 = crossroads.addRoute('/news/{id}');
 route1.matched.add(function(id){
   console.log('handler 1: '+ id);
@@ -665,7 +745,7 @@ crossroads.parse('/news/123'); //will trigger both handlers of `route1`
                         All the properties of the rules object are optional, you can specify only the segments you want to validate.
                     </p>
                     <h4>Example</h4>
-<pre class="brush: js; gutter:false; toolbar:false">
+<pre class="brush: js">
 var route1 = crossroads.addRoute('/{section}/{date}/{id}');
 
 //note that `rules` keys have the same as route pattern segments
@@ -728,7 +808,7 @@ route1.match("/blog/2011-05-04/999"); //false. {id} is too high
 route1.match("/blog/2011-05-04/2"); //true. all segments validate
 </pre>
 <h4>Example RegExp pattern</h4>
-<pre class="brush: js; gutter:false; toolbar:false">
+<pre class="brush: js">
 var route1 = crossroads.addRoute(/([\-\w]+)\/([\-\w]+)\/([\-\w]+)/);
 
 //note that `rules` keys represent capturing group index
@@ -759,7 +839,7 @@ route1.match("/blog/2011-05-04/2"); //true. all segments validate
                         request during <a href="#crossroads-parse">parse</a>.
                     </p>
 <h4>Example</h4>
-<pre class="brush: js; gutter:false; toolbar:false">
+<pre class="brush: js">
 var projectsRoute = crossroads.addRoute('/projects/:id:');
 projectsRoute.add(console.log, console);
 projectsRoute.greedy = true; // greedy!
@@ -786,7 +866,7 @@ crossroads.parse('/projects/123');
                         Test if Route matches against request. Return <code>true</code> if request validate against route rules and pattern.
                     </p>
                     <h4>Example</h4>
-<pre class="brush: js; gutter:false; toolbar:false">
+<pre class="brush: js">
 var route1 = crossroads.addRoute('/news/{id}');
 route1.match('/foo/bar'); //false
 route1.match('/news/123'); //true
@@ -799,7 +879,7 @@ route1.match('/news/foo-bar'); //true
                         Return a string that matches the route replacing the capturing groups with the values provided in the <code>replacements</code> object. If the generated string doesn't pass the <a href="#route-rules">validation rules</a> it throws an error <small>(help spotting errors sooner)</small>.
                     </p>
                     <h4>Example</h4>
-<pre class="brush: js; gutter:false; toolbar:false">
+<pre class="brush: js">
 var route1 = crossroads.addRoute('news/{id}');
 route1.interpolate({id: 123});   // "news/123"
 route1.interpolate({id: 'foo'}); // "news/foo"
