@@ -63,12 +63,33 @@ describe('Match', function(){
         expect( s.match('/lorem-ipsum/') ).toBe( true );
     });
 
+    it('should match named params', function(){
+        var s = crossroads.addRoute('|bar|');
+        expect( s.match('lorem-ipsum') ).toBe( false );
+        expect( s.match('') ).toBe( true );
+        expect( s.match('bar/lorem-ipsum') ).toBe( true );
+        expect( s.match('bar/lorem-ipsum/dolor') ).toBe( false );
+        expect( s.match('bar/lorem-ipsum/') ).toBe( true );
+    });
+
     it('should match normal params and optional params', function(){
         var s = crossroads.addRoute('/{foo}/:bar:');
         expect( s.match('/lorem-ipsum') ).toBe( true );
         expect( s.match('/lorem-ipsum/') ).toBe( true );
         expect( s.match('/lorem-ipsum/dolor') ).toBe( true );
         expect( s.match('123/45') ).toBe( true );
+    });
+
+    it('should match named params and optional params', function(){
+        var s = crossroads.addRoute('/|foo|/:bar:');
+        expect( s.match('/lorem-ipsum') ).toBe( true );
+        expect( s.match('/foo/lorem-ipsum/') ).toBe( true );
+        expect( s.match('foo/lorem-ipsum/') ).toBe( true );
+        expect( s.match('foo/lorem-ipsum/dolor') ).toBe( true );
+        expect( s.match('/lorem-ipsum/dolor') ).toBe( false );
+        expect( s.match('bar/lorem-ipsum/dolor') ).toBe( false );
+        expect( s.match('123/45') ).toBe( false );
+        expect( s.match('foo/123/45') ).toBe( true );
     });
 
     it('should work even with optional params on the middle of pattern', function(){
@@ -89,6 +110,26 @@ describe('Match', function(){
         expect( d.match('/123/45/ipsum') ).toBe( true );
     });
 
+    it('should mix and match required, optional, and named parameters', function() {
+        var a = crossroads.addRoute('/|foo|/:bar:/{ipsum}');
+        expect( a.match('foo/123/45/asd') ).toBe( true );
+        expect( a.match('foo/123/asd') ).toBe( true );
+        expect( a.match('123/asd') ).toBe( true );
+        expect( a.match('foo/123') ).toBe( true );
+        expect( a.match('foo') ).toBe( false );
+
+        var b = crossroads.addRoute('/{foo}|bar|{ipsum}'); //bad use!
+        expect( b.match('/123/bar/45/asd') ).toBe( true );
+        expect( b.match('/123/bar/45') ).toBe( false );
+        expect( b.match('/123/45') ).toBe( true );
+
+        var c = crossroads.addRoute('/|foo|:bar:|baz|'); // bad use!
+        expect( c.match('foo/123/45/baz/ipsum') ).toBe( true );
+        expect( c.match('45/baz/ipsum') ).toBe( true );
+        expect( c.match('foo/123/baz/ipsum') ).toBe( true );
+        expect( c.match('foo/123/baz') ).toBe( true ); // ambigious
+    });
+
     it('should support multiple consecutive optional params', function(){
         var s = crossroads.addRoute('/123/:bar:/:ipsum:');
         expect( s.match('/123') ).toBe( true );
@@ -97,6 +138,18 @@ describe('Match', function(){
         expect( s.match('/123/asd/45') ).toBe( true );
         expect( s.match('/123/asd/45/') ).toBe( true );
         expect( s.match('/123/asd/45/qwe') ).toBe( false );
+    });
+
+    it('should support named params in any permutation', function(){
+        var s = crossroads.addRoute('/|search|/|year|/|make|/|color|');
+        expect( s.match('/search/hatchback') ).toBe( true );
+        expect( s.match('/year/2012/') ).toBe( true );
+        expect( s.match('make/toyota') ).toBe( true );
+        expect( s.match('/year/2012/color/red') ).toBe( true );
+        expect( s.match('/year/2012/make/ford/color/red') ).toBe( true );
+        expect( s.match('/year/2012/make/color/red') ).toBe( false );
+        expect( s.match('2012/make/color/red') ).toBe( false );
+        expect( s.match('/make/ford/year/2012/color/red') ).toBe( false );
     });
 
     it('should not be case sensitive by default', function () {

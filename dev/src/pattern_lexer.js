@@ -13,22 +13,23 @@
             LEGACY_SLASHES_REGEXP = /\/$/g,
 
             //params - everything between `{ }` or `: :`
-            PARAMS_REGEXP = /(?:\{|:)([^}:]+)(?:\}|:)/g,
+            PARAMS_REGEXP = /(?:\{|:|\|)([^}:\|]+)(?:\}|:|\|)/g,
+            OPTIONAL_PARAMS_REGEXP = /(?:|\|)([^:\|]+)(?:|\|)/g,
 
             //used to save params during compile (avoid escaping things that
             //shouldn't be escaped).
             TOKENS = {
                 'OS' : {
                     //optional slashes
-                    //slash between `::` or `}:` or `\w:` or `:{?` or `}{?` or `\w{?`
-                    rgx : /([:}]|\w(?=\/))\/?(:|(?:\{\?))/g,
+                    //slash between most every permutation of :, |, and {} that's not required
+                    rgx : /([:}\|]|\w(?=\/))\/?(:|\||(?:\{\?))/g,
                     save : '$1{{id}}$2',
                     res : '\\/?'
                 },
                 'RS' : {
                     //required slashes
-                    //used to insert slash between `:{` and `}{`
-                    rgx : /([:}])\/?(\{)/g,
+                    //used to insert slash between `:{`, `|{`, and `}{`
+                    rgx : /([:\|}])\/?(\{)/g,
                     save : '$1{{id}}$2',
                     res : '\\/'
                 },
@@ -64,6 +65,13 @@
                     //optional params - everything between `: :`
                     rgx : /:([^:]+):/g,
                     res : '([^\\/?]+)?\/?'
+                },
+                'NP' : {
+                    //named params - everything between `| |`
+                    rgx : /\|([a-zA-Z\-\_\~]+)\|/g,
+                    res : '($1/[^\\/?]+)?\/?',
+                    save : '__NP-$1__',
+                    rRestore: /__NP-([^_]+)__/g
                 }
             },
 
@@ -81,7 +89,7 @@
                     cur = TOKENS[key];
                     cur.id = '__CR_'+ key +'__';
                     cur.save = ('save' in cur)? cur.save.replace('{{id}}', cur.id) : cur.id;
-                    cur.rRestore = new RegExp(cur.id, 'g');
+                    cur.rRestore = cur.rRestore || new RegExp(cur.id, 'g');
                 }
             }
         }
@@ -105,7 +113,11 @@
         }
 
         function getOptionalParamsIds(pattern) {
-            return captureVals(TOKENS.OP.rgx, pattern);
+            return captureVals(OPTIONAL_PARAMS_REGEXP, pattern);
+        }
+
+        function getNamedParamsIds(pattern) {
+            return captureVals(TOKENS.NP.rgx, pattern);
         }
 
         function compilePattern(pattern, ignoreCase) {
@@ -149,10 +161,21 @@
             return pattern;
         }
 
-        function getParamValues(request, regexp, shouldTypecast) {
+        function getParamValues(request, regexp, pattern, shouldTypecast) {
             var vals = regexp.exec(request);
             if (vals) {
                 vals.shift();
+
+                var namedParams = getNamedParamsIds(pattern || '');
+                for (var namedIdx in namedParams) {
+                    var named = namedParams[namedIdx];
+                    for (var i in vals) {
+                        if (vals.hasOwnProperty(i) && typeof vals[i] === 'string' && vals[i].indexOf(named + '/') === 0) {
+                            vals[i] = vals[i].split('/')[1];
+                        }
+                    }
+                }
+
                 if (shouldTypecast) {
                     vals = typecastArrayValues(vals);
                 }

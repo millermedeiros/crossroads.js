@@ -28,19 +28,19 @@ describe('patternLexer', function(){
 
         it('should work with special chars', function(){
             var pattern = '/lo[rem](ipsum)/{ipsum}/{dolor}',
-                regex = crossroads.patternLexer.compilePattern(pattern); 
+                regex = crossroads.patternLexer.compilePattern(pattern);
             expect( regex.test(pattern) ).toEqual( true );
         });
 
         it('should work with optional params', function(){
             var pattern = '/lo[rem](ipsum)/{ipsum}/{dolor}:foo::bar:/:blah:/maecennas',
-                regex = crossroads.patternLexer.compilePattern(pattern); 
+                regex = crossroads.patternLexer.compilePattern(pattern);
             expect( regex.test(pattern) ).toEqual( true );
         });
 
         it('should support rest params', function(){
             var pattern = '/lo[rem](ipsum)/{ipsum*}/{dolor}:foo::bar*:/:blah:/maecennas',
-                regex = crossroads.patternLexer.compilePattern(pattern); 
+                regex = crossroads.patternLexer.compilePattern(pattern);
             expect( regex.test(pattern) ).toEqual( true );
         });
 
@@ -53,6 +53,15 @@ describe('patternLexer', function(){
             var pattern = '/lorem/{ipsum}/{dolor}',
                 regex = crossroads.patternLexer.compilePattern(pattern),
                 params = crossroads.patternLexer.getParamValues('/lorem/foo/bar', regex);
+
+            expect( params[0] ).toEqual( 'foo' );
+            expect( params[1] ).toEqual( 'bar' );
+        });
+
+        it('should correctly handle named params', function(){
+            var pattern = '/lorem/|ipsum|/|dolor|',
+                regex = crossroads.patternLexer.compilePattern(pattern),
+                params = crossroads.patternLexer.getParamValues('/lorem/ipsum/foo/dolor/bar', regex, pattern);
 
             expect( params[0] ).toEqual( 'foo' );
             expect( params[1] ).toEqual( 'bar' );
