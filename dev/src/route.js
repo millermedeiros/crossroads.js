@@ -98,7 +98,7 @@
 
         _getParamsObject : function (request) {
             var shouldTypecast = this._router.shouldTypecast,
-                values = crossroads.patternLexer.getParamValues(request, this._matchRegexp, shouldTypecast),
+                values = crossroads.patternLexer.getParamValues(request, this._matchRegexp, this._pattern, shouldTypecast),
                 o = {},
                 n = values.length,
                 param, val;

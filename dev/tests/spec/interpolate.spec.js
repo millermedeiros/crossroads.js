@@ -40,6 +40,15 @@ describe('Route.interpolate()', function(){
         expect( a.interpolate({}) ).toEqual( 'lorem' );
     });
 
+    it('should replace multiple named segments', function(){
+        var a = crossroads.addRoute('lorem/|a||b||c||d|');
+        expect( a.interpolate({a: 'ipsum', d: 'dolor'}) ).toEqual( 'lorem/a/ipsum/d/dolor' );
+        expect( a.interpolate({a: 'ipsum', b: 'dolor', c : 'sit'}) ).toEqual( 'lorem/a/ipsum/b/dolor/c/sit' );
+        expect( a.interpolate({b: 'dolor', c: 'sit'}) ).toEqual( 'lorem/b/dolor/c/sit' );
+        expect( a.interpolate({c: 'dolor-sit'}) ).toEqual( 'lorem/c/dolor-sit' );
+        expect( a.interpolate({}) ).toEqual( 'lorem' );
+    });
+
     it('should throw an error if missing required argument', function () {
         var a = crossroads.addRoute('/{foo}/:bar:');
         expect( function(){

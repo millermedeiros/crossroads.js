@@ -199,6 +199,44 @@ describe('crossroads.parse()', function(){
     });
 
 
+    describe('named params', function(){
+
+        it('should capture named params', function(){
+            var calls = 0;
+
+            var a = crossroads.addRoute('foo/|lorem|/|ipsum|/|dolor|/|sit|');
+            a.matched.add(function(a, b, c, d){
+                expect( a ).toBe( '123' );
+                expect( b ).toBe( 'true' );
+                expect( c ).toBe( 'false' );
+                expect( d ).toBe( 'hi' );
+                calls++;
+            });
+
+            crossroads.parse('foo/lorem/123/ipsum/true/dolor/false/sit/hi');
+
+            expect( calls ).toBe( 1 );
+        });
+
+        it('should only pass matched params', function(){
+            var calls = 0;
+
+            var a = crossroads.addRoute('foo/|lorem|/|ipsum|/|dolor|/|sit|');
+            a.matched.add(function(a, b, c, d){
+                expect( a ).toBe( 'lorem' );
+                expect( b ).toBeUndefined();
+                expect( c ).toBe( '123' );
+                expect( d ).toBeUndefined();
+                calls++;
+            });
+
+            crossroads.parse('foo/lorem/lorem/dolor/123');
+
+            expect( calls ).toBe( 1 );
+        });
+
+    });
+
 
     describe('regex route', function(){
 
