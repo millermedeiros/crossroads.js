@@ -30,6 +30,7 @@
         "jasmine-node" : "1.0.x"
     },
     "scripts" : {
+        "pretest" : "node build",
         "test" : "node node_modules/.bin/jasmine-node dev/tests/spec"
     }
 }

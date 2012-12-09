@@ -1,5 +1,5 @@
 //for node
-var crossroads = crossroads || require('crossroads');
+var crossroads = crossroads || require('../../../dist/crossroads');
 //end node
 
 
