@@ -196,6 +196,9 @@
                         if (match.indexOf('*') === -1 && val.indexOf('/') !== -1) {
                             throw new Error('Invalid value "'+ val +'" for segment "'+ match +'".');
                         }
+                        if (val && match.indexOf('|') === 0) {
+                            val = prop + '/' + val;
+                        }
                     }
                     else if (match.indexOf('{') !== -1) {
                         throw new Error('The segment '+ match +' is required.');
@@ -207,14 +210,14 @@
                 };
 
             if (! TOKENS.OS.trail) {
-                TOKENS.OS.trail = new RegExp('(?:'+ TOKENS.OS.id +')+$');
+                TOKENS.OS.trail = new RegExp('()('+ TOKENS.OS.id +')+$|(' + TOKENS.OS.id + ')('+ TOKENS.OS.id +')+', 'g');
             }
 
-            return pattern
-                        .replace(TOKENS.OS.rgx, TOKENS.OS.save)
-                        .replace(PARAMS_REGEXP, replaceFn)
-                        .replace(TOKENS.OS.trail, '') // remove trailing
-                        .replace(TOKENS.OS.rRestore, '/'); // add slash between segments
+            pattern = pattern.replace(TOKENS.OS.rgx, TOKENS.OS.save)
+            pattern = pattern.replace(PARAMS_REGEXP, replaceFn)
+            pattern = pattern.replace(TOKENS.OS.trail, '$3') // remove empty optionals
+            pattern = pattern.replace(TOKENS.OS.rRestore, '/'); // add slash between segments
+            return pattern;
         }
 
         //API
