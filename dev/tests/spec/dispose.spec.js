@@ -15,20 +15,17 @@ describe('Route.dispose()', function(){
 
 
     it('should dispose route', function(){
-        var t1, t2, t3, t4;
+        var count = 0;
 
-        var a = crossroads.addRoute('/{foo}_{bar}');
+        var a = crossroads.addRoute('{foo}/{bar}');
         a.matched.add(function(foo, bar){
-            t1 = foo;
-            t2 = bar;
+            count++;
         });
 
-        crossroads.parse('/lorem_ipsum');
+        crossroads.parse('foo/bar');
         a.dispose();
-        crossroads.parse('/foo_bar');
-
-        expect( t1 ).toBe( 'lorem' );
-        expect( t2 ).toBe( 'ipsum' );
+        crossroads.parse('dolor/amet');
+        expect( count ).toBe( 1 );
     });
 
 });
