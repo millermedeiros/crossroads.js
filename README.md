@@ -1,10 +1,13 @@
+[![Build Status](https://secure.travis-ci.org/millermedeiros/crossroads.js.png)](https://travis-ci.org/millermedeiros/crossroads.js)
+
+---
 
 ![Crossroads - JavaScript Routes](https://github.com/millermedeiros/crossroads.js/raw/master/_assets/crossroads_logo.png)
 
 
 ## Introduction ##
 
-Crossroads.js is a routing library inspired by URL Route/Dispatch utilities present on frameworks like Rails, Pyramid, Django, CakePHP, CodeIgniter, etc... 
+Crossroads.js is a routing library inspired by URL Route/Dispatch utilities present on frameworks like Rails, Pyramid, Django, CakePHP, CodeIgniter, etc...
 It parses a string input and decides which action should be executed by matching the string against multiple patterns.
 
 If used properly it can reduce code complexity by decoupling objects and also by abstracting navigation paths.
@@ -83,7 +86,7 @@ This will delete all JS files inside the `dist` folder, merge/update/compress so
 
 ### On the browser ###
 
-Open `dev/tests/spec_runner-dist.html` on your browser. 
+Open `dev/tests/spec_runner-dist.html` on your browser.
 
 `spec_runner-dist` tests `dist/crossroads.js` and `spec_runner-dev` tests files inside
 `dev/src` - they all run the same specs.
