@@ -167,9 +167,19 @@
 
             var replaceFn = function(match, prop){
                     var val;
-                    if (prop in replacements) {
+                    prop = prop.substr(0, 1) == '?' ? prop.substr(1) : prop;
+                    if (typeof replacements[prop] != 'undefined') {
                         // make sure value is a string see #gh-54
-                        val = String(replacements[prop]);
+                        if (typeof replacements[prop] == 'object') {
+                            var queryParts = [];
+                            for(var key in replacements[prop]) {
+                                queryParts.push(encodeURI(key + '=' + replacements[prop][key]));
+                            }
+                            val = '?' + queryParts.join('&');
+                        } else {
+                            val = String(replacements[prop]);
+                        }
+
                         if (match.indexOf('*') === -1 && val.indexOf('/') !== -1) {
                             throw new Error('Invalid value "'+ val +'" for segment "'+ match +'".');
                         }
