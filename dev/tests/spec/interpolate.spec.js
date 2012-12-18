@@ -72,4 +72,9 @@ describe('Route.interpolate()', function(){
         }).toThrow( 'Generated string doesn\'t validate against `Route.rules`.' );
     });
 
+    it('should replace query segments', function(){
+        var a = crossroads.addRoute('/{foo}/:?query:');
+        expect( a.interpolate({foo: 'lorem', query: {some: 'test'}}) ).toEqual( '/lorem/?some=test' );
+        expect( a.interpolate({foo: 'dolor-sit', query: {multiple: 'params', works: 'fine'}}) ).toEqual( '/dolor-sit/?multiple=params&works=fine' );
+    });
 });
