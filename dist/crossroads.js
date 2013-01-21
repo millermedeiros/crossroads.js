@@ -2,7 +2,7 @@
  * crossroads <http://millermedeiros.github.com/crossroads.js/>
  * License: MIT
  * Author: Miller Medeiros
- * Version: 0.11.0a (2012/10/24 13:36)
+ * Version: 0.11.0 (2012/10/31 21:44)
  */
 
 (function (define) {
@@ -119,7 +119,17 @@ define(['signals'], function (signals) {
 
     Crossroads.prototype = {
 
+        greedy : false,
+
+        greedyEnabled : true,
+
         ignoreCase : true,
+
+        ignoreState : false,
+
+        shouldTypecast : false,
+
+        normalizeFn : null,
 
         resetState : function(){
             this._prevRoutes.length = 0;
@@ -127,17 +137,9 @@ define(['signals'], function (signals) {
             this._prevBypassedRequest = null;
         },
 
-        greedy : false,
-
-        greedyEnabled : true,
-
-        normalizeFn : null,
-
         create : function () {
             return new Crossroads();
         },
-
-        shouldTypecast : false,
 
         addRoute : function (pattern, callback, priority) {
             var route = new Route(pattern, callback, priority, this);
@@ -162,8 +164,10 @@ define(['signals'], function (signals) {
             request = request || '';
             defaultArgs = defaultArgs || [];
 
-            // should only care about different requests
-            if (request === this._prevMatchedRequest || request === this._prevBypassedRequest) {
+            // should only care about different requests if ignoreState isn't true
+            if ( !this.ignoreState &&
+                (request === this._prevMatchedRequest ||
+                 request === this._prevBypassedRequest) ) {
                 return;
             }
 
@@ -269,7 +273,7 @@ define(['signals'], function (signals) {
 
     //"static" instance
     crossroads = new Crossroads();
-    crossroads.VERSION = '0.11.0a';
+    crossroads.VERSION = '0.11.0';
 
     crossroads.NORM_AS_ARRAY = function (req, vals) {
         return [vals.vals_];

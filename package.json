@@ -3,7 +3,7 @@
     "description" : "Flexible router which can be used in multiple environments",
     "keywords" : ["routes", "event", "observer", "routing", "router"],
     "homepage" : "http://millermedeiros.github.com/crossroads.js/",
-    "version" : "0.11.0a",
+    "version" : "0.11.0",
     "author" : {
         "name" : "Miller Medeiros",
         "url" : "http://blog.millermedeiros.com/"
@@ -23,9 +23,14 @@
         }
     ],
     "dependencies" : {
-        "signals" : "*"
+        "signals" : "<2.0"
     },
     "devDependencies" : {
-        "uglify-js" : "~1.2.3"
+        "uglify-js" : "~1.2.3",
+        "jasmine-node" : "1.0.x"
+    },
+    "scripts" : {
+        "pretest" : "node build",
+        "test" : "node node_modules/.bin/jasmine-node dev/tests/spec"
     }
 }
