@@ -7,7 +7,7 @@
      */
     function Route(pattern, callback, priority, router) {
         var isRegexPattern = isRegExp(pattern),
-            patternLexer = crossroads.patternLexer;
+            patternLexer = router.patternLexer;
         this._router = router;
         this._pattern = pattern;
         this._paramsIds = isRegexPattern? null : patternLexer.getParamIds(pattern);
@@ -98,7 +98,7 @@
 
         _getParamsObject : function (request) {
             var shouldTypecast = this._router.shouldTypecast,
-                values = crossroads.patternLexer.getParamValues(request, this._matchRegexp, shouldTypecast),
+                values = this._router.patternLexer.getParamValues(request, this._matchRegexp, shouldTypecast),
                 o = {},
                 n = values.length,
                 param, val;
@@ -145,7 +145,7 @@
         },
 
         interpolate : function(replacements) {
-            var str = crossroads.patternLexer.interpolate(this._pattern, replacements);
+            var str = this._router.patternLexer.interpolate(this._pattern, replacements);
             if (! this._validateParams(str) ) {
                 throw new Error('Generated string doesn\'t validate against `Route.rules`.');
             }

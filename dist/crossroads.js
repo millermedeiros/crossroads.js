@@ -1,8 +1,7 @@
 /** @license
  * crossroads <http://millermedeiros.github.com/crossroads.js/>
- * License: MIT
- * Author: Miller Medeiros
- * Version: 0.11.0 (2012/10/31 21:44)
+ * Author: Miller Medeiros | MIT License
+ * v0.11.0 (2013/01/21 13:20)
  */
 
 (function (define) {
@@ -292,7 +291,7 @@ define(['signals'], function (signals) {
      */
     function Route(pattern, callback, priority, router) {
         var isRegexPattern = isRegExp(pattern),
-            patternLexer = crossroads.patternLexer;
+            patternLexer = router.patternLexer;
         this._router = router;
         this._pattern = pattern;
         this._paramsIds = isRegexPattern? null : patternLexer.getParamIds(pattern);
@@ -383,7 +382,7 @@ define(['signals'], function (signals) {
 
         _getParamsObject : function (request) {
             var shouldTypecast = this._router.shouldTypecast,
-                values = crossroads.patternLexer.getParamValues(request, this._matchRegexp, shouldTypecast),
+                values = this._router.patternLexer.getParamValues(request, this._matchRegexp, shouldTypecast),
                 o = {},
                 n = values.length,
                 param, val;
@@ -430,7 +429,7 @@ define(['signals'], function (signals) {
         },
 
         interpolate : function(replacements) {
-            var str = crossroads.patternLexer.interpolate(this._pattern, replacements);
+            var str = this._router.patternLexer.interpolate(this._pattern, replacements);
             if (! this._validateParams(str) ) {
                 throw new Error('Generated string doesn\'t validate against `Route.rules`.');
             }
@@ -458,7 +457,7 @@ define(['signals'], function (signals) {
     // Pattern Lexer ------
     //=====================
 
-    crossroads.patternLexer = (function () {
+    Crossroads.prototype.patternLexer = (function () {
 
         var
             //match chars that should be escaped on string regexp
@@ -623,9 +622,19 @@ define(['signals'], function (signals) {
 
             var replaceFn = function(match, prop){
                     var val;
-                    if (prop in replacements) {
-                        // make sure value is a string see #gh-54
-                        val = String(replacements[prop]);
+                    prop = (prop.substr(0, 1) === '?')? prop.substr(1) : prop;
+                    if (replacements[prop] != null) {
+                        if (typeof replacements[prop] === 'object') {
+                            var queryParts = [];
+                            for(var key in replacements[prop]) {
+                                queryParts.push(encodeURI(key + '=' + replacements[prop][key]));
+                            }
+                            val = '?' + queryParts.join('&');
+                        } else {
+                            // make sure value is a string see #gh-54
+                            val = String(replacements[prop]);
+                        }
+
                         if (match.indexOf('*') === -1 && val.indexOf('/') !== -1) {
                             throw new Error('Invalid value "'+ val +'" for segment "'+ match +'".');
                         }

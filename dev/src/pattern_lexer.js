@@ -2,7 +2,7 @@
     // Pattern Lexer ------
     //=====================
 
-    crossroads.patternLexer = (function () {
+    Crossroads.prototype.patternLexer = (function () {
 
         var
             //match chars that should be escaped on string regexp
@@ -167,9 +167,19 @@
 
             var replaceFn = function(match, prop){
                     var val;
-                    if (prop in replacements) {
-                        // make sure value is a string see #gh-54
-                        val = String(replacements[prop]);
+                    prop = (prop.substr(0, 1) === '?')? prop.substr(1) : prop;
+                    if (replacements[prop] != null) {
+                        if (typeof replacements[prop] === 'object') {
+                            var queryParts = [];
+                            for(var key in replacements[prop]) {
+                                queryParts.push(encodeURI(key + '=' + replacements[prop][key]));
+                            }
+                            val = '?' + queryParts.join('&');
+                        } else {
+                            // make sure value is a string see #gh-54
+                            val = String(replacements[prop]);
+                        }
+
                         if (match.indexOf('*') === -1 && val.indexOf('/') !== -1) {
                             throw new Error('Invalid value "'+ val +'" for segment "'+ match +'".');
                         }

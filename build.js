@@ -76,7 +76,8 @@ function uglify(srcPath) {
 
 function minify(){
     var license = tmpl( readFile(SRC_DIR +'/license.txt'), _replacements );
-    _fs.writeFileSync(DIST_MIN_PATH, license + uglify(DIST_PATH), FILE_ENCODING);
+    // we add a leading/trailing ";" to avoid concat issues (#73)
+    _fs.writeFileSync(DIST_MIN_PATH, license +';'+ uglify(DIST_PATH) +';', FILE_ENCODING);
     console.log(' '+ DIST_MIN_PATH +' built.');
 }
 
