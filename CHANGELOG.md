@@ -2,6 +2,7 @@
 
 ## Next ##
 
+ - improve `Route.interpolate()` to support query strings. (#76)
  - make it possible to have a different patternLexer per router. (#67)
 
 
