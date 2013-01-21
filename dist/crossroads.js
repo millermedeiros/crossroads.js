@@ -2,7 +2,7 @@
  * crossroads <http://millermedeiros.github.com/crossroads.js/>
  * License: MIT
  * Author: Miller Medeiros
- * Version: 0.11.0 (2012/10/31 21:44)
+ * Version: 0.11.0 (2012/12/18 11:00)
  */
 
 (function (define) {
@@ -623,9 +623,19 @@ define(['signals'], function (signals) {
 
             var replaceFn = function(match, prop){
                     var val;
-                    if (prop in replacements) {
+                    prop = prop.substr(0, 1) == '?' ? prop.substr(1) : prop;
+                    if (typeof replacements[prop] != 'undefined') {
                         // make sure value is a string see #gh-54
-                        val = String(replacements[prop]);
+                        if (typeof replacements[prop] == 'object') {
+                            var queryParts = [];
+                            for(var key in replacements[prop]) {
+                                queryParts.push(encodeURI(key + '=' + replacements[prop][key]));
+                            }
+                            val = '?' + queryParts.join('&');
+                        } else {
+                            val = String(replacements[prop]);
+                        }
+
                         if (match.indexOf('*') === -1 && val.indexOf('/') !== -1) {
                             throw new Error('Invalid value "'+ val +'" for segment "'+ match +'".');
                         }
