@@ -1,5 +1,10 @@
 # Crossroads.js Changelog #
 
+## Next ##
+
+ - make it possible to have a different patternLexer per router. (#67)
+
+
 ## v0.11.0 (2012/10/31) ##
 
 ### API Changes

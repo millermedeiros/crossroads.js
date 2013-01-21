@@ -2,7 +2,7 @@
  * crossroads <http://millermedeiros.github.com/crossroads.js/>
  * License: MIT
  * Author: Miller Medeiros
- * Version: 0.11.0 (2012/12/18 11:00)
+ * Version: 0.11.0 (2013/01/21 13:02)
  */
 
 (function (define) {
@@ -292,7 +292,7 @@ define(['signals'], function (signals) {
      */
     function Route(pattern, callback, priority, router) {
         var isRegexPattern = isRegExp(pattern),
-            patternLexer = crossroads.patternLexer;
+            patternLexer = router.patternLexer;
         this._router = router;
         this._pattern = pattern;
         this._paramsIds = isRegexPattern? null : patternLexer.getParamIds(pattern);
@@ -383,7 +383,7 @@ define(['signals'], function (signals) {
 
         _getParamsObject : function (request) {
             var shouldTypecast = this._router.shouldTypecast,
-                values = crossroads.patternLexer.getParamValues(request, this._matchRegexp, shouldTypecast),
+                values = this._router.patternLexer.getParamValues(request, this._matchRegexp, shouldTypecast),
                 o = {},
                 n = values.length,
                 param, val;
@@ -430,7 +430,7 @@ define(['signals'], function (signals) {
         },
 
         interpolate : function(replacements) {
-            var str = crossroads.patternLexer.interpolate(this._pattern, replacements);
+            var str = this._router.patternLexer.interpolate(this._pattern, replacements);
             if (! this._validateParams(str) ) {
                 throw new Error('Generated string doesn\'t validate against `Route.rules`.');
             }
@@ -458,7 +458,7 @@ define(['signals'], function (signals) {
     // Pattern Lexer ------
     //=====================
 
-    crossroads.patternLexer = (function () {
+    Crossroads.prototype.patternLexer = (function () {
 
         var
             //match chars that should be escaped on string regexp

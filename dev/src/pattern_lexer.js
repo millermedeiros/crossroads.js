@@ -2,7 +2,7 @@
     // Pattern Lexer ------
     //=====================
 
-    crossroads.patternLexer = (function () {
+    Crossroads.prototype.patternLexer = (function () {
 
         var
             //match chars that should be escaped on string regexp
