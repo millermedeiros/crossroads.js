@@ -1,6 +1,6 @@
 # Crossroads.js Changelog #
 
-## Next ##
+## v0.12.0 (2013/01/21) ##
 
  - improve `Route.interpolate()` to support query strings. (#76)
  - make it possible to have a different patternLexer per router. (#67)
