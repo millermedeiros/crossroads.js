@@ -1,8 +1,7 @@
 /** @license
  * crossroads <http://millermedeiros.github.com/crossroads.js/>
- * License: MIT
- * Author: Miller Medeiros
- * Version: 0.11.0 (2013/01/21 13:15)
+ * Author: Miller Medeiros | MIT License
+ * v0.11.0 (2013/01/21 13:20)
  */
 
 (function (define) {
