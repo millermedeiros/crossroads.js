@@ -5,6 +5,7 @@
  - improve `Route.interpolate()` to support query strings. (#76)
  - make it possible to have a different patternLexer per router. (#67)
  - add trailing/leading ";" to crossroads.min.js to avoid concat issues. (#73)
+ - improve UMD wrapper so crossroads.min.js should also work with r.js.
 
 
 ## v0.11.0 (2012/10/31) ##

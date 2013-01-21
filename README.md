@@ -101,8 +101,5 @@ npm install --dev
 npm test
 ```
 
-Note that node.js can only run the distribution file, so any change to the
-`dev/src` files will require a new `node build`. `npm link` takes care of
-installing dependencies and
-[updating](https://github.com/isaacs/npm/blob/master/doc/link.md) crossroads at
-each change to the `dist/crossroads.js` file.
+Each time you run `npm test` the files inside the `dist` folder will be updated
+(it executes `node build` as a `pretest` script).

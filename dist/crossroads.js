@@ -1,11 +1,11 @@
 /** @license
  * crossroads <http://millermedeiros.github.com/crossroads.js/>
  * Author: Miller Medeiros | MIT License
- * v0.11.0 (2013/01/21 13:20)
+ * v0.11.0 (2013/01/21 13:45)
  */
 
-(function (define) {
-define(['signals'], function (signals) {
+(function () {
+var factory = function (signals) {
 
     var crossroads,
         _hasOptionalGroupBug,
@@ -681,12 +681,16 @@ define(['signals'], function (signals) {
 
 
     return crossroads;
-});
-}(typeof define === 'function' && define.amd ? define : function (deps, factory) {
-    if (typeof module !== 'undefined' && module.exports) { //Node
-        module.exports = factory(require(deps[0]));
-    } else {
-        /*jshint sub:true */
-        window['crossroads'] = factory(window[deps[0]]);
-    }
-}));
+};
+
+if (typeof define === 'function' && define.amd) {
+    define(['signals'], factory);
+} else if (typeof module !== 'undefined' && module.exports) { //Node
+    module.exports = factory(require('signals'));
+} else {
+    /*jshint sub:true */
+    window['crossroads'] = factory(window['signals']);
+}
+
+}());
+
