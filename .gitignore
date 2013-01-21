@@ -2,9 +2,11 @@
 .project
 .settings/
 design/
-node_modules/signals/
+node_modules/
+testacular.conf.js
 
 .DS_Store?
 ehthumbs.db
 Icon?
 Thumbs.db
+
