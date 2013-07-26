@@ -170,9 +170,17 @@
                     prop = (prop.substr(0, 1) === '?')? prop.substr(1) : prop;
                     if (replacements[prop] != null) {
                         if (typeof replacements[prop] === 'object') {
-                            var queryParts = [];
+                            var queryParts = [], rep;
                             for(var key in replacements[prop]) {
-                                queryParts.push(encodeURI(key + '=' + replacements[prop][key]));
+                                rep = replacements[prop][key];
+                                if (isArray(rep)) {
+                                    for (var k in rep) {
+                                        queryParts.push(encodeURI(key + '=' + rep[k]));
+                                    }
+                                }
+                                else {
+                                    queryParts.push(encodeURI(key + '=' + rep));
+                                }
                             }
                             val = '?' + queryParts.join('&');
                         } else {
