@@ -140,13 +140,32 @@
                 routes = this._routes,
                 n = routes.length,
                 route;
+
+            while (route = routes[--n]) {
+                route.active = false;
+            }
+
             //should be decrement loop since higher priorities are added at the end of array
+            n = routes.length;
             while (route = routes[--n]) {
                 if ((!res.length || this.greedy || route.greedy) && route.match(request)) {
-                    res.push({
-                        route : route,
-                        params : route._getParamsArray(request)
-                    });
+                    var allParams = route._getParamsArray(request),
+                        ancestors = route._selfAndAncestors();
+
+                    var i = ancestors.length;
+                    while (route = ancestors[--i]) {
+                        var consume = route._getParamsArray(request, true).length;
+                        var params = allParams.splice(0, consume);
+                        if (route.active) {
+                            continue;
+                        }
+
+                        route.active = true;
+                        res.push({
+                            route : route,
+                            params : params
+                        });
+                    }
                 }
                 if (!this.greedyEnabled && res.length) {
                     break;

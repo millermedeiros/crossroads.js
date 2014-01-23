@@ -1,7 +1,7 @@
 /** @license
  * crossroads <http://millermedeiros.github.com/crossroads.js/>
  * Author: Miller Medeiros | MIT License
- * v0.12.0 (2013/01/21 13:47)
+ * v0.12.0 (2014/01/23 16:28)
  */
 
 (function () {
@@ -242,13 +242,32 @@ var factory = function (signals) {
                 routes = this._routes,
                 n = routes.length,
                 route;
+
+            while (route = routes[--n]) {
+                route.active = false;
+            }
+
             //should be decrement loop since higher priorities are added at the end of array
+            n = routes.length;
             while (route = routes[--n]) {
                 if ((!res.length || this.greedy || route.greedy) && route.match(request)) {
-                    res.push({
-                        route : route,
-                        params : route._getParamsArray(request)
-                    });
+                    var allParams = route._getParamsArray(request),
+                        ancestors = route._selfAndAncestors();
+
+                    var i = ancestors.length;
+                    while (route = ancestors[--i]) {
+                        var consume = route._getParamsArray(request, true).length;
+                        var params = allParams.splice(0, consume);
+                        if (route.active) {
+                            continue;
+                        }
+
+                        route.active = true;
+                        res.push({
+                            route : route,
+                            params : params
+                        });
+                    }
                 }
                 if (!this.greedyEnabled && res.length) {
                     break;
@@ -297,6 +316,7 @@ var factory = function (signals) {
         this._paramsIds = isRegexPattern? null : patternLexer.getParamIds(pattern);
         this._optionalParamsIds = isRegexPattern? null : patternLexer.getOptionalParamsIds(pattern);
         this._matchRegexp = isRegexPattern? pattern : patternLexer.compilePattern(pattern, router.ignoreCase);
+        this._matchRegexpHead = isRegexPattern? pattern : patternLexer.compilePattern(pattern, router.ignoreCase, true);
         this.matched = new signals.Signal();
         this.switched = new signals.Signal();
         if (callback) {
@@ -382,7 +402,7 @@ var factory = function (signals) {
 
         _getParamsObject : function (request) {
             var shouldTypecast = this._router.shouldTypecast,
-                values = this._router.patternLexer.getParamValues(request, this._matchRegexp, shouldTypecast),
+                values = this._router.patternLexer.getParamValues(request, this._matchRegexpHead, shouldTypecast),
                 o = {},
                 n = values.length,
                 param, val;
@@ -448,6 +468,29 @@ var factory = function (signals) {
 
         toString : function () {
             return '[Route pattern:"'+ this._pattern +'", numListeners:'+ this.matched.getNumListeners() +']';
+        },
+
+        addRoute : function (pattern, handler, priority) {
+            var basePattern = this._pattern,
+                route;
+
+            if (basePattern[basePattern.length-1] == '/')
+                basePattern = basePattern.slice(0, -1);
+            if (pattern[0] != '/')
+                basePattern = basePattern + '/'
+
+            route = this._router.addRoute(basePattern + pattern, handler, priority);
+            route._parent = this;
+            return route;
+        },
+
+        _selfAndAncestors : function() {
+            var parent = this;
+            var collect = [this];
+            while (parent = parent._parent) {
+                collect.push(parent);
+            }
+            return collect;
         }
 
     };
@@ -563,7 +606,7 @@ var factory = function (signals) {
             return captureVals(TOKENS.OP.rgx, pattern);
         }
 
-        function compilePattern(pattern, ignoreCase) {
+        function compilePattern(pattern, ignoreCase, matchHead) {
             pattern = pattern || '';
 
             if(pattern){
@@ -590,7 +633,10 @@ var factory = function (signals) {
                 //single slash is treated as empty and end slash is optional
                 pattern += '\\/?';
             }
-            return new RegExp('^'+ pattern + '$', ignoreCase? 'i' : '');
+            if (!matchHead) {
+                pattern += '$'
+            }
+            return new RegExp('^'+ pattern, ignoreCase? 'i' : '');
         }
 
         function replaceTokens(pattern, regexpName, replaceName) {
