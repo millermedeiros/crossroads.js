@@ -171,6 +171,12 @@
             var basePattern = this._pattern,
                 route;
 
+            if (!pattern || typeof pattern == 'function') {
+                priority = handler;
+                handler = pattern;
+                pattern = '';
+            }
+
             if (basePattern[basePattern.length-1] === '/')
                 basePattern = basePattern.slice(0, -1);
             if (pattern[0] !== '/')
@@ -178,6 +184,11 @@
 
             route = this._router.addRoute(basePattern + pattern, handler, priority);
             route._parent = this;
+
+            // index routes should be matched together with parent route
+            if (!pattern.length || pattern === '/')
+                route.greedy = true;
+
             return route;
         },
 

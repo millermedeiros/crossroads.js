@@ -1,7 +1,7 @@
 /** @license
  * crossroads <http://millermedeiros.github.com/crossroads.js/>
  * Author: Miller Medeiros | MIT License
- * v0.12.0 (2014/01/23 16:28)
+ * v0.12.0 (2014/01/23 17:08)
  */
 
 (function () {
@@ -474,13 +474,24 @@ var factory = function (signals) {
             var basePattern = this._pattern,
                 route;
 
-            if (basePattern[basePattern.length-1] == '/')
+            if (!pattern || typeof pattern == 'function') {
+                priority = handler;
+                handler = pattern;
+                pattern = '';
+            }
+
+            if (basePattern[basePattern.length-1] === '/')
                 basePattern = basePattern.slice(0, -1);
-            if (pattern[0] != '/')
-                basePattern = basePattern + '/'
+            if (pattern[0] !== '/')
+                basePattern = basePattern + '/';
 
             route = this._router.addRoute(basePattern + pattern, handler, priority);
             route._parent = this;
+
+            // index routes should be matched together with parent route
+            if (!pattern.length || pattern === '/')
+                route.greedy = true;
+
             return route;
         },
 
@@ -634,7 +645,7 @@ var factory = function (signals) {
                 pattern += '\\/?';
             }
             if (!matchHead) {
-                pattern += '$'
+                pattern += '$';
             }
             return new RegExp('^'+ pattern, ignoreCase? 'i' : '');
         }

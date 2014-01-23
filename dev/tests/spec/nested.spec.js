@@ -27,7 +27,7 @@ describe('nested routes', function(){
     });
 
 
-    describe('parse different children', function(){
+    describe('parse child', function(){
 
         it('should match the child route', function(){
 
@@ -78,6 +78,16 @@ describe('nested routes', function(){
             crossroads.parse('/base/foo/child/bar');
             crossroads.parse('/base/foo/another/child');
             expect(ancestorSwitched.calls.length).toEqual(0);
+
+        });
+
+        it('should match the index route', function(){
+
+            var indexMatched = jasmine.createSpy(),
+                indexRoute = baseRoute.addRoute(indexMatched)
+
+            crossroads.parse('/base/foo');
+            expect(indexMatched).toHaveBeenCalled();
 
         });
 
