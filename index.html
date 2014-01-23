@@ -191,6 +191,7 @@ hasher.setHash('lorem/ipsum');
                             <li><a href="#crossroads-unpipe">crossroads.unpipe()</a></li>
                         </ul>
                         <ul class="col col-1_2 code">
+                            <li><a href="#route-add-route">Route.addRoute()</a></li>
                             <li><a href="#route-matched">Route.matched</a></li>
                             <li><a href="#route-switched">Route.switched</a></li>
                             <li><a href="#route-rules">Route.rules</a></li>
@@ -669,6 +670,61 @@ sectionRouter.parse('bar');
 
 
 <!-- =================== Route ======================== -->
+
+                    <h3 class="code" id="route-add-route">Route.addRoute(<em>[pattern], [handler], [priority]</em>)<em>:Route</em></h3>
+                    <p>Add a nested route to the current one.
+<pre class="brush: js">
+var base = crossroads.addRoute('/base');
+var child = base.addRoute('/child');
+</pre>
+                    <p>This creates a child route which matches the same pattern as</p>
+<pre class="brush: js">
+crossroads.addRoute('/base/child');
+</pre>
+                    <p>If a nested route is matched, its parents are also matched.</p>
+<pre class="brush: js">
+crossroads.parse('/base/child');
+// base.matched is emitted
+// child.matched is emitted
+</pre>
+                    <p>But the base route is not switched if a child changes.</p>
+<pre class="brush: js">
+base.addRoute('/another');
+crossroads.parse('/base/child');
+crossroads.parse('/base/another');
+// child.switched is emitted
+// base.switched is not emitted
+</pre>
+                    <p>Of course, the <code>base</code> route also matches the pattern <code>"/base"</code>.</p>
+<pre class="brush: js">
+crossroads.parse('/base/');
+// base.matched is emitted
+// child.matched is not emitted
+</pre>
+                    <h4>Index Routes</h4>
+                    <p>When subscribing to the <code>base</code> route we cannot determine whether <code>"/base/"</code> or <code>"/base/child"</code> was matched. As a solution we may attach an index route to <code>base</code>.</p>
+<pre class="brush: js">
+var index = base.addRoute(handlerFunc);
+crossroads.parse('/base/');
+// base.matched is emitted
+// index.matched is emitted and handlerFunc is called
+</pre>
+                    <p>In this case <code>pattern</code> becomes an optional parameter and is set to <code>"/"</code>.</p>
+
+                    <h4>Matched Parameters</h4>
+                    <p>When matching nested routes only the parameters of the segments are passed to the handlers.</p>
+
+<pre class="brush: js">
+var base = crossroads.addRoute('/{foo}');
+var child = base.addRoute('/{bar}');
+crossroads.parse('/foo/bar')
+// base.matched is emitted with 'foo' as the only argument and
+// child.matched is emitted with 'bar' as the only argument.
+</pre>
+
+                    <p>
+                        <b>See also:</b> <a href="#crossroads-add_route">crossroads.addRoute()</a>                    </p>
+
 
                     <h3 class="code" id="route-matched">Route.matched<em>:Signal</em></h3>
                     <p>Signal dispatched every time a request matches the route pattern.</p>
