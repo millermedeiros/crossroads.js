@@ -7,7 +7,7 @@ var crossroads = crossroads || require('../../../dist/crossroads');
 
 describe('crossroads.pipe / crossroads.unpipe', function(){
 
-    describe('it should pipe parse() calls to multiple routers', function () {
+    it('should pipe parse() calls to multiple routers', function () {
         var r1 = crossroads.create();
         var r2 = crossroads.create();
         var r3 = crossroads.create();
