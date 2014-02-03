@@ -103,6 +103,10 @@ describe('nested routes', function(){
             anotherChild = baseRoute.addRoute('/{child}/bar');
         });
 
+        afterEach(function(){
+            crossroads.greedy = false;
+        });
+
         it('should match both children', function(){
 
             var childMatched = jasmine.createSpy();
