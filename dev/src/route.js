@@ -13,6 +13,7 @@
         this._paramsIds = isRegexPattern? null : patternLexer.getParamIds(pattern);
         this._optionalParamsIds = isRegexPattern? null : patternLexer.getOptionalParamsIds(pattern);
         this._matchRegexp = isRegexPattern? pattern : patternLexer.compilePattern(pattern, router.ignoreCase);
+        this._matchRegexpHead = isRegexPattern? pattern : patternLexer.compilePattern(pattern, router.ignoreCase, true);
         this.matched = new signals.Signal();
         this.switched = new signals.Signal();
         if (callback) {
@@ -98,7 +99,7 @@
 
         _getParamsObject : function (request) {
             var shouldTypecast = this._router.shouldTypecast,
-                values = this._router.patternLexer.getParamValues(request, this._matchRegexp, shouldTypecast),
+                values = this._router.patternLexer.getParamValues(request, this._matchRegexpHead, shouldTypecast),
                 o = {},
                 n = values.length,
                 param, val;
@@ -164,6 +165,40 @@
 
         toString : function () {
             return '[Route pattern:"'+ this._pattern +'", numListeners:'+ this.matched.getNumListeners() +']';
+        },
+
+        addRoute : function (pattern, handler, priority) {
+            var basePattern = this._pattern,
+                route;
+
+            if (!pattern || typeof pattern == 'function') {
+                priority = handler;
+                handler = pattern;
+                pattern = '';
+            }
+
+            if (basePattern[basePattern.length-1] === '/')
+                basePattern = basePattern.slice(0, -1);
+            if (pattern[0] !== '/')
+                basePattern = basePattern + '/';
+
+            route = this._router.addRoute(basePattern + pattern, handler, priority);
+            route._parent = this;
+
+            // index routes should be matched together with parent route
+            if (!pattern.length || pattern === '/')
+                route.greedy = true;
+
+            return route;
+        },
+
+        _selfAndAncestors : function() {
+            var parent = this;
+            var collect = [this];
+            while (parent = parent._parent) {
+                collect.push(parent);
+            }
+            return collect;
         }
 
     };

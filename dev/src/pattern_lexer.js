@@ -108,7 +108,7 @@
             return captureVals(TOKENS.OP.rgx, pattern);
         }
 
-        function compilePattern(pattern, ignoreCase) {
+        function compilePattern(pattern, ignoreCase, matchHead) {
             pattern = pattern || '';
 
             if(pattern){
@@ -135,7 +135,10 @@
                 //single slash is treated as empty and end slash is optional
                 pattern += '\\/?';
             }
-            return new RegExp('^'+ pattern + '$', ignoreCase? 'i' : '');
+            if (!matchHead) {
+                pattern += '$';
+            }
+            return new RegExp('^'+ pattern, ignoreCase? 'i' : '');
         }
 
         function replaceTokens(pattern, regexpName, replaceName) {
