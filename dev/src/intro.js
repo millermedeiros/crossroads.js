@@ -86,7 +86,7 @@
             item, val;
         while (n--) {
             item = queryArr[n].split('=');
-            val = shouldTypecast ? typecastValue(item[1]) : item[1];
+            val = shouldTypecast ? typecastValue(item.slice(1).join('=')) : item.slice(1).join('=');
             obj[item[0]] = (typeof val === 'string')? decodeURIComponent(val) : val;
         }
         return obj;
