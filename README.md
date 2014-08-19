@@ -1,4 +1,4 @@
-[![Build Status](https://secure.travis-ci.org/millermedeiros/crossroads.js.png)](https://travis-ci.org/millermedeiros/crossroads.js)
+[![Build Status](https://secure.travis-ci.org/millermedeiros/crossroads.js.svg)](https://travis-ci.org/millermedeiros/crossroads.js)
 
 ---
 
