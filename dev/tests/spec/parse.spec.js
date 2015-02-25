@@ -2,6 +2,7 @@
 
 //for node
 var crossroads = crossroads || require('../../../dist/crossroads');
+var async = async || require('async');
 //end node
 
 
@@ -155,6 +156,43 @@ describe('crossroads.parse()', function(){
             crossroads.parse();
 
             expect( calls ).toBe( 1 );
+        });
+
+
+        it('should call functions upon matched params', function(done){
+            var paramPassed = false;
+            var s = crossroads.addRoute('/paramtest/{param}', function(){
+                expect( paramPassed ).toBe( true );
+                done();
+            });
+            crossroads.param('param', function(param, callback){
+                expect( param ).toBe( '123' );
+                paramPassed = true;
+                callback();
+            });
+            crossroads.parse('/paramtest/123');
+        });
+
+
+        it('calls optional functions upon multiple matched params', function(done){
+            var param1Passed = false;
+            var param2Passed = false;
+            var s = crossroads.addRoute('/paramtest/{param1}/{param2}', function(){
+                expect( param1Passed ).toBe( true );
+                expect( param2Passed ).toBe( true );
+                done();
+            });
+            crossroads.param('param1', function(param, callback){
+                expect( param ).toBe( '123' );
+                param1Passed = true;
+                callback();
+            });
+            crossroads.param('param2', function(param, callback){
+                expect( param ).toBe( '456' );
+                param2Passed = true;
+                callback();
+            });
+            crossroads.parse('/paramtest/123/456');
         });
     });
 

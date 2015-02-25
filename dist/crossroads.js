@@ -1,11 +1,11 @@
 /** @license
  * crossroads <http://millermedeiros.github.com/crossroads.js/>
  * Author: Miller Medeiros | MIT License
- * v0.12.0 (2013/01/21 13:47)
+ * v0.12.0 (2015/02/25 21:04)
  */
 
 (function () {
-var factory = function (signals) {
+var factory = function (signals, async) {
 
     var crossroads,
         _hasOptionalGroupBug,
@@ -100,7 +100,6 @@ var factory = function (signals) {
         return obj;
     }
 
-
     // Crossroads --------
     //====================
 
@@ -111,6 +110,7 @@ var factory = function (signals) {
         this.bypassed = new signals.Signal();
         this.routed = new signals.Signal();
         this._routes = [];
+        this._params = {};
         this._prevRoutes = [];
         this._piped = [];
         this.resetState();
@@ -146,6 +146,10 @@ var factory = function (signals) {
             return route;
         },
 
+        param : function (param, callback) {
+            this._params[param] = callback;
+        },
+
         removeRoute : function (route) {
             arrayRemove(this._routes, route);
             route._destroy();
@@ -172,8 +176,19 @@ var factory = function (signals) {
 
             var routes = this._getMatchedRoutes(request),
                 i = 0,
+                j = 0,
                 n = routes.length,
-                cur;
+                cur,
+                self = this;
+
+            var dispatchFn = function(i) {
+                return function(){
+                    // console.log(request);
+                    cur.route.matched.dispatch.apply(cur.route.matched, defaultArgs.concat(cur.params));
+                    cur.isFirst = !i;
+                    self.routed.dispatch.apply(this.routed, defaultArgs.concat([request, cur]));
+                };
+            };
 
             if (n) {
                 this._prevMatchedRequest = request;
@@ -183,9 +198,21 @@ var factory = function (signals) {
                 //should be incremental loop, execute routes in order
                 while (i < n) {
                     cur = routes[i];
-                    cur.route.matched.dispatch.apply(cur.route.matched, defaultArgs.concat(cur.params));
-                    cur.isFirst = !i;
-                    this.routed.dispatch.apply(this.routed, defaultArgs.concat([request, cur]));
+                    if(cur.route._paramsIds){
+                        var fns = [];
+                        for(j=0; j<cur.route._paramsIds.length; ++j) {
+                            var fn = this._params[cur.route._paramsIds[j]];
+                            if(fn && (typeof fn === 'function')) {
+                                fns.push((async.apply).apply(null, [fn].concat(defaultArgs).concat([cur.params[j]])));
+                            }
+                        }
+
+                        async.series(fns, dispatchFn(i));
+                    }
+                    else{
+                        dispatchFn(i)();
+                    }
+
                     i += 1;
                 }
             } else {
@@ -684,12 +711,12 @@ var factory = function (signals) {
 };
 
 if (typeof define === 'function' && define.amd) {
-    define(['signals'], factory);
+    define(['signals', 'async'], factory);
 } else if (typeof module !== 'undefined' && module.exports) { //Node
-    module.exports = factory(require('signals'));
+    module.exports = factory(require('signals'), require('async'));
 } else {
     /*jshint sub:true */
-    window['crossroads'] = factory(window['signals']);
+    window['crossroads'] = factory(window['signals'], window['async']);
 }
 
 }());

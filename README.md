@@ -27,7 +27,7 @@ See [project page](http://millermedeiros.github.com/crossroads.js/) for document
 
 ## Dependencies ##
 
-**This library requires [JS-Signals](http://millermedeiros.github.com/js-signals/) to work.**
+**This library requires [JS-Signals](http://millermedeiros.github.com/js-signals/) and [async](https://github.com/caolan/async) to work.**
 
 
 
