@@ -1,7 +1,7 @@
 /** @license
  * crossroads <http://millermedeiros.github.com/crossroads.js/>
  * Author: Miller Medeiros | MIT License
- * v0.12.0 (2015/02/25 21:04)
+ * v0.12.0 (2015/02/25 21:23)
  */
 
 (function () {
@@ -182,8 +182,10 @@ var factory = function (signals, async) {
                 self = this;
 
             var dispatchFn = function(i) {
-                return function(){
-                    // console.log(request);
+                return function(err){
+                    if(err){
+                        return;
+                    }
                     cur.route.matched.dispatch.apply(cur.route.matched, defaultArgs.concat(cur.params));
                     cur.isFirst = !i;
                     self.routed.dispatch.apply(this.routed, defaultArgs.concat([request, cur]));

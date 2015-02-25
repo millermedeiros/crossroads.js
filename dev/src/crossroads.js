@@ -81,8 +81,10 @@
                 self = this;
 
             var dispatchFn = function(i) {
-                return function(){
-                    // console.log(request);
+                return function(err){
+                    if(err){
+                        return;
+                    }
                     cur.route.matched.dispatch.apply(cur.route.matched, defaultArgs.concat(cur.params));
                     cur.isFirst = !i;
                     self.routed.dispatch.apply(this.routed, defaultArgs.concat([request, cur]));
