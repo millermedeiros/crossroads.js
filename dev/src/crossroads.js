@@ -39,8 +39,8 @@
             return new Crossroads();
         },
 
-        addRoute : function (pattern, callback, priority) {
-            var route = new Route(pattern, callback, priority, this);
+        addRoute : function (pattern, callbacks, priority) {
+            var route = new Route(pattern, callbacks, priority, this);
             this._sortedInsert(route);
             return route;
         },

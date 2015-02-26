@@ -5,7 +5,7 @@
     /**
      * @constructor
      */
-    function Route(pattern, callback, priority, router) {
+    function Route(pattern, callbacks, priority, router) {
         var isRegexPattern = isRegExp(pattern),
             patternLexer = router.patternLexer;
         this._router = router;
@@ -15,8 +15,19 @@
         this._matchRegexp = isRegexPattern? pattern : patternLexer.compilePattern(pattern, router.ignoreCase);
         this.matched = new signals.Signal();
         this.switched = new signals.Signal();
-        if (callback) {
-            this.matched.add(callback);
+        if (callbacks) {
+            if(typeof callbacks === 'function'){
+                this.matched.add(callbacks);
+            }
+            else{
+                this.matched.add(function(){
+                    var fns = [];
+                    for(var i=0; i<callbacks.length; ++i){
+                        fns.push((async.apply).apply(null, [callbacks[i]].concat(arguments)));
+                    }
+                    async.series(fns);
+                });
+            }
         }
         this._priority = priority || 0;
     }

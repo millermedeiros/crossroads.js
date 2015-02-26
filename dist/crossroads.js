@@ -1,7 +1,7 @@
 /** @license
  * crossroads <http://millermedeiros.github.com/crossroads.js/>
  * Author: Miller Medeiros | MIT License
- * v0.12.0 (2015/02/25 21:23)
+ * v0.12.0 (2015/02/26 23:31)
  */
 
 (function () {
@@ -140,8 +140,8 @@ var factory = function (signals, async) {
             return new Crossroads();
         },
 
-        addRoute : function (pattern, callback, priority) {
-            var route = new Route(pattern, callback, priority, this);
+        addRoute : function (pattern, callbacks, priority) {
+            var route = new Route(pattern, callbacks, priority, this);
             this._sortedInsert(route);
             return route;
         },
@@ -318,7 +318,7 @@ var factory = function (signals, async) {
     /**
      * @constructor
      */
-    function Route(pattern, callback, priority, router) {
+    function Route(pattern, callbacks, priority, router) {
         var isRegexPattern = isRegExp(pattern),
             patternLexer = router.patternLexer;
         this._router = router;
@@ -328,8 +328,19 @@ var factory = function (signals, async) {
         this._matchRegexp = isRegexPattern? pattern : patternLexer.compilePattern(pattern, router.ignoreCase);
         this.matched = new signals.Signal();
         this.switched = new signals.Signal();
-        if (callback) {
-            this.matched.add(callback);
+        if (callbacks) {
+            if(typeof callbacks === 'function'){
+                this.matched.add(callbacks);
+            }
+            else{
+                this.matched.add(function(){
+                    var fns = [];
+                    for(var i=0; i<callbacks.length; ++i){
+                        fns.push((async.apply).apply(null, [callbacks[i]].concat(arguments)));
+                    }
+                    async.series(fns);
+                });
+            }
         }
         this._priority = priority || 0;
     }
