@@ -43,7 +43,7 @@ describe('crossroads.parse()', function(){
             expect( t1 ).toBe( 2 );
         });
 
-        it('shold route basic strings with multiple chained callbacks', function(){
+        it('shold route basic strings with multiple chained callbacks', function(done){
             var t1 = 0;
             var t2 = 0;
 
@@ -53,11 +53,10 @@ describe('crossroads.parse()', function(){
                     cb();
                 }, function(a, cb){
                     t2++;
-                    cb();
-                }], function(){
                     expect( t1 ).toBe( 1 );
                     expect( t2 ).toBe( 1 );
-                });
+                    done();
+                }]);
             crossroads.parse('/foo');
         });
 
