@@ -45,19 +45,20 @@ describe('crossroads.parse()', function(){
 
         it('shold route basic strings with multiple chained callbacks', function(){
             var t1 = 0;
+            var t2 = 0;
 
             crossroads.addRoute('/foo', 
                 [function(a, cb){
                     t1++;
                     cb();
-                }, function(){
-                    t1++;
-                }]);
-            crossroads.parse('/bar');
+                }, function(a, cb){
+                    t2++;
+                    cb();
+                }], function(){
+                    expect( t1 ).toBe( 1 );
+                    expect( t2 ).toBe( 1 );
+                });
             crossroads.parse('/foo');
-            crossroads.parse('foo');
-
-            expect( t1 ).toBe( 4 );
         });
 
         it('should pass params and allow multiple routes', function(){
