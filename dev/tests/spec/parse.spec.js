@@ -48,10 +48,10 @@ describe('crossroads.parse()', function(){
             var t2 = 0;
 
             crossroads.addRoute('/foo', 
-                [function(a, cb){
+                [function(cb){
                     t1++;
                     cb();
-                }, function(a, cb){
+                }, function(cb){
                     t2++;
                     expect( t1 ).toBe( 1 );
                     expect( t2 ).toBe( 1 );

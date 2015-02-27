@@ -21,9 +21,10 @@
             }
             else{
                 this.matched.add(function(){
+                    var params = Array.prototype.slice.call(arguments);
                     var fns = [];
                     for(var i=0; i<callbacks.length; ++i){
-                        fns.push((async.apply).apply(null, [callbacks[i]].concat(arguments)));
+                        fns.push((async.apply).apply(null, [callbacks[i]].concat(params)));
                     }
                     async.series(fns);
                 });
