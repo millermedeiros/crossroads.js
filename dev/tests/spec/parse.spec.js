@@ -1018,6 +1018,24 @@ describe('crossroads.parse()', function(){
                 expect( t2 ).toEqual( {lorem : 'ipsum', asd : '123', bar : 'false'} );
             });
         });
+		
+		describe('required query string after required segment', function () {
+            it('should parse query string into an object and typecast vals with = in parameter', function () {
+                crossroads.shouldTypecast = true;
+
+                var r = crossroads.addRoute('{a}{?b}');
+                var t1, t2;
+                r.matched.addOnce(function(a, b){
+                    t1 = a;
+                    t2 = b;
+                });
+                crossroads.parse('foo.php?lorem=ipsume==&asd=123&bar=false');
+
+                expect( t1 ).toEqual( 'foo.php' );
+                expect( t2 ).toEqual( {lorem : 'ipsume==', asd : 123, bar : false} );
+            });
+        });
+		
     });
 
 
