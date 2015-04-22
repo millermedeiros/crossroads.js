@@ -83,19 +83,21 @@
         var queryArr = (str || '').replace('?', '').split('&'),
             n = queryArr.length,
             obj = {},
-            item, val, decodedVal;
+            item, val, decodedVal, propertyName, prev;
         while (n--) {
             item = queryArr[n].split('=');
+            propertyName = item[0];
+            prev = obj[propertyName];
             val = shouldTypecast ? typecastValue(item[1]) : item[1];
             decodedVal = (typeof val === 'string')? decodeURIComponent(val) : val;
-            if (isArray(obj[item[0]])) {
-                obj[item[0]].unshift(decodedVal);
+            if (isArray(prev)) {
+                prev.unshift(decodedVal);
             }
             else if (obj[item[0]]) {
-                obj[item[0]] = [decodedVal, obj[item[0]]];
+                obj[propertyName] = [decodedVal, prev];
             }
             else {
-                obj[item[0]] = decodedVal;
+                obj[propertyName] = decodedVal;
             }
         }
         return obj;
