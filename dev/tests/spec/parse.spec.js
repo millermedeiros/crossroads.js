@@ -6,7 +6,6 @@ var crossroads = crossroads || require('../../../dist/crossroads');
 
 
 describe('crossroads.parse()', function(){
-
     var _prevTypecast;
 
 
@@ -1016,6 +1015,21 @@ describe('crossroads.parse()', function(){
 
                 expect( t1 ).toEqual( 'foo.php' );
                 expect( t2 ).toEqual( {lorem : 'ipsum', asd : '123', bar : 'false'} );
+            });
+        });
+
+        describe('multiple query parameters with same name', function () {
+            it('should parse values into an array', function () {
+                var t1;
+                var r = crossroads.addRoute('foo.php:?query:', function(a) {
+                    t1 = a;
+                });
+
+                crossroads.parse('foo.php?name=x&name=y');
+                expect( t1 ).toEqual( {name : ['x', 'y']} );
+
+                crossroads.parse('foo.php?name=x&type=json&name=y&name=z');
+                expect( t1 ).toEqual( {name : ['x', 'y', 'z'], type : 'json'} );
             });
         });
     });

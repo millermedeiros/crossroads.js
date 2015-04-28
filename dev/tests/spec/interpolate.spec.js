@@ -76,5 +76,6 @@ describe('Route.interpolate()', function(){
         var a = crossroads.addRoute('/{foo}/:?query:');
         expect( a.interpolate({foo: 'lorem', query: {some: 'test'}}) ).toEqual( '/lorem/?some=test' );
         expect( a.interpolate({foo: 'dolor-sit', query: {multiple: 'params', works: 'fine'}}) ).toEqual( '/dolor-sit/?multiple=params&works=fine' );
+        expect( a.interpolate({foo: 'amet', query: {multiple: ['paramsWith', 'sameName'], works: 'fine2'}}) ).toEqual( '/amet/?multiple=paramsWith&multiple=sameName&works=fine2' );
     });
 });
