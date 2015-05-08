@@ -1,5 +1,6 @@
 //for node
 var crossroads = crossroads || require('../../../dist/crossroads');
+var async = async || require('async');
 //end node
 
 

@@ -1,11 +1,11 @@
 /** @license
  * crossroads <http://millermedeiros.github.com/crossroads.js/>
  * Author: Miller Medeiros | MIT License
- * v0.12.0 (2013/01/21 13:47)
+ * v0.12.1 (2015/02/27 16:20)
  */
 
 (function () {
-var factory = function (signals) {
+var factory = function (signals, async) {
 
     var crossroads,
         _hasOptionalGroupBug,
@@ -100,7 +100,6 @@ var factory = function (signals) {
         return obj;
     }
 
-
     // Crossroads --------
     //====================
 
@@ -111,6 +110,7 @@ var factory = function (signals) {
         this.bypassed = new signals.Signal();
         this.routed = new signals.Signal();
         this._routes = [];
+        this._params = {};
         this._prevRoutes = [];
         this._piped = [];
         this.resetState();
@@ -140,10 +140,14 @@ var factory = function (signals) {
             return new Crossroads();
         },
 
-        addRoute : function (pattern, callback, priority) {
-            var route = new Route(pattern, callback, priority, this);
+        addRoute : function (pattern, callbacks, priority) {
+            var route = new Route(pattern, callbacks, priority, this);
             this._sortedInsert(route);
             return route;
+        },
+
+        param : function (param, callback) {
+            this._params[param] = callback;
         },
 
         removeRoute : function (route) {
@@ -172,8 +176,21 @@ var factory = function (signals) {
 
             var routes = this._getMatchedRoutes(request),
                 i = 0,
+                j = 0,
                 n = routes.length,
-                cur;
+                cur,
+                self = this;
+
+            var dispatchFn = function(i) {
+                return function(err){
+                    if(err){
+                        return;
+                    }
+                    cur.route.matched.dispatch.apply(cur.route.matched, defaultArgs.concat(cur.params));
+                    cur.isFirst = !i;
+                    self.routed.dispatch.apply(this.routed, defaultArgs.concat([request, cur]));
+                };
+            };
 
             if (n) {
                 this._prevMatchedRequest = request;
@@ -183,9 +200,21 @@ var factory = function (signals) {
                 //should be incremental loop, execute routes in order
                 while (i < n) {
                     cur = routes[i];
-                    cur.route.matched.dispatch.apply(cur.route.matched, defaultArgs.concat(cur.params));
-                    cur.isFirst = !i;
-                    this.routed.dispatch.apply(this.routed, defaultArgs.concat([request, cur]));
+                    if(cur.route._paramsIds){
+                        var fns = [];
+                        for(j=0; j<cur.route._paramsIds.length; ++j) {
+                            var fn = this._params[cur.route._paramsIds[j]];
+                            if(fn && (typeof fn === 'function')) {
+                                fns.push((async.apply).apply(null, [fn].concat(defaultArgs).concat([cur.params[j]])));
+                            }
+                        }
+
+                        async.series(fns, dispatchFn(i));
+                    }
+                    else{
+                        dispatchFn(i)();
+                    }
+
                     i += 1;
                 }
             } else {
@@ -272,7 +301,7 @@ var factory = function (signals) {
 
     //"static" instance
     crossroads = new Crossroads();
-    crossroads.VERSION = '0.12.0';
+    crossroads.VERSION = '0.12.1';
 
     crossroads.NORM_AS_ARRAY = function (req, vals) {
         return [vals.vals_];
@@ -289,7 +318,7 @@ var factory = function (signals) {
     /**
      * @constructor
      */
-    function Route(pattern, callback, priority, router) {
+    function Route(pattern, callbacks, priority, router) {
         var isRegexPattern = isRegExp(pattern),
             patternLexer = router.patternLexer;
         this._router = router;
@@ -299,8 +328,20 @@ var factory = function (signals) {
         this._matchRegexp = isRegexPattern? pattern : patternLexer.compilePattern(pattern, router.ignoreCase);
         this.matched = new signals.Signal();
         this.switched = new signals.Signal();
-        if (callback) {
-            this.matched.add(callback);
+        if (callbacks) {
+            if(typeof callbacks === 'function'){
+                this.matched.add(callbacks);
+            }
+            else{
+                this.matched.add(function(){
+                    var params = Array.prototype.slice.call(arguments);
+                    var fns = [];
+                    for(var i=0; i<callbacks.length; ++i){
+                        fns.push((async.apply).apply(null, [callbacks[i]].concat(params)));
+                    }
+                    async.series(fns);
+                });
+            }
         }
         this._priority = priority || 0;
     }
@@ -684,12 +725,12 @@ var factory = function (signals) {
 };
 
 if (typeof define === 'function' && define.amd) {
-    define(['signals'], factory);
+    define(['signals', 'async'], factory);
 } else if (typeof module !== 'undefined' && module.exports) { //Node
-    module.exports = factory(require('signals'));
+    module.exports = factory(require('signals'), require('async'));
 } else {
     /*jshint sub:true */
-    window['crossroads'] = factory(window['signals']);
+    window['crossroads'] = factory(window['signals'], window['async']);
 }
 
 }());
