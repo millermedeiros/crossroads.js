@@ -1,5 +1,9 @@
 # Crossroads.js Changelog #
 
+## v0.12.1 (2015/07/08) ##
+
+ - allow multiple query parameters with same name (#128)
+
 ## v0.12.0 (2013/01/21) ##
 
  - improve `Route.interpolate()` to support query strings. (#76)

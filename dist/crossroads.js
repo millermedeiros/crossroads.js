@@ -1,7 +1,7 @@
 /** @license
  * crossroads <http://millermedeiros.github.com/crossroads.js/>
  * Author: Miller Medeiros | MIT License
- * v0.12.0 (2013/01/21 13:47)
+ * v0.12.1 (2015/07/08 16:49)
  */
 
 (function () {
@@ -91,11 +91,22 @@ var factory = function (signals) {
         var queryArr = (str || '').replace('?', '').split('&'),
             n = queryArr.length,
             obj = {},
-            item, val;
+            item, val, decodedVal, propertyName, prev;
         while (n--) {
             item = queryArr[n].split('=');
+            propertyName = item[0];
+            prev = obj[propertyName];
             val = shouldTypecast ? typecastValue(item[1]) : item[1];
-            obj[item[0]] = (typeof val === 'string')? decodeURIComponent(val) : val;
+            decodedVal = (typeof val === 'string')? decodeURIComponent(val) : val;
+            if (isArray(prev)) {
+                prev.unshift(decodedVal);
+            }
+            else if (obj[item[0]]) {
+                obj[propertyName] = [decodedVal, prev];
+            }
+            else {
+                obj[propertyName] = decodedVal;
+            }
         }
         return obj;
     }
@@ -272,7 +283,7 @@ var factory = function (signals) {
 
     //"static" instance
     crossroads = new Crossroads();
-    crossroads.VERSION = '0.12.0';
+    crossroads.VERSION = '0.12.1';
 
     crossroads.NORM_AS_ARRAY = function (req, vals) {
         return [vals.vals_];
@@ -625,9 +636,17 @@ var factory = function (signals) {
                     prop = (prop.substr(0, 1) === '?')? prop.substr(1) : prop;
                     if (replacements[prop] != null) {
                         if (typeof replacements[prop] === 'object') {
-                            var queryParts = [];
+                            var queryParts = [], rep;
                             for(var key in replacements[prop]) {
-                                queryParts.push(encodeURI(key + '=' + replacements[prop][key]));
+                                rep = replacements[prop][key];
+                                if (isArray(rep)) {
+                                    for (var k in rep) {
+                                        queryParts.push(encodeURI(key + '=' + rep[k]));
+                                    }
+                                }
+                                else {
+                                    queryParts.push(encodeURI(key + '=' + rep));
+                                }
                             }
                             val = '?' + queryParts.join('&');
                         } else {
