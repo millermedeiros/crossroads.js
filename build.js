@@ -17,7 +17,7 @@ var _fs = require('fs'),
         AUTHOR : _pkg.author.name,
         VERSION_NUMBER : _pkg.version,
         HOMEPAGE : _pkg.homepage,
-        LICENSE : _pkg.licenses[0].type,
+        LICENSE : _pkg.license,
         BUILD_DATE : _now.getUTCFullYear() +'/'+ pad(_now.getUTCMonth() + 1) +'/'+ pad(_now.getUTCDate()) +' '+ pad(_now.getUTCHours()) +':'+ pad(_now.getUTCMinutes())
     };
 
