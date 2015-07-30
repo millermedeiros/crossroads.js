@@ -175,7 +175,11 @@
                                 rep = replacements[prop][key];
                                 if (isArray(rep)) {
                                     for (var k in rep) {
-                                        queryParts.push(encodeURI(key + '=' + rep[k]));
+                                        if ( key.slice(-2) == '[]' ) {
+                                            queryParts.push(encodeURI(key.slice(0, -2)) + '[]=' + encodeURI(rep[k]));
+                                        } else {
+                                            queryParts.push(encodeURI(key + '=' + rep[k]));
+                                        }
                                     }
                                 }
                                 else {
