@@ -914,10 +914,10 @@ describe('crossroads.parse()', function(){
                     t1 = a;
                     t2 = b;
                 });
-                crossroads.parse('foo.php?lorem=ipsum&asd=123&bar=false');
+                crossroads.parse('foo.php?lorem=ipsum&asd=123==456==Foo&bar=false&baz=123');
 
                 expect( t1 ).toEqual( 'foo.php' );
-                expect( t2 ).toEqual( {lorem : 'ipsum', asd : 123, bar : false} );
+                expect( t2 ).toEqual( {lorem : 'ipsum', asd : '123==456==Foo', bar : false, baz : 123} );
             });
         });
 

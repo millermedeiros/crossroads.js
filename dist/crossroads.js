@@ -1,7 +1,7 @@
 /** @license
  * crossroads <http://millermedeiros.github.com/crossroads.js/>
  * Author: Miller Medeiros | MIT License
- * v0.12.1 (2015/07/30 10:34)
+ * v0.12.1 (2015/07/31 15:23)
  */
 
 (function () {
@@ -86,27 +86,32 @@ var factory = function (signals) {
         return result;
     }
 
-    //borrowed from AMD-Utils
-    function decodeQueryString(str, shouldTypecast) {
-        var queryArr = (str || '').replace('?', '').split('&'),
-            n = queryArr.length,
+    // borrowed from MOUT
+    function decodeQueryString(queryStr, shouldTypecast) {
+        var queryArr = (queryStr || '').replace('?', '').split('&'),
+            reg = /([^=]+)=(.+)/,
+            i = -1,
+            len = queryArr.length,
             obj = {},
-            item, val, decodedVal, propertyName, prev;
-        while (n--) {
-            item = queryArr[n].split('=');
-            propertyName = item[0];
-            prev = obj[propertyName];
-            val = shouldTypecast ? typecastValue(item[1]) : item[1];
-            decodedVal = (typeof val === 'string')? decodeURIComponent(val) : val;
-            if (isArray(prev)) {
-                prev.unshift(decodedVal);
+            equalIndex, cur, pValue, pName;
+
+        while (++i < len) {
+            cur = queryArr[i];
+            equalIndex = cur.indexOf('=');
+            pName = cur.substring(0, equalIndex);
+            pValue = decodeURIComponent(cur.substring(equalIndex + 1));
+            if (shouldTypecast !== false) {
+                pValue = typecastValue(pValue);
             }
-            else if (obj[item[0]]) {
-                obj[propertyName] = [decodedVal, prev];
-            }
-            else {
-                obj[propertyName] = decodedVal;
-            }
+            if (pName in obj){
+                if(isArray(obj[pName])){
+                    obj[pName].push(pValue);
+                } else {
+                    obj[pName] = [obj[pName], pValue];
+                }
+            } else {
+                obj[pName] = pValue;
+           }
         }
         return obj;
     }
