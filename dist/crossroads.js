@@ -1,7 +1,7 @@
 /** @license
  * crossroads <http://millermedeiros.github.com/crossroads.js/>
  * Author: Miller Medeiros | MIT License
- * v0.12.1 (2015/07/31 18:33)
+ * v0.12.2 (2015/07/31 18:37)
  */
 
 (function () {
@@ -286,7 +286,7 @@ var factory = function (signals) {
 
     //"static" instance
     crossroads = new Crossroads();
-    crossroads.VERSION = '0.12.1';
+    crossroads.VERSION = '0.12.2';
 
     crossroads.NORM_AS_ARRAY = function (req, vals) {
         return [vals.vals_];
