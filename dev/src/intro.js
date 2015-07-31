@@ -83,12 +83,10 @@
         var queryArr = (queryStr || '').replace('?', '').split('&'),
             reg = /([^=]+)=(.+)/,
             i = -1,
-            len = queryArr.length,
             obj = {},
             equalIndex, cur, pValue, pName;
 
-        while (++i < len) {
-            cur = queryArr[i];
+        while ((cur = queryArr[++i])) {
             equalIndex = cur.indexOf('=');
             pName = cur.substring(0, equalIndex);
             pValue = decodeURIComponent(cur.substring(equalIndex + 1));

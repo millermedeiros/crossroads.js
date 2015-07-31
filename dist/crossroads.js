@@ -1,7 +1,7 @@
 /** @license
  * crossroads <http://millermedeiros.github.com/crossroads.js/>
  * Author: Miller Medeiros | MIT License
- * v0.12.1 (2015/07/31 15:23)
+ * v0.12.1 (2015/07/31 18:33)
  */
 
 (function () {
@@ -91,12 +91,10 @@ var factory = function (signals) {
         var queryArr = (queryStr || '').replace('?', '').split('&'),
             reg = /([^=]+)=(.+)/,
             i = -1,
-            len = queryArr.length,
             obj = {},
             equalIndex, cur, pValue, pName;
 
-        while (++i < len) {
-            cur = queryArr[i];
+        while ((cur = queryArr[++i])) {
             equalIndex = cur.indexOf('=');
             pName = cur.substring(0, equalIndex);
             pValue = decodeURIComponent(cur.substring(equalIndex + 1));
@@ -632,6 +630,9 @@ var factory = function (signals) {
         }
 
         function interpolate(pattern, replacements) {
+            // default to an empty object because pattern might have just
+            // optional arguments
+            replacements = replacements || {};
             if (typeof pattern !== 'string') {
                 throw new Error('Route pattern should be a string.');
             }

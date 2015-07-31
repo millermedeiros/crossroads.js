@@ -161,6 +161,9 @@
         }
 
         function interpolate(pattern, replacements) {
+            // default to an empty object because pattern might have just
+            // optional arguments
+            replacements = replacements || {};
             if (typeof pattern !== 'string') {
                 throw new Error('Route pattern should be a string.');
             }

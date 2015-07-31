@@ -13,6 +13,12 @@ describe('Route.interpolate()', function(){
         crossroads.removeAllRoutes();
     });
 
+    it('should ignore optional segments', function(){
+        var a = crossroads.addRoute('/foo/:bar:');
+        expect( a.interpolate() ).toEqual( '/foo' );
+        expect( a.interpolate({}) ).toEqual( '/foo' );
+        expect( a.interpolate({bar: '456'}) ).toEqual( '/foo/456' );
+    });
 
     it('should replace regular segments', function(){
         var a = crossroads.addRoute('/{foo}/:bar:');
