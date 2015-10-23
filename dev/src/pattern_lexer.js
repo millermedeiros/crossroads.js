@@ -179,14 +179,14 @@
                                 if (isArray(rep)) {
                                     for (var k in rep) {
                                         if ( key.slice(-2) == '[]' ) {
-                                            queryParts.push(encodeURI(key.slice(0, -2)) + '[]=' + encodeURI(rep[k]));
+                                            queryParts.push(encodeURIComponent(key.slice(0, -2)) + '[]=' + encodeURIComponent(rep[k]));
                                         } else {
-                                            queryParts.push(encodeURI(key + '=' + rep[k]));
+                                            queryParts.push(encodeURIComponent(key) + '=' + encodeURIComponent(rep[k]));
                                         }
                                     }
                                 }
                                 else {
-                                    queryParts.push(encodeURI(key + '=' + rep));
+                                    queryParts.push(encodeURIComponent(key) + '=' + encodeURIComponent(rep));
                                 }
                             }
                             val = '?' + queryParts.join('&');
