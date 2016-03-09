@@ -177,7 +177,7 @@
                             for(var key in replacements[prop]) {
                                 rep = replacements[prop][key];
                                 if (isArray(rep)) {
-                                    for (var k in rep) {
+                                    for (var k=0; k<rep.length; k++) {
                                         if ( key.slice(-2) == '[]' ) {
                                             queryParts.push(encodeURI(key.slice(0, -2)) + '[]=' + encodeURI(rep[k]));
                                         } else {
