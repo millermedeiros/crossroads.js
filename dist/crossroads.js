@@ -1,7 +1,7 @@
 /** @license
  * crossroads <http://millermedeiros.github.com/crossroads.js/>
  * Author: Miller Medeiros | MIT License
- * v0.12.2 (2015/07/31 18:37)
+ * v0.12.2 (2016/03/09 17:55)
  */
 
 (function () {
@@ -646,7 +646,7 @@ var factory = function (signals) {
                             for(var key in replacements[prop]) {
                                 rep = replacements[prop][key];
                                 if (isArray(rep)) {
-                                    for (var k in rep) {
+                                    for (var k=0; k<rep.length; k++) {
                                         if ( key.slice(-2) == '[]' ) {
                                             queryParts.push(encodeURI(key.slice(0, -2)) + '[]=' + encodeURI(rep[k]));
                                         } else {
