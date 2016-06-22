@@ -20,9 +20,10 @@
                     rqIndex = string.indexOf("__CR_RQ__"), //first index of required query
                     oqIndex = string.indexOf("__CR_OQ__"), //first index of optional query
                     slashIndex = string.indexOf("\\/", offset), //first index of char slash after the matched offset
-                    qIndex = Math.min(oqIndex === -1 ? string.length : oqIndex, rqIndex === -1 ? string.length : rqIndex);
+                    qIndex = Math.min(oqIndex === -1 ? string.length : oqIndex, rqIndex === -1 ? string.length : rqIndex),
+                    endPosition = offset + match.length;
 
-                if (offset - qIndex >= -9 || offset < rsIndex || offset < slashIndex) {
+                if (endPosition >= qIndex || endPosition < rsIndex || endPosition < slashIndex) {
                     //regex for optinal slash is returned when the optional slash:
                     //1. immediately precedes a query (either optional or required) or appears after a query
                     //2. appears before a required slash
@@ -51,7 +52,7 @@
                     //optional because if the slash is optional, hash "foobar" will also match foo/:bar:
                     //with parameter bar set to "bar"
                     //arsbq stands for "after required slash or before query"
-                    res_arsbq : '(?:(?:\\/(?=[^\\/?]+))|^\\/?|\\/?$)',
+                    res_arsbq : '(?:(?:\\/(?=[^\\/?]+))|^\\/?|\\/?$)'
                 },
                 'RS' : {
                     //required slashes
