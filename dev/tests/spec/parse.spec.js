@@ -195,6 +195,23 @@ describe('crossroads.parse()', function(){
             expect( calls ).toBe( 1 );
         });
 
+        it('should capture optional params when option params in the front are omitted', function(){
+            var calls = 0;
+
+            var a = crossroads.addRoute('foo/:lorem:/:ipsum:/:dolor:/:sit:');
+            a.matched.add(function(a, b, c, d){
+                expect( a ).toBeUndefined();
+                expect( b ).toBe( '123' );
+                expect( c ).toBeUndefined();
+                expect( d ).toBeUndefined();
+                calls++;
+            });
+
+            crossroads.parse('foo//123');
+
+            expect( calls ).toBe( 1 );
+        })
+
     });
 
 

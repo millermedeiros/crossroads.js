@@ -15,6 +15,27 @@
             //params - everything between `{ }` or `: :`
             PARAMS_REGEXP = /(?:\{|:)([^}:]+)(?:\}|:)/g,
 
+            fnReplaceOS = function(match, offset, string) {
+                var rsIndex = string.lastIndexOf("__CR_RS__"), //last index of required slash
+                    rqIndex = string.indexOf("__CR_RQ__"), //first index of required query
+                    oqIndex = string.indexOf("__CR_OQ__"), //first index of optional query
+                    slashIndex = string.indexOf("\\/", offset), //first index of char slash after the matched offset
+                    qIndex = Math.min(oqIndex === -1 ? string.length : oqIndex, rqIndex === -1 ? string.length : rqIndex),
+                    endPosition = offset + match.length;
+
+                if (endPosition >= qIndex || endPosition < rsIndex || endPosition < slashIndex) {
+                    //regex for optinal slash is returned when the optional slash:
+                    //1. immediately precedes a query (either optional or required) or appears after a query
+                    //2. appears before a required slash
+                    //3. appears before a slash char in the pattern
+                    return TOKENS.OS.res_normal;
+                } else {
+                    //otherwise the slash isn't fully optional and return the regex defined
+                    //for optional slash "after required slash or before query"
+                    return TOKENS.OS.res_arsbq;
+                }
+            },
+
             //used to save params during compile (avoid escaping things that
             //shouldn't be escaped).
             TOKENS = {
@@ -23,7 +44,15 @@
                     //slash between `::` or `}:` or `\w:` or `:{?` or `}{?` or `\w{?`
                     rgx : /([:}]|\w(?=\/))\/?(:|(?:\{\?))/g,
                     save : '$1{{id}}$2',
-                    res : '\\/?'
+                    res : fnReplaceOS,
+                    //the regex for optinal slash
+                    res_normal : '\\/?',
+                    //the regex for slash which isn't fully optional based on the given pattern
+                    //for example, given patterns foo/:bar: and foobar/:bar:, the slash isn't fully
+                    //optional because if the slash is optional, hash "foobar" will also match foo/:bar:
+                    //with parameter bar set to "bar"
+                    //arsbq stands for "after required slash or before query"
+                    res_arsbq : '(?:(?:\\/(?=(?:[^\\/?]+)?))|^\\/?|\\/?$)'
                 },
                 'RS' : {
                     //required slashes
@@ -238,4 +267,3 @@
         };
 
     }());
-

@@ -89,6 +89,12 @@ describe('Match', function(){
         expect( d.match('/123/45/ipsum') ).toBe( true );
     });
 
+    it('should not take the slash as optional one', function(){
+        var s = crossroads.addRoute('/123/:bar:');
+        expect( s.match('/1234') ).toBe(false);
+        expect( s.match('/123/4') ).toBe(true);
+    });
+
     it('should support multiple consecutive optional params', function(){
         var s = crossroads.addRoute('/123/:bar:/:ipsum:');
         expect( s.match('/123') ).toBe( true );
