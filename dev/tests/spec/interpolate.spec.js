@@ -78,11 +78,36 @@ describe('Route.interpolate()', function(){
         }).toThrow( 'Generated string doesn\'t validate against `Route.rules`.' );
     });
 
-    it('should replace query segments', function(){
+    it('should replace required query segments', function(){
+        var a = crossroads.addRoute('/{foo}/{?query}');
+        expect( a.interpolate({foo: 'lorem', query: {some: 'test'}}) ).toEqual( '/lorem/?some=test' );
+        expect( a.interpolate({foo: 'dolor-sit', query: {multiple: 'params', works: 'fine'}}) ).toEqual( '/dolor-sit/?multiple=params&works=fine' );
+        expect( a.interpolate({foo: 'amet', query: {multiple: ['paramsWith', 'sameName'], works: 'fine2'}}) ).toEqual( '/amet/?multiple=paramsWith&multiple=sameName&works=fine2' );
+        expect( a.interpolate({foo: 'amet2', query: {"multiple[]": ['paramsWith', 'sameName'], works: 'fine2'}}) ).toEqual( '/amet2/?multiple[]=paramsWith&multiple[]=sameName&works=fine2' );
+    });
+
+    it('should replace optional query segments', function(){
         var a = crossroads.addRoute('/{foo}/:?query:');
         expect( a.interpolate({foo: 'lorem', query: {some: 'test'}}) ).toEqual( '/lorem/?some=test' );
         expect( a.interpolate({foo: 'dolor-sit', query: {multiple: 'params', works: 'fine'}}) ).toEqual( '/dolor-sit/?multiple=params&works=fine' );
         expect( a.interpolate({foo: 'amet', query: {multiple: ['paramsWith', 'sameName'], works: 'fine2'}}) ).toEqual( '/amet/?multiple=paramsWith&multiple=sameName&works=fine2' );
         expect( a.interpolate({foo: 'amet2', query: {"multiple[]": ['paramsWith', 'sameName'], works: 'fine2'}}) ).toEqual( '/amet2/?multiple[]=paramsWith&multiple[]=sameName&works=fine2' );
     });
+
+    it('should replace optional query segments without last slash', function(){
+        var a = crossroads.addRoute('/{foo}:?query:');
+        expect( a.interpolate({foo: 'lorem', query: {some: 'test'}, x:'x', y:'y', z:'z'}) ).toEqual( '/lorem?some=test' );
+        expect( a.interpolate({foo: 'dolor-sit', query: {multiple: 'params', works: 'fine'}}) ).toEqual( '/dolor-sit?multiple=params&works=fine' );
+        expect( a.interpolate({foo: 'amet', query: {multiple: ['paramsWith', 'sameName'], works: 'fine2'}}) ).toEqual( '/amet?multiple=paramsWith&multiple=sameName&works=fine2' );
+        expect( a.interpolate({foo: 'amet2', query: {"multiple[]": ['paramsWith', 'sameName'], works: 'fine2'}}) ).toEqual( '/amet2?multiple[]=paramsWith&multiple[]=sameName&works=fine2' );
+    });
+
+    it('should replace required query segments without last slash', function(){
+        var a = crossroads.addRoute('/{foo}{?query}');
+        expect( a.interpolate({foo: 'lorem', query: {some: 'test'}, x:'x', y:'y', z:'z'}) ).toEqual( '/lorem?some=test' );
+        expect( a.interpolate({foo: 'dolor-sit', query: {multiple: 'params', works: 'fine'}}) ).toEqual( '/dolor-sit?multiple=params&works=fine' );
+        expect( a.interpolate({foo: 'amet', query: {multiple: ['paramsWith', 'sameName'], works: 'fine2'}}) ).toEqual( '/amet?multiple=paramsWith&multiple=sameName&works=fine2' );
+        expect( a.interpolate({foo: 'amet2', query: {"multiple[]": ['paramsWith', 'sameName'], works: 'fine2'}}) ).toEqual( '/amet2?multiple[]=paramsWith&multiple[]=sameName&works=fine2' );
+    });
+
 });
