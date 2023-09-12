@@ -1,14 +1,14 @@
 /*jshint onevar:false */
 
 //for node
-var crossroads = crossroads || require('../../../dist/crossroads');
+let crossroads = crossroads || require('../../../dist/crossroads');
 //end node
 
 
 describe('Match', function(){
 
-    var _prevTypecast;
-    var _prevCase;
+    let _prevTypecast;
+    let _prevCase;
 
     beforeEach(function(){
         _prevTypecast = crossroads.shouldTypecast;
@@ -27,7 +27,7 @@ describe('Match', function(){
 
 
     it('should match simple string', function(){
-        var r1 = crossroads.addRoute('/lorem-ipsum');
+        let r1 = crossroads.addRoute('/lorem-ipsum');
 
         expect( r1.match('/lorem-ipsum') ).toBe( true );
         expect( r1.match('/lorem-ipsum/') ).toBe( true );
@@ -35,7 +35,7 @@ describe('Match', function(){
     });
 
     it('should ignore trailing slash on pattern', function(){
-        var r1 = crossroads.addRoute('/lorem-ipsum/');
+        let r1 = crossroads.addRoute('/lorem-ipsum/');
 
         expect( r1.match('/lorem-ipsum') ).toBe( true );
         expect( r1.match('/lorem-ipsum/') ).toBe( true );
@@ -43,7 +43,7 @@ describe('Match', function(){
     });
 
     it('should match params', function(){
-        var s = crossroads.addRoute('/{foo}');
+        let s = crossroads.addRoute('/{foo}');
 
         expect( s.match('/lorem-ipsum') ).toBe( true );
         expect( s.match('/lorem-ipsum/') ).toBe( true );
@@ -56,7 +56,7 @@ describe('Match', function(){
     });
 
     it('should match optional params', function(){
-        var s = crossroads.addRoute(':bar:');
+        let s = crossroads.addRoute(':bar:');
         expect( s.match('lorem-ipsum') ).toBe( true );
         expect( s.match('') ).toBe( true );
         expect( s.match('lorem-ipsum/dolor') ).toBe( false );
@@ -64,7 +64,7 @@ describe('Match', function(){
     });
 
     it('should match normal params and optional params', function(){
-        var s = crossroads.addRoute('/{foo}/:bar:');
+        let s = crossroads.addRoute('/{foo}/:bar:');
         expect( s.match('/lorem-ipsum') ).toBe( true );
         expect( s.match('/lorem-ipsum/') ).toBe( true );
         expect( s.match('/lorem-ipsum/dolor') ).toBe( true );
@@ -72,25 +72,25 @@ describe('Match', function(){
     });
 
     it('should work even with optional params on the middle of pattern', function(){
-        var a = crossroads.addRoute('/{foo}/:bar:/{ipsum}'); //bad use!
+        let a = crossroads.addRoute('/{foo}/:bar:/{ipsum}'); //bad use!
         expect( a.match('/123/45/asd') ).toBe( true );
         expect( a.match('/123/asd') ).toBe( true );
 
-        var b = crossroads.addRoute('/{foo}:bar:{ipsum}'); //bad use!
+        let b = crossroads.addRoute('/{foo}:bar:{ipsum}'); //bad use!
         expect( b.match('/123/45/asd') ).toBe( true );
         expect( b.match('/123/45') ).toBe( true );
 
-        var c = crossroads.addRoute('/{foo}:bar:/ipsum');
+        let c = crossroads.addRoute('/{foo}:bar:/ipsum');
         expect( c.match('/123/45/ipsum') ).toBe( true );
         expect( c.match('/123/ipsum') ).toBe( true );
 
-        var d = crossroads.addRoute('/{foo}:bar:ipsum'); //weird use!
+        let d = crossroads.addRoute('/{foo}:bar:ipsum'); //weird use!
         expect( d.match('/123/ipsum') ).toBe( true );
         expect( d.match('/123/45/ipsum') ).toBe( true );
     });
 
     it('should support multiple consecutive optional params', function(){
-        var s = crossroads.addRoute('/123/:bar:/:ipsum:');
+        let s = crossroads.addRoute('/123/:bar:/:ipsum:');
         expect( s.match('/123') ).toBe( true );
         expect( s.match('/123/') ).toBe( true );
         expect( s.match('/123/asd') ).toBe( true );
@@ -100,7 +100,7 @@ describe('Match', function(){
     });
 
     it('should not be case sensitive by default', function () {
-        var s = crossroads.addRoute('foo/bar');
+        let s = crossroads.addRoute('foo/bar');
         expect( s.match('foo') ).toBe( false );
         expect( s.match('Foo') ).toBe( false );
         expect( s.match('foo/bar') ).toBe( true );
@@ -111,7 +111,7 @@ describe('Match', function(){
     it('should be allow toggling case sensitivity', function () {
         crossroads.ignoreCase = true;
 
-        var s = crossroads.addRoute('foo/bar');
+        let s = crossroads.addRoute('foo/bar');
         expect( s.match('foo') ).toBe( false );
         expect( s.match('Foo') ).toBe( false );
         expect( s.match('foo/bar') ).toBe( true );
@@ -121,7 +121,7 @@ describe('Match', function(){
 
     describe('rest params', function () {
         it('should support rest params', function () {
-            var s = crossroads.addRoute('/123/{bar}/:ipsum*:');
+            let s = crossroads.addRoute('/123/{bar}/:ipsum*:');
             expect( s.match('/123') ).toBe( false );
             expect( s.match('/123/') ).toBe( false );
             expect( s.match('/123/asd') ).toBe( true );
@@ -132,7 +132,7 @@ describe('Match', function(){
         });
 
         it('should work even in the middle of pattern', function () {
-            var s = crossroads.addRoute('/foo/:bar*:/edit');
+            let s = crossroads.addRoute('/foo/:bar*:/edit');
             expect( s.match('/foo') ).toBe( false );
             expect( s.match('/foo/') ).toBe( false );
             expect( s.match('/foo/edit') ).toBe( true );
@@ -146,7 +146,7 @@ describe('Match', function(){
 
     describe('query string', function () {
         it('should match query string as first segment', function () {
-            var r = crossroads.addRoute('{?q}');
+            let r = crossroads.addRoute('{?q}');
             expect( r.match('') ).toBe( false );
             expect( r.match('foo') ).toBe( false );
             expect( r.match('/foo') ).toBe( false );
