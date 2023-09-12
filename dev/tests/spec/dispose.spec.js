@@ -1,7 +1,7 @@
 /*jshint onevar:false */
 
 //for node
-var crossroads = crossroads || require('../../../dist/crossroads');
+let crossroads = crossroads || require('../../../dist/crossroads');
 //end node
 
 
@@ -15,9 +15,9 @@ describe('Route.dispose()', function(){
 
 
     it('should dispose route', function(){
-        var count = 0;
+        let count = 0;
 
-        var a = crossroads.addRoute('{foo}/{bar}');
+        let a = crossroads.addRoute('{foo}/{bar}');
         a.matched.add(function(foo, bar){
             count++;
         });
