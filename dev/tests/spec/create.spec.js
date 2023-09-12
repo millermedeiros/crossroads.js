@@ -1,7 +1,7 @@
 /*jshint onevar:false */
 
 //for node
-var crossroads = crossroads || require('../../../dist/crossroads');
+let crossroads = crossroads || require('../../../dist/crossroads');
 //end node
 
 
@@ -16,8 +16,8 @@ describe('crossroads.create()', function(){
     describe('new Router instance', function(){
 
         it('should work in new instances', function(){
-            var t1;
-            var cr = crossroads.create();
+            let t1;
+            let cr = crossroads.create();
 
             cr.addRoute('/{foo}', function(foo){
                 t1 = foo;
@@ -29,8 +29,8 @@ describe('crossroads.create()', function(){
 
 
         it('shouldn\'t affect static instance', function(){
-            var t1;
-            var cr = crossroads.create();
+            let t1;
+            let cr = crossroads.create();
 
             cr.addRoute('/{foo}', function(foo){
                 t1 = foo;
@@ -45,8 +45,8 @@ describe('crossroads.create()', function(){
 
 
         it('shouldn\'t be affected by static instance', function(){
-            var t1;
-            var cr = crossroads.create();
+            let t1;
+            let cr = crossroads.create();
 
             crossroads.addRoute('/{foo}', function(foo){
                 t1 = foo;
@@ -61,8 +61,8 @@ describe('crossroads.create()', function(){
 
 
         it('should allow a different lexer per router', function () {
-            var cr = crossroads.create();
-            var count = 0;
+            let cr = crossroads.create();
+            let count = 0;
             cr.patternLexer = {
                 getParamIds : function(){
                     return ['a','b'];
@@ -77,8 +77,8 @@ describe('crossroads.create()', function(){
                     return (/foo-bar/);
                 }
             };
-            var vals = [];
-            var inc = function(a, b){
+            let vals = [];
+            let inc = function(a, b){
                 vals[0] = a;
                 vals[1] = b;
                 count++;
