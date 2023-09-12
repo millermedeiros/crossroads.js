@@ -1,17 +1,17 @@
 /*jshint onevar:false */
 
 //for node
-var crossroads = crossroads || require('../../../dist/crossroads');
+let crossroads = crossroads || require('../../../dist/crossroads');
 //end node
 
 
 describe('crossroads.pipe / crossroads.unpipe', function(){
 
     describe('it should pipe parse() calls to multiple routers', function () {
-        var r1 = crossroads.create();
-        var r2 = crossroads.create();
-        var r3 = crossroads.create();
-        var matches = [];
+        let r1 = crossroads.create();
+        let r2 = crossroads.create();
+        let r3 = crossroads.create();
+        let matches = [];
 
         r1.addRoute('{foo}', function(f){
             matches.push('r1:'+ f);
