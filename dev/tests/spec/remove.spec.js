@@ -1,7 +1,7 @@
 /*jshint onevar:false */
 
 //for node
-var crossroads = crossroads || require('../../../dist/crossroads');
+let crossroads = crossroads || require('../../../dist/crossroads');
 //end node
 
 
@@ -18,9 +18,9 @@ describe('crossroads.toString() and route.toString()', function(){
     describe('crossroads.removeRoute()', function(){
 
         it('should remove by reference', function(){
-            var t1, t2, t3, t4;
+            let t1, t2, t3, t4;
 
-            var a = crossroads.addRoute('/{foo}_{bar}');
+            let a = crossroads.addRoute('/{foo}_{bar}');
             a.matched.add(function(foo, bar){
                 t1 = foo;
                 t2 = bar;
@@ -40,15 +40,15 @@ describe('crossroads.toString() and route.toString()', function(){
     describe('crossroads.removeAll()', function(){
 
         it('should removeAll', function(){
-            var t1, t2, t3, t4;
+            let t1, t2, t3, t4;
 
-            var a = crossroads.addRoute('/{foo}/{bar}');
+            let a = crossroads.addRoute('/{foo}/{bar}');
             a.matched.add(function(foo, bar){
                 t1 = foo;
                 t2 = bar;
             });
 
-            var b = crossroads.addRoute('/{foo}_{bar}');
+            let b = crossroads.addRoute('/{foo}_{bar}');
             b.matched.add(function(foo, bar){
                 t1 = foo;
                 t2 = bar;
