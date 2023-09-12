@@ -1,7 +1,7 @@
 /*jshint onevar:false */
 
 //for node
-var crossroads = crossroads || require('../../../dist/crossroads');
+let crossroads = crossroads || require('../../../dist/crossroads');
 //end node
 
 
@@ -23,7 +23,7 @@ describe('crossroads.addRoute()', function(){
 
     it('should return a route and attach it to crossroads', function(){
 
-        var s = crossroads.addRoute('/{foo}');
+        let s = crossroads.addRoute('/{foo}');
 
         expect( s ).toBeDefined();
         expect( s.rules ).toBeUndefined();
@@ -34,7 +34,7 @@ describe('crossroads.addRoute()', function(){
 
     it('should add listener to matched if provided', function(){
 
-        var s = crossroads.addRoute('/{foo}', function(){
+        let s = crossroads.addRoute('/{foo}', function(){
             expect().toBe('shouldnt be called');
         });
 
@@ -47,7 +47,7 @@ describe('crossroads.addRoute()', function(){
 
     it('should accept RegExp', function(){
 
-        var s = crossroads.addRoute(/^foo\/([a-z]+)$/, function(){
+        let s = crossroads.addRoute(/^foo\/([a-z]+)$/, function(){
             expect().toBe('shouldnt be called');
         });
 
@@ -60,11 +60,11 @@ describe('crossroads.addRoute()', function(){
 
     it('should increment num routes', function(){
 
-        var s1 = crossroads.addRoute(/^foo\/([a-z]+)$/, function(){
+        let s1 = crossroads.addRoute(/^foo\/([a-z]+)$/, function(){
             expect().toBe('shouldnt be called');
         });
 
-        var s2 = crossroads.addRoute('/{foo}', function(){
+        let s2 = crossroads.addRoute('/{foo}', function(){
             expect().toBe('shouldnt be called');
         });
 
@@ -80,9 +80,9 @@ describe('crossroads.addRoute()', function(){
 
     it('should work on multiple instances', function(){
 
-        var s1 = crossroads.addRoute('/bar');
-        var cr = crossroads.create();
-        var s2 = cr.addRoute('/ipsum');
+        let s1 = crossroads.addRoute('/bar');
+        let cr = crossroads.create();
+        let s2 = cr.addRoute('/ipsum');
 
         expect( s1 ).toBeDefined();
         expect( s2 ).toBeDefined();
