@@ -1,12 +1,12 @@
 /*jshint onevar:false */
 
 //for node
-var crossroads = crossroads || require('../../../dist/crossroads');
+let crossroads = crossroads || require('../../../dist/crossroads');
 //end node
 
 
 describe('crossroads.parse()', function(){
-    var _prevTypecast;
+    let _prevTypecast;
 
 
     beforeEach(function(){
@@ -29,7 +29,7 @@ describe('crossroads.parse()', function(){
     describe('simple string route', function(){
 
         it('shold route basic strings', function(){
-            var t1 = 0;
+            let t1 = 0;
 
             crossroads.addRoute('/foo', function(a){
                 t1++;
@@ -42,7 +42,7 @@ describe('crossroads.parse()', function(){
         });
 
         it('should pass params and allow multiple routes', function(){
-            var t1, t2, t3;
+            let t1, t2, t3;
 
             crossroads.addRoute('/{foo}', function(foo){
                 t1 = foo;
@@ -60,14 +60,14 @@ describe('crossroads.parse()', function(){
         });
 
         it('should dispatch matched signal', function(){
-            var t1, t2, t3;
+            let t1, t2, t3;
 
-            var a = crossroads.addRoute('/{foo}');
+            let a = crossroads.addRoute('/{foo}');
             a.matched.add(function(foo){
                 t1 = foo;
             });
 
-            var b = crossroads.addRoute('/{foo}/{bar}');
+            let b = crossroads.addRoute('/{foo}/{bar}');
             b.matched.add(function(foo, bar){
                 t2 = foo;
                 t3 = bar;
@@ -82,15 +82,15 @@ describe('crossroads.parse()', function(){
         });
 
         it('should handle a word separator that isn\'t necessarily /', function(){
-            var t1, t2, t3, t4;
+            let t1, t2, t3, t4;
 
-            var a = crossroads.addRoute('/{foo}_{bar}');
+            let a = crossroads.addRoute('/{foo}_{bar}');
             a.matched.add(function(foo, bar){
                 t1 = foo;
                 t2 = bar;
             });
 
-            var b = crossroads.addRoute('/{foo}-{bar}');
+            let b = crossroads.addRoute('/{foo}-{bar}');
             b.matched.add(function(foo, bar){
                 t3 = foo;
                 t4 = bar;
@@ -106,9 +106,9 @@ describe('crossroads.parse()', function(){
         });
 
         it('should handle empty routes', function(){
-            var calls = 0;
+            let calls = 0;
 
-            var a = crossroads.addRoute();
+            let a = crossroads.addRoute();
             a.matched.add(function(foo, bar){
                 expect( foo ).toBeUndefined();
                 expect( bar ).toBeUndefined();
@@ -123,9 +123,9 @@ describe('crossroads.parse()', function(){
         });
 
         it('should handle empty strings', function(){
-            var calls = 0;
+            let calls = 0;
 
-            var a = crossroads.addRoute('');
+            let a = crossroads.addRoute('');
             a.matched.add(function(foo, bar){
                 expect( foo ).toBeUndefined();
                 expect( bar ).toBeUndefined();
@@ -140,9 +140,9 @@ describe('crossroads.parse()', function(){
         });
 
         it('should route `null` as empty string', function(){
-            var calls = 0;
+            let calls = 0;
 
-            var a = crossroads.addRoute('');
+            let a = crossroads.addRoute('');
             a.matched.add(function(foo, bar){
                 expect( foo ).toBeUndefined();
                 expect( bar ).toBeUndefined();
@@ -162,9 +162,9 @@ describe('crossroads.parse()', function(){
     describe('optional params', function(){
 
         it('should capture optional params', function(){
-            var calls = 0;
+            let calls = 0;
 
-            var a = crossroads.addRoute('foo/:lorem:/:ipsum:/:dolor:/:sit:');
+            let a = crossroads.addRoute('foo/:lorem:/:ipsum:/:dolor:/:sit:');
             a.matched.add(function(a, b, c, d){
                 expect( a ).toBe( 'lorem' );
                 expect( b ).toBe( '123' );
@@ -179,9 +179,9 @@ describe('crossroads.parse()', function(){
         });
 
         it('should only pass matched params', function(){
-            var calls = 0;
+            let calls = 0;
 
-            var a = crossroads.addRoute('foo/:lorem:/:ipsum:/:dolor:/:sit:');
+            let a = crossroads.addRoute('foo/:lorem:/:ipsum:/:dolor:/:sit:');
             a.matched.add(function(a, b, c, d){
                 expect( a ).toBe( 'lorem' );
                 expect( b ).toBe( '123' );
@@ -202,9 +202,9 @@ describe('crossroads.parse()', function(){
     describe('regex route', function(){
 
         it('should capture groups', function(){
-            var calls = 0;
+            let calls = 0;
 
-            var a = crossroads.addRoute(/^\/[0-9]+\/([0-9]+)$/); //capturing groups becomes params
+            let a = crossroads.addRoute(/^\/[0-9]+\/([0-9]+)$/); //capturing groups becomes params
             a.matched.add(function(foo, bar){
                 expect( foo ).toBe( '456' );
                 expect( bar ).toBeUndefined();
@@ -218,9 +218,9 @@ describe('crossroads.parse()', function(){
         });
 
         it('should capture even empty groups', function(){
-            var calls = 0;
+            let calls = 0;
 
-            var a = crossroads.addRoute(/^\/()\/([0-9]+)$/); //capturing groups becomes params
+            let a = crossroads.addRoute(/^\/()\/([0-9]+)$/); //capturing groups becomes params
             a.matched.add(function(foo, bar){
                 expect( foo ).toBe( '' );
                 expect( bar ).toBe( '456' );
