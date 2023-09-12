@@ -1,7 +1,7 @@
 /*jshint onevar:false */
 
 //for node
-var crossroads = crossroads || require('../../../dist/crossroads');
+let crossroads = crossroads || require('../../../dist/crossroads');
 //end node
 
 
@@ -16,8 +16,8 @@ describe('crossroads.toString() and route.toString()', function(){
 
 
     it('should help debugging', function(){
-        var count = 0, requests = [];
-        var a = crossroads.addRoute('/{foo}_{bar}');
+        let count = 0, requests = [];
+        let a = crossroads.addRoute('/{foo}_{bar}');
         a.matched.add(function(foo, bar){
             expect(null).toEqual('fail: not a trigger test');
         });
