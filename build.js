@@ -1,5 +1,5 @@
 
-var FILE_ENCODING = 'utf-8',
+let FILE_ENCODING = 'utf-8',
     SRC_DIR = 'dev/src',
     DIST_DIR = 'dist',
     DIST_NAME = 'crossroads.js',
@@ -8,7 +8,7 @@ var FILE_ENCODING = 'utf-8',
     DIST_MIN_PATH = DIST_DIR +'/'+ DIST_MIN_NAME;
 
 
-var _fs = require('fs'),
+let _fs = require('fs'),
     _path = require('path'),
     _pkg = JSON.parse(readFile('package.json')),
     _now = new Date(),
@@ -33,7 +33,7 @@ function purgeDeploy(){
 
 
 function build(){
-    var wrapper = readFile(SRC_DIR + '/wrapper.js'),
+    let wrapper = readFile(SRC_DIR + '/wrapper.js'),
         deploy = tmpl(wrapper, {
             LICENSE       : readFile(SRC_DIR + '/license.txt'),
             INTRO_JS      : readFile(SRC_DIR + '/intro.js'),
@@ -61,7 +61,7 @@ function tmpl(template, data, regexp){
 
 
 function uglify(srcPath) {
-    var
+    let
       uglyfyJS = require('uglify-js'),
       jsp = uglyfyJS.parser,
       pro = uglyfyJS.uglify,
@@ -75,7 +75,7 @@ function uglify(srcPath) {
 
 
 function minify(){
-    var license = tmpl( readFile(SRC_DIR +'/license.txt'), _replacements );
+    let license = tmpl( readFile(SRC_DIR +'/license.txt'), _replacements );
     // we add a leading/trailing ";" to avoid concat issues (#73)
     _fs.writeFileSync(DIST_MIN_PATH, license +';'+ uglify(DIST_PATH) +';', FILE_ENCODING);
     console.log(' '+ DIST_MIN_PATH +' built.');
