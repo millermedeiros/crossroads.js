@@ -1,7 +1,7 @@
 /*jshint onevar:false */
 
 //for node
-var crossroads = crossroads || require('../../../dist/crossroads');
+let crossroads = crossroads || require('../../../dist/crossroads');
 //end node
 
 
@@ -18,8 +18,8 @@ describe('crossroads Signals', function(){
 
 
     it('should dispatch bypassed if don\'t match any route', function(){
-        var count = 0, requests = [];
-        var a = crossroads.addRoute('/{foo}_{bar}');
+        let count = 0, requests = [];
+        let a = crossroads.addRoute('/{foo}_{bar}');
 
         a.matched.add(function(foo, bar){
             expect(null).toEqual('fail: shouldn\'t match');
@@ -39,13 +39,13 @@ describe('crossroads Signals', function(){
 
 
     it('should dispatch routed at each match', function(){
-        var count = 0,
+        let count = 0,
             requests = [],
             count2 = 0,
             routed,
             first;
 
-        var a = crossroads.addRoute('/{foo}_{bar}');
+        let a = crossroads.addRoute('/{foo}_{bar}');
         a.matched.add(function(foo, bar){
             count++;
         });
@@ -80,12 +80,12 @@ describe('crossroads Signals', function(){
     });
 
     it('should not dispatch routed/bypassed/matched twice for same request multiple times in a row', function(){
-        var bypassed = [],
+        let bypassed = [],
             routed = [],
             matched = [],
             switched = [];
 
-        var a = crossroads.addRoute('/{foo}_{bar}');
+        let a = crossroads.addRoute('/{foo}_{bar}');
         a.matched.add(function(a, b){
             matched.push(a, b);
         });
@@ -132,12 +132,12 @@ describe('crossroads Signals', function(){
     });
 
     it('should dispatch routed/bypassed/matched twice for same request if calling resetState() in between', function(){
-        var bypassed = [],
+        let bypassed = [],
             routed = [],
             matched = [],
             switched = [];
 
-        var a = crossroads.addRoute('/{foo}_{bar}');
+        let a = crossroads.addRoute('/{foo}_{bar}');
         a.matched.add(function(a, b){
             matched.push(a, b);
         });
@@ -145,7 +145,7 @@ describe('crossroads Signals', function(){
             switched.push(req);
         });
 
-        var b = crossroads.addRoute('/maecennas');
+        let b = crossroads.addRoute('/maecennas');
         b.matched.add(function(){
             matched.push('maecennas');
         });
@@ -216,7 +216,7 @@ describe('crossroads Signals', function(){
 
 
     it('should dispatch routed/bypassed/matched multiple times for same request if ignoreState == true', function(){
-        var bypassed = [],
+        let bypassed = [],
             routed = [],
             matched = [],
             switched = [];
@@ -224,7 +224,7 @@ describe('crossroads Signals', function(){
         // toggle behavior
         crossroads.ignoreState = true;
 
-        var a = crossroads.addRoute('/{foo}_{bar}');
+        let a = crossroads.addRoute('/{foo}_{bar}');
         a.matched.add(function(a, b){
             matched.push(a, b);
         });
