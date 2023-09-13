@@ -4,7 +4,7 @@
 
     Crossroads.prototype.patternLexer = (function () {
 
-        var
+        let
             //match chars that should be escaped on string regexp
             ESCAPE_CHARS_REGEXP = /[\\.+*?\^$\[\](){}\/'#]/g,
 
@@ -75,7 +75,7 @@
 
 
         function precompileTokens(){
-            var key, cur;
+            let key, cur;
             for (key in TOKENS) {
                 if (TOKENS.hasOwnProperty(key)) {
                     cur = TOKENS[key];
@@ -89,7 +89,7 @@
 
 
         function captureVals(regex, pattern) {
-            var vals = [], match;
+            let vals = [], match;
             // very important to reset lastIndex since RegExp can have "g" flag
             // and multiple runs might affect the result, specially if matching
             // same string multiple times on IE 7-8
@@ -139,7 +139,7 @@
         }
 
         function replaceTokens(pattern, regexpName, replaceName) {
-            var cur, key;
+            let cur, key;
             for (key in TOKENS) {
                 if (TOKENS.hasOwnProperty(key)) {
                     cur = TOKENS[key];
@@ -150,7 +150,7 @@
         }
 
         function getParamValues(request, regexp, shouldTypecast) {
-            var vals = regexp.exec(request);
+            let vals = regexp.exec(request);
             if (vals) {
                 vals.shift();
                 if (shouldTypecast) {
@@ -168,16 +168,16 @@
                 throw new Error('Route pattern should be a string.');
             }
 
-            var replaceFn = function(match, prop){
-                    var val;
+            let replaceFn = function(match, prop){
+                    let val;
                     prop = (prop.substr(0, 1) === '?')? prop.substr(1) : prop;
                     if (replacements[prop] != null) {
                         if (typeof replacements[prop] === 'object') {
-                            var queryParts = [], rep;
-                            for(var key in replacements[prop]) {
+                            let queryParts = [], rep;
+                            for(let key in replacements[prop]) {
                                 rep = replacements[prop][key];
                                 if (isArray(rep)) {
-                                    for (var k in rep) {
+                                    for (let k in rep) {
                                         if ( key.slice(-2) == '[]' ) {
                                             queryParts.push(encodeURI(key.slice(0, -2)) + '[]=' + encodeURI(rep[k]));
                                         } else {
