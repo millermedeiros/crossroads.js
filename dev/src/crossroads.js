@@ -39,7 +39,7 @@
         },
 
         addRoute : function (pattern, callback, priority) {
-            var route = new Route(pattern, callback, priority, this);
+            let route = new Route(pattern, callback, priority, this);
             this._sortedInsert(route);
             return route;
         },
@@ -50,7 +50,7 @@
         },
 
         removeAllRoutes : function () {
-            var n = this.getNumRoutes();
+            let n = this.getNumRoutes();
             while (n--) {
                 this._routes[n]._destroy();
             }
@@ -68,7 +68,7 @@
                 return;
             }
 
-            var routes = this._getMatchedRoutes(request),
+            let routes = this._getMatchedRoutes(request),
                 i = 0,
                 n = routes.length,
                 cur;
@@ -95,7 +95,7 @@
         },
 
         _notifyPrevRoutes : function(matchedRoutes, request) {
-            var i = 0, prev;
+            let i = 0, prev;
             while (prev = this._prevRoutes[i++]) {
                 //check if switched exist since route may be disposed
                 if(prev.route.switched && this._didSwitch(prev.route, matchedRoutes)) {
@@ -105,7 +105,7 @@
         },
 
         _didSwitch : function (route, matchedRoutes){
-            var matched,
+            let matched,
                 i = 0;
             while (matched = matchedRoutes[i++]) {
                 // only dispatch switched if it is going to a different route
@@ -117,7 +117,7 @@
         },
 
         _pipeParse : function(request, defaultArgs) {
-            var i = 0, route;
+            let i = 0, route;
             while (route = this._piped[i++]) {
                 route.parse(request, defaultArgs);
             }
@@ -129,14 +129,14 @@
 
         _sortedInsert : function (route) {
             //simplified insertion sort
-            var routes = this._routes,
+            let routes = this._routes,
                 n = routes.length;
             do { --n; } while (routes[n] && route._priority <= routes[n]._priority);
             routes.splice(n+1, 0, route);
         },
 
         _getMatchedRoutes : function (request) {
-            var res = [],
+            let res = [],
                 routes = this._routes,
                 n = routes.length,
                 route;
