@@ -1,5 +1,5 @@
 
-    var crossroads,
+    let crossroads,
         _hasOptionalGroupBug,
         UNDEF;
 
@@ -15,7 +15,7 @@
             return arr.indexOf(val);
         } else {
             //Array.indexOf doesn't work on IE 6-7
-            var n = arr.length;
+            let n = arr.length;
             while (n--) {
                 if (arr[n] === val) {
                     return n;
@@ -26,7 +26,7 @@
     }
 
     function arrayRemove(arr, item) {
-        var i = arrayIndexOf(arr, item);
+        let i = arrayIndexOf(arr, item);
         if (i !== -1) {
             arr.splice(i, 1);
         }
@@ -50,7 +50,7 @@
 
     //borrowed from AMD-utils
     function typecastValue(val) {
-        var r;
+        let r;
         if (val === null || val === 'null') {
             r = null;
         } else if (val === 'true') {
@@ -70,7 +70,7 @@
     }
 
     function typecastArrayValues(values) {
-        var n = values.length,
+        let n = values.length,
             result = [];
         while (n--) {
             result[n] = typecastValue(values[n]);
@@ -80,7 +80,7 @@
 
     // borrowed from MOUT
     function decodeQueryString(queryStr, shouldTypecast) {
-        var queryArr = (queryStr || '').replace('?', '').split('&'),
+        let queryArr = (queryStr || '').replace('?', '').split('&'),
             reg = /([^=]+)=(.+)/,
             i = -1,
             obj = {},
