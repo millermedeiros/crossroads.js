@@ -87,7 +87,7 @@
          * @return {*} Value returned by the listener.
          */
         execute : function (paramsArr) {
-            var handlerReturn, params;
+            let handlerReturn, params;
             if (this.active && !!this._listener) {
                 params = this.params? this.params.concat(paramsArr) : paramsArr;
                 handlerReturn = this._listener.apply(this.context, params);
@@ -215,7 +215,7 @@
          */
         _registerListener : function (listener, isOnce, listenerContext, priority) {
 
-            var prevIndex = this._indexOfListener(listener, listenerContext),
+            let prevIndex = this._indexOfListener(listener, listenerContext),
                 binding;
 
             if (prevIndex !== -1) {
@@ -241,7 +241,7 @@
          */
         _addBinding : function (binding) {
             //simplified insertion sort
-            var n = this._bindings.length;
+            let n = this._bindings.length;
             do { --n; } while (this._bindings[n] && binding._priority <= this._bindings[n]._priority);
             this._bindings.splice(n + 1, 0, binding);
         },
@@ -252,7 +252,7 @@
          * @private
          */
         _indexOfListener : function (listener, context) {
-            var n = this._bindings.length,
+            let n = this._bindings.length,
                 cur;
             while (n--) {
                 cur = this._bindings[n];
@@ -306,7 +306,7 @@
         remove : function (listener, context) {
             validateListener(listener, 'remove');
 
-            var i = this._indexOfListener(listener, context);
+            let i = this._indexOfListener(listener, context);
             if (i !== -1) {
                 this._bindings[i]._destroy(); //no reason to a SignalBinding exist if it isn't attached to a signal
                 this._bindings.splice(i, 1);
@@ -318,7 +318,7 @@
          * Remove all listeners from the Signal.
          */
         removeAll : function () {
-            var n = this._bindings.length;
+            let n = this._bindings.length;
             while (n--) {
                 this._bindings[n]._destroy();
             }
@@ -350,7 +350,7 @@
                 return;
             }
 
-            var paramsArr = Array.prototype.slice.call(arguments),
+            let paramsArr = Array.prototype.slice.call(arguments),
                 n = this._bindings.length,
                 bindings;
 
@@ -407,7 +407,7 @@
      * @namespace
      * @name signals
      */
-    var signals = Signal;
+    let signals = Signal;
 
     /**
      * Custom event broadcaster
