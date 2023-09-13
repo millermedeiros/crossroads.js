@@ -6,7 +6,7 @@
      * @constructor
      */
     function Route(pattern, callback, priority, router) {
-        var isRegexPattern = isRegExp(pattern),
+        let isRegexPattern = isRegExp(pattern),
             patternLexer = router.patternLexer;
         this._router = router;
         this._pattern = pattern;
@@ -33,7 +33,7 @@
         },
 
         _validateParams : function (request) {
-            var rules = this.rules,
+            let rules = this.rules,
                 values = this._getParamsObject(request),
                 key;
             for (key in rules) {
@@ -46,7 +46,7 @@
         },
 
         _isValidParam : function (request, prop, values) {
-            var validationRule = this.rules[prop],
+            let validationRule = this.rules[prop],
                 val = values[prop],
                 isValid = false,
                 isQuery = (prop.indexOf('?') === 0);
@@ -82,7 +82,7 @@
                 val = val.toLowerCase();
             }
 
-            var n = arr.length,
+            let n = arr.length,
                 item,
                 compareVal;
 
@@ -97,7 +97,7 @@
         },
 
         _getParamsObject : function (request) {
-            var shouldTypecast = this._router.shouldTypecast,
+            let shouldTypecast = this._router.shouldTypecast,
                 values = this._router.patternLexer.getParamValues(request, this._matchRegexp, shouldTypecast),
                 o = {},
                 n = values.length,
@@ -133,7 +133,7 @@
         },
 
         _getParamsArray : function (request) {
-            var norm = this.rules? this.rules.normalize_ : null,
+            let norm = this.rules? this.rules.normalize_ : null,
                 params;
             norm = norm || this._router.normalizeFn; // default normalize
             if (norm && isFunction(norm)) {
@@ -145,7 +145,7 @@
         },
 
         interpolate : function(replacements) {
-            var str = this._router.patternLexer.interpolate(this._pattern, replacements);
+            let str = this._router.patternLexer.interpolate(this._pattern, replacements);
             if (! this._validateParams(str) ) {
                 throw new Error('Generated string doesn\'t validate against `Route.rules`.');
             }
